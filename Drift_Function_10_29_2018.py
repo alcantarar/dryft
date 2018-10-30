@@ -88,7 +88,7 @@ def plot_separated_steps(force,begin,end):
     plt.grid()
     for i in range(end.shape[0]): plt.plot(force[begin[i]:end[i],2])
     
-    # %%
+# %%
 def trim_aerial_phases(force, begin, end):
     '''
     Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase. 
@@ -122,7 +122,7 @@ def trim_aerial_phases(force, begin, end):
         print('trimming ',trim,' frames from the start/end of aerial phase')
         
         return trim
-    # %%
+# %%
 def plot_aerial_phases(force, aerial_means, begin, end, trim, colormap = plt.cm.viridis):
     '''
     aerial_means is an array of mean values for every aerial phase. 
@@ -241,7 +241,6 @@ def detrend_force(filename,Fs,Fc,min_step_length,step_threshold = 100,plots = Fa
         plt.legend(['original signal','detrended signal'],fontsize =16)
         plt.xlabel('Seconds', fontsize = 16)
     
-    
     #calculate mean aerial for detrend data
     aerial_means_d = np.zeros(aerial_means.shape[0])
     for i in range(aerial_begin_all.shape[0]):
@@ -265,7 +264,3 @@ def detrend_force(filename,Fs,Fc,min_step_length,step_threshold = 100,plots = Fa
 # %% 
 #NEXT: force_fd has a weird blip at the end. not getting the number of steps totally right. 
 #also make more subplots instead of separated plots. plots are all or nothing anywyas
-    
-    
-# %%
-force_fd, aerial_means, aerial_means_d =detrend_force('drifting_forces.txt',Fs = 300, Fc = 60, min_step_length = 60, step_threshold = 100, plots = True)
