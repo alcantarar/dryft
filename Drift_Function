@@ -1,18 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import numpy as np
 from scipy.signal import butter, filtfilt
 import matplotlib.pyplot as plt
 import pandas as pd
-#import copy
-  # %%  
+# %%  
 def readcheck_input(filename):
     force_imported = (pd.read_csv(filename,header = None)).as_matrix()
     if force_imported.shape[1] == 3:
         return force_imported
     else: raise ValueError('force data must be Nx3 columns [horizontal, horizontal, vertical]')
-   # %% 
+# %% 
 def step_ID(force, threshold, Fs, min_step, max_step):
     '''
     This function reads in FILTERED *running* ground reaction force data and splits steps based on a force threshold.
@@ -21,22 +17,23 @@ def step_ID(force, threshold, Fs, min_step, max_step):
     Parameters
     -------------
     force :             Nx3 array of FILTERED 3D [horizontal,horizontal,vertical] force data
-    step_threshold :    Threshold in Newtons used to define heel-strike and toe-off. Please be responsible and set < 50N. 
+    threshold :         Threshold in Newtons used to define heel-strike and toe-off. Please be responsible and set < 50N. 
+    Fs :                Sampling Frequency of force signal
     min_step :          Min Step Length - Minimum number of frames the step ID algorithm will consider 1 step. Running should be > 0.2*Fs.
     max_step :          Max Step length - Maximum number of frames the step ID algorithm will consider 1 step. Running should be < 0.4*Fs.
+    
     Returns
     -------------
     step_begin_all :    Array of frame indexes for beginning of stance phase
     step_end_all :      Array of frame indexes for end of stance phase
-    (prints # of step beginnings/ends too)
+    (prints # of suspicious steps and # of step starts/ends too)
     
     Example
     -------------
-    >>> step_begin_all, step_end_all = step_ID(force_filtered,threshold = 20, min_step = 60) #20N threshold, 60 frame min length
+    >>> step_begin_all, step_end_all = step_ID(force_filtered, 20, 1000, 60, 90) #20N threshold, 1000Hz, 60-90 frame step length OK
     Number of step begin/end: 77 77
     array([101, 213, 323, 435]) #step_begin_all
     array([177, 289, 401, 511]) #step_end_all   
-    
     
     '''
     if min_step < max_step:
@@ -56,34 +53,28 @@ def step_ID(force, threshold, Fs, min_step, max_step):
         step_len = np.full(step_begin.shape, np.nan) #step begin and end should be same length...
         step_begin_all = np.full(step_begin.shape, np.nan)
         step_end_all = np.full(step_end.shape, np.nan)
-        
-        #LEARN FROM THIS: (u/TheBlackCat13):
-    #    for i_step_end, i_step_begin in zip(step_end,step_begin):
-    #        if i_step_end - i_step_begin > min_step: #removes false positives by comparing min step_length
-    #            step_begin_all[good_step] = i_step_begin
-    #            step_end_all[good_step] = i_step_end
-    #            good_step = good_step + 1
-                
-        #or alternatively can be vectorizedsince step_begin and step_end are the same size now (see initialization)
-        step_len = step_end - step_begin #mean is 67 frames
-        good_step = np.logical_and(step_len >= min_step, step_len < max_step) 
+        #calculate step length and compare to min/max step lengths
+        step_len = step_end - step_begin
+        good_step = np.logical_and(step_len >= min_step, step_len <= max_step) 
         step_begin_all = step_begin[good_step]
         step_end_all = step_end[good_step]
+        #ID suspicious steps (too long or short)
         if np.any(step_len < 0.2*Fs):
             print('Out of', step_len.shape[0], 'steps,', sum(step_len < 0.2*Fs), '< 0.20 s. min_step =', min_step/Fs,'s.')
         if np.any(step_len > 0.4*Fs): 
             print('Out of', step_len.shape[0], 'steps,', sum(step_len > 0.4*Fs), '> 0.40 s.')
         #print sizes
-    #    step_end_all = (step_end_all[~np.isnan(step_end_all)]).astype(int) #not needed anymore
-    #    step_begin_all = (step_begin_all[~np.isnan(step_begin_all)]).astype(int)
         print('Number of step begin/end:',step_end_all.shape[0], step_begin_all.shape[0])
         
         return step_begin_all, step_end_all
-    else: raise IndexError('Did not separate steps. Min step length > Max step length of 0.4s')
+      
+    else: raise IndexError('Did not separate steps. Min step length > Max step length of 0.4s.')
 # %%
 def plot_separated_steps(force,begin,end):
     '''
-    plots separated steps on top of each other. Requires an array of beginning/end of stance phase indexes and 3d (dim: Nx3) force data.
+    Plots separated steps on top of each other. Requires an array of beginning/end of stance phase indexes and 3d (dim: Nx3) force data.
+    Example: 
+    >>> plot_separated_steps(force_filtered, steps[:,0], steps[:,1])
     '''
     colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))     
 
@@ -95,16 +86,22 @@ def plot_separated_steps(force,begin,end):
     for i in range(end.shape[0]): plt.plot(force[begin[i]:end[i],2], color = colors[i])
     plt.tight_layout()
     plt.pause(.5)
+    plt.show(block = False)
 
-    # %%
+# %%
 def trim_aerial_phases(force, begin, end):
     '''
     Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase. 
     This is done because filtering can cause artificial negative values where zero values rapidly change to positive values. 
     These changes primarly occur during the beginning/end of stance phase. 
     
-    Graph should appear with vertical black lines at the beginning/end of the first aerial phase. Function is
-    waiting for two mouse clicks where you'd like to trim the aerial phase. Click within the two black vertical lines!
+    Graph appears with vertical black lines at the beginning/end of the a aerial phase. Function is
+    waiting for two mouse clicks on plot where you'd like to trim the aerial phase. Click within the two black vertical lines!
+    
+    Returns:
+    -------------
+    trim :        Amount of frames to trim off the beginning and end of each aerial phase. Is average of userinputs.
+    
     '''
     #plot a first 2 steps and get user input for how much to trim off beginning/end of aerial phase
     trim_fig, ax = plt.subplots()
@@ -118,8 +115,7 @@ def trim_aerial_phases(force, begin, end):
     ax.set_xlabel('frames')
     ax.set_ylabel('force (N)')
     plt.tight_layout()
-#    import warnings
-#    warnings.filterwarnings('ignore','.*GUI is implemented.*')
+
     #user input from mouse click
     bad_points = 1
     while bad_points:
@@ -138,14 +134,18 @@ def trim_aerial_phases(force, begin, end):
             plt.close(trim_fig)
     
     #can't trim more than step length, but assume trim is good and step length is bad.        
-    step_len = end-begin 
-    if np.any(step_len < trim*2): raise IndexError('Trim amount is greater than step length. Adjust threshold or min_step_len.')
+    aerial_begin = end[:-1]
+    aerial_end = begin[1:]
+    aerial_len = aerial_end-aerial_begin 
+    if np.any(aerial_len < trim*2): raise IndexError('Trim amount is greater than aerial phase length. If trim selection was reasonable, adjust threshold or min_step_len.')
     
     return trim
-    # %%
+  
+# %%
 def plot_aerial_phases(force, aerial_means, begin, end, trim, colormap = plt.cm.viridis):
     '''
-    aerial_means is an array of mean values for every aerial phase. 
+    Plotting function for detrend_force. Plots 1) All the untrimmed aerial phases, 2) All the trimmed aerial phases, 
+    and 3) the means of the trimmed aerial phases. Visualizes the means used to account for drift in detrend_force function.
     
     '''
     if aerial_means.shape[0] == begin.shape[0] == end.shape[0]:
@@ -174,26 +174,28 @@ def plot_aerial_phases(force, aerial_means, begin, end, trim, colormap = plt.cm.
         for i in range(begin.shape[0]):
             meanp.plot(i,aerial_means[i,2],
                        marker = 'o',
-                       color = colors[i])            
+                       color = colors[i])   
+        plt.show(block = False)
 # %%
 def detrend_force(filename,Fs,Fc,min_step,step_threshold = 100,plots = False):
     '''
-    This function reads in a comma separated file of *running* ground reaction force data and removes drift in a stepwise manner.
+    This function reads in a text file of 3D *running* ground reaction force data and removes drift in a stepwise manner.
     Author: Ryan Alcantara || ryan.alcantara@colorado.edu || github.com/alcantarar
     
     Parameters
     -------------
-    force_imported :    Nx3 array of 3D [horizontal,horizontal,vertical] force data in Newtons
-    Fs :                Sampling frequency of force signal
-    Fc :                Cut off frequency for 4th order zero-lag butterworth filter
-    min_step :               Min Step Len - Minimum number of frames the step ID algorithm will consider 1 step
-    step_threshold :    (optional) threshold in Newtons used to define heel-strike and toe-off. 
-                        default is 100N (better to be aggressive for detrending)
-    plots :             (optional) T/F logical input to receive graphs depicting detrend process
+    filename :          filename of Nx3 array of 3D [horizontal,horizontal,vertical] force data to import via pd.read_csv.
+    Fs :                Sampling frequency of force data.
+    Fc :                Cut off frequency for 4th order zero-lag butterworth filter.
+    min_step :          Minimum number of frames the step ID algorithm will consider 1 step. Default max_step is 0.4*Fs.
+    step_threshold :    (optional) threshold in Newtons used to define heel-strike and toe-off. Default is 100N because
+                        it is better to be aggressive for detrending. Can re-run Step_ID function with a reasonable 
+                        step_threshold once signal is detrended.
+    plots :             (optional) Logical input to receive graphs depicting detrend process.
     
     Returns
     -------------
-    force_fd :          Nx3 array of detrended 3D force data 
+    force_fd :          Nx3 array of filtered, detrended 3D force data 
     aerial_means :      Mean of force during aerial phase for original signal
     aerial_means_d :    Mean of force during aerial phase for detrended signal
     
@@ -203,31 +205,21 @@ def detrend_force(filename,Fs,Fc,min_step,step_threshold = 100,plots = False):
         if imported file is not Nx3 dimensions. Requires 3D force data: [horizontal, horizontal, vertical].
     
     IndexError
-        if number of aerial phase beginnings and aerial phase ends don't agree. check step_ID function.
+        if aerial phase is exceptionally short. Happens when step identification is poor. Check plots and increase step_threshold or min_step 
         
     Examples
     -------------
-    Explicitly defining parameters and output:
-        
-    >>> force_fd, aerial_means, aerial_means_d = detrend_force('drifting_forces.txt',
-                                                               Fs = 300, 
-                                                               Fc = 60, 
-                                                               min_step = 60, 
-                                                               step_threshold = 100, 
-                                                               plots = True)
-    
-    Without optional parameters and suppressing some outputs:
-        
     >>> fname = '/Users/alcantarar/data/drifting_forces.csv'    
-    >>> force_fd,_,_ = detrend_force(fname,300, 60, 60)
-
-    '''
+    >>> force_fd, aerial_means, aerial_means_d = detrend_force(fname, Fs=300, Fc=60, min_step=60) #step_threshold = 100N, no plots
+    #OR
+    >>> force_fd,_,_ = detrend_force('drifting_forces.csv',300,60,60,100,True) #suppress aerial means outputs 
     
+    '''
     force = readcheck_input(filename)
     #filter 4th order zero lag butterworth
     fn = (Fs/2)
     b,a = butter(2,Fc/fn)
-    force_f = filtfilt(b,a,force,axis = 0) #filtfilt doubles order (2nd*2 = 4th order)
+    force_f = filtfilt(b,a,force,axis = 0) #filtfilt doubles order (2nd*2 = 4th order effect)
         
     # %% split steps and create aerial phases
     max_step = 0.4*Fs 
@@ -308,9 +300,10 @@ def detrend_force(filename,Fs,Fc,min_step,step_threshold = 100,plots = False):
             meancomp.legend(['original signal','detrended signal'], loc = 1) #don't want it in loop, but it needs it?
         plt.tight_layout()
 
-    plt.show(block = False) #what is this gb? I don't get the block arg.
+    plt.show(block = False)
+    
     return force_fd, aerial_means, aerial_means_d 
     
-# %%
+# %% EXAMPLE:
 force_fd, aerial_means, aerial_means_d = detrend_force('drifting_forces.txt',Fs = 300, Fc = 60, min_step = 60, step_threshold = 100, plots = True)
 
