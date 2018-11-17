@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 # %%  
 def readcheck_input(filename):
-    force_imported = (pd.read_csv(filename,header = None)).as_matrix()
+    force_imported = pd.read_csv(filename,header = None)
     if force_imported.shape[1] == 3:
-        return force_imported
+        return force_imported.values
     else: raise ValueError('force data must be Nx3 columns [horizontal, horizontal, vertical]')
 # %% 
 def step_ID(force, threshold, Fs, min_step, max_step):
