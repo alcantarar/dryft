@@ -305,5 +305,5 @@ def detrend_force(filename,Fs,Fc,min_step,step_threshold = 100,plots = False):
     return force_fd, aerial_means, aerial_means_d 
     
 # %% EXAMPLE:
-force_fd, aerial_means, aerial_means_d = detrend_force('drifting_forces.txt',Fs = 300, Fc = 60, min_step = 60, step_threshold = 100, plots = True)
+force_fd, aerial_means, aerial_means_d = detrend_force('cat6.csv',Fs = 1000, Fc = 30,min_step = 40, step_threshold = 200, plots = True)
 
