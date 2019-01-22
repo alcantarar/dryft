@@ -6,14 +6,14 @@
 
 %Outputs: crap ton of plots and data_detrend variable
 %Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
-
+%Last edited 8/17/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clearvars
 close all
 clc
 %first import voltages (xyz*4 transducers = 12 channels)
-[filename pathname] = uigetfile('*.*')
-data_v = load([pathname filename]); %zero indexed, matches Nexus output
+[filename pathname] = uigetfile('*.csv')
+data_v = csvread([pathname filename],5,2); %zero indexed, matches Nexus output
 data_v = data_v(:,1:12); %trim any EMG signals at end of file
 
 %% convert to newtons and filter. CALMAT is specific to HighSpeed Treadmill. DO NOT CHANGE.
