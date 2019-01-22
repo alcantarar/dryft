@@ -14,7 +14,7 @@ clc
 %first import voltages (xyz*4 transducers = 12 channels)
 [filename pathname] = uigetfile('*.csv')
 data_v = csvread([pathname filename],5,2); %zero indexed, matches Nexus output
-data_v = data_v(:,1:12); %trim any EMG signals at end of file
+data_v = data_v(:,1:12); %trim any extra signals columns at end of file
 
 %% convert to newtons and filter. CALMAT is specific to HighSpeed Treadmill. DO NOT CHANGE.
 calmat = [...
@@ -51,12 +51,12 @@ data_n_f = filtfilt(b,a,data_n);
 % -> summed_force_f is sum of transducers, filtered, in newtons
 data_drift = data_n_f;
 
-%% visualize drift and filter for each transducer and compare to summed force. Force cancels -mostly.
+%% visualize horizontal drift and filter for each transducer and compare to summed force. Force cancels -mostly.
 figure(1)
 t = 1;
 for i = [1 4 7 10]
     subplot(3,2,t)
-    plot(data_n_f(:,i))
+    plot(data_drift(:,i))
     t = t+1;
     grid on
     title('transducer drift')
@@ -71,7 +71,7 @@ title('summed force')
 
 %% step ID
 
-step_threshold = 30; %newtons
+step_threshold = 60; %newtons
 blah = summed_force_f(:,3) > step_threshold; %every data point that is over the threshold
 events = diff(blah); % either x2-x1 = 0-1 = -1 (end of step) or x2-x1 = 1-0 = 1 (beginning of step)
 step_begin.all = find(events == 1); %index of step begin
