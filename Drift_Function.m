@@ -40,22 +40,11 @@ data_v_f = filtfilt(b,a,volts_data_array);
 % -> data_v_f is filtered transducer in volts (idk why but why not)
 % -> summed_force is sum of transducers, unfiltered, in newtons
 % -> summed_force_f is sum of transducers, filtered, in newtons
-data_drift = summed_force_f;
-
-%% visualize horizontal drift and filter for each transducer and compare to summed force. Force cancels -mostly.
-figure(1)
-plot(data_drift)
-grid on
-title('data_drift (user defined)')
-figure(2)
-plot(data_n_f)
-grid on
-legend(colnames);
-title('transducers (Newtons) filtered')
+data_drift = newtons_transducers;
 
 %% simple step ID
 
-step_threshold = 60; %newtons
+step_threshold = 100; %newtons. be heavy-handed at first. 
 blah = summed_force_f(:,3) > step_threshold; %every data point that is over the threshold
 events = diff(blah); % either x2-x1 = 0-1 = -1 (end of step) or x2-x1 = 1-0 = 1 (beginning of step)
 step_begin.all = find(events == 1); %index of step begin
@@ -70,37 +59,31 @@ step_end.all = find(events == -1); %index of step end
 % grid on
 % hold off
 
-%if trial starts with end of step, ignore it
-step_end.all = step_end.all(step_end.all > step_begin.all(1)); 
+%if trial starts with end of step, 
+%ignore it so that trial starts with first whole step
+step_end.keep = step_end.all(step_end.all > step_begin.all(1)); 
+step_begin.keep = step_begin.all(1:length(step_end.keep));
 %above compare indexes from begin #1 to every step end index, keep if end > begin is true
 
 %remove steps that are too short (not full step @ end of trial
-step_len = nan(length(step_end.all),1); %want to see what the length of each step is
-good_step = 1;
-for step_check = 1:length(step_end.all)
-    step_len(step_check) = step_end.all(step_check) - step_begin.all(step_check); 
-    %above is array of step length (end-begin), smallest so far = 195
-    
-    if step_end.all(step_check) - step_begin.all(step_check) > 195 %minimum length for full step length (frames)
-        step_begin.all(good_step) = step_begin.all(step_check);
-        step_end.all(good_step) = step_end.all(step_check);
-        good_step = good_step+1;
-    end
-end
-%trim any extra step starts/ends
-if length(step_end.all) < length(step_begin.all)
-    step_begin.all = step_begin.all(1:end-1);
-elseif length(step_begin.all) < length(step_end.all)
-    step_end.all = step_end.all(1:end-1);
-end
+min_step = 0.15*Fs_force;
+max_step = 0.35*Fs_force;
+
+%calculate step length and compare to min step length
+step_len = step_end.keep - step_begin.keep;
+good_step = step_len >= min_step; %which steps meet minimum length req
+good_step = good_step <= max_step; %which steps meet max length req
+step_begin.keep = step_begin.keep(good_step); %take those steps' beginnings
+step_end.keep = step_end.keep(good_step); %take those steps' ends
+
 %plot all separated steps
 
-colors = parula(length(step_end.all));
+colors = parula(length(step_end.keep));
 
 figure(3)
 hold on
-for i = 1:size(step_end.all)
-    plot(summed_force_f(step_begin.all(i):step_end.all(i),3),'color',colors(i,:))
+for i = 1:size(step_end.keep)
+    plot(summed_force_f(step_begin.keep(i):step_end.keep(i),3),'color',colors(i,:))
 end
 grid on
 title('all the separated steps')
@@ -108,8 +91,8 @@ hold off
 
 %% Separate and trim aerial phases
 %define aerial phases
-aerial_begin = step_end.all(1:end-1);
-aerial_end = step_begin.all(2:end); 
+aerial_begin = step_end.keep(1:end-1);
+aerial_end = step_begin.keep(2:end); 
 xtra = 40; %frames to trim off each end of aerial phase so filter effect at start/end of stance phase is minimized.
 %initialize variables
 aerial_mean = NaN(length(aerial_begin),3); %x,y,z
@@ -156,6 +139,7 @@ for i = 1:length(aerial_begin)
 end
 grid on
 hold off
+ylim([min(aerial_mean(:,ax))-10, max(aerial_mean(:,ax))+10])
 
 linkaxes([p1,p2],'y')
 
