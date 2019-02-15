@@ -31,7 +31,7 @@ fn = (Fs_force/2);
 [b a] = butter(4,Fc_force/fn);
 summed_force_f = filtfilt(b,a,summed_force);
 data_n_f = filtfilt(b,a,newtons_transducers);
-data_v_f = filtfilt(b,a,volts_data_array);
+data_v_f = filtfilt(b,a,volts_transducers);
 %% chose signal to detrend. 
 %Options:
 % -> newtons_transducers is unfiltered transducer in newtons.
