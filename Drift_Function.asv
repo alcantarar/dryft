@@ -54,7 +54,7 @@ data_drift = data_n;
 %% visualize horizontal drift and filter for each transducer and compare to summed force. Force cancels -mostly.
 figure(1)
 t = 1;
-for i = [1 4 7 10]
+for i = [3 6 9 12]
     subplot(3,2,t)
     plot(data_drift(:,i))
     t = t+1;
@@ -64,7 +64,7 @@ for i = [1 4 7 10]
 end
 
 subplot(3,2,5:6)
-plot(summed_force_f(:,i-9))
+plot(summed_force(:,i-9))
 grid on
 title('summed force')
 
