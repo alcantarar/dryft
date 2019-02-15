@@ -38,6 +38,8 @@ data_v_f = filtfilt(b,a,volts_data_array);
 % -> data_n_f is filtered transducer in newtons.
 % -> volts_transducers is raw voltage
 % -> data_v_f is filtered transducer in volts (idk why but why not)
+
+%Available for comparison, but won't work with detrend code. Need n x 12.
 % -> summed_force is sum of transducers, unfiltered, in newtons
 % -> summed_force_f is sum of transducers, filtered, in newtons
 data_drift = newtons_transducers;
@@ -146,31 +148,56 @@ linkaxes([p1,p2],'y')
 %% Detrend each transducer (_t)
 
 %initialize variables
-data_detrend = NaN(size(data_n));
-diff_vals = NaN(length(aerial_begin),12);
-aerial_mean_t = NaN(length(aerial_begin),12);
-aerial_mean_d = NaN(size(aerial_mean_t));
+data_detrend = NaN(size(data_drift)); %output: detrended data
+diff_vals = NaN(length(aerial_begin)+1,12); %difference between consecutive aerial phases
+aerial_mean_t = NaN(length(aerial_begin)+1,12); %means of aerial phases (pre detrending)
+aerial_mean_d = NaN(size(aerial_mean_t)); %means of aerial phases (post detrending) for comparison
 
-for t_num = 1:size(data_drift,2) %all transducers, all axes
+for t_num = 1:12 %all transducers, all axes
     
     trans = data_drift(:,t_num);
     
     %calculate mean force during aerial phase for a given transducer
-    for i = 1:length(aerial_begin)
-        aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i)+xtra:aerial_end(i)-xtra));
+    %     for i = 1:length(aerial_begin)
+    i = 1;
+    while i < min([length(step_begin.all), length(step_end.all)])-1
+        aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i)+xtra:aerial_end(i)-xtra)); %trim of early/late aerial phase because of filter effect
+        i = i + 1;
     end
+    %last one
+    aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i-1)+xtra:aerial_end(i-1)-xtra)); %trim of early/late aerial phase because of filter effect
+
     
-    for i = 1:length(aerial_mean_t)-1
+    %     for i = 1:length(aerial_mean_t)-1
+    %         diff_temp = (aerial_mean_t(i,t_num)+aerial_mean_t(i+1,t_num))/2; %mean of aerial phaes before/after given step (i)
+    %         diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
+    %         data_detrend(step_begin.all(i):step_begin.all(i+1),t_num) = ...
+    %             trans(step_begin.all(i):step_begin.all(i+1)) - diff_temp; % signal - difference between aerial phase before/after = detrended signal
+    %     end
+    %     %and last step will repeat final diff (might be slightly off)
+    %     i = i+1;
+    i = 1;
+    while i < min([length(step_begin.all), length(step_end.all)])-1
         diff_temp = (aerial_mean_t(i,t_num)+aerial_mean_t(i+1,t_num))/2; %mean of aerial phaes before/after given step (i)
-        diff_vals(i,t_num) = diff_temp; %hangs onto value subtracted from each step across the 12 channels
+        diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
         data_detrend(step_begin.all(i):step_begin.all(i+1),t_num) = ...
-            trans(step_begin.all(i):step_begin.all(i+1)) - diff_temp; %detrended signal
+            trans(step_begin.all(i):step_begin.all(i+1)) - diff_temp;
+        i = i+1;
     end
-    
+    diff_temp = (aerial_mean_t(i-1,t_num)+aerial_mean_t(i,t_num))/2; %mean of aerial phaes before/after given step (i)
+    diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
+    data_detrend(step_begin.all(i):step_begin.all(i+1),t_num) = ...
+        trans(step_begin.all(i):step_begin.all(i+1)) - diff_temp;
+
     %calculate mean aerial phase for detrend data
-    for i = 1:length(aerial_begin)
+    %     for i = 1:length(aerial_begin)
+    i = 1;
+    while i < min([length(step_begin.all), length(step_end.all)])-1
         aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i)+xtra:aerial_end(i)-xtra,t_num));
+        i = i+1;
     end
+    aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i-1)+xtra:aerial_end(i-1)-xtra,t_num)); %repeat last one
+
 end
 
 
@@ -181,13 +208,18 @@ summed_force_detrend(:,3) = data_detrend(:,3)+data_detrend(:,6)+data_detrend(:,9
 
 %% plot transducer specific drift
 %adjustment values across transducers
-figure(5)
-plot(diff_vals)
-grid on
-title('values subtracted from each step - all 12 channels','fontsize',16)
-xlabel('steps')
+% figure(5)
+% plot(diff_vals)
+% grid on
+% title('values subtracted from each step - all 12 channels','fontsize',16)
+% xlabel('steps')
+% if unique(data_drift == newtons_transducers) || unique(data_drift == data_n_f)
+%     ylabel('newtons')
+% elseif unique(data_drift == volts_transducers) || unique(data_drift == data_v_f)
+%     ylabel('volts')
+% end
 
-t_num = 1; %which transducer to plot (or axis if data_detrend is calculated from summed_force @ line 52)
+t_num = 3; %which transducer to plot
 
 figure(7)
 p1 = subplot(3,2,2);
@@ -227,20 +259,29 @@ title('mean of TRANSDUCER aerial phases','fontsize',16)
 xlabel('steps')
 hold on
 for i = 1:length(aerial_mean_t)
-    plot(i,aerial_mean_t(i,t_num),'b.')
-    plot(i,aerial_mean_d(i,t_num),'r.')
+    plot(i,aerial_mean_t(i,t_num),'bo')
+    plot(i,aerial_mean_d(i,t_num),'ro')
 end
+fit1 = polyfit((1:length(aerial_mean_t))', aerial_mean_t(:,t_num),2);
+plot(polyval(fit1,1:length(aerial_mean_t)),'b','LineWidth',1.5)
+fit2 = polyfit((1:length(aerial_mean_t))', aerial_mean_d(:,t_num),2);
+plot(polyval(fit2,1:length(aerial_mean_t)),'r','LineWidth',1.5)
 grid on
 hold off
-
+%%
 figure(8) %detrended summed FORCE vs drifted summed FORCE. going to have to zoom in to find differences ~ 10N
+%filter detrended data 
+summed_force_detrend_f = summed_force_detrend;
+summed_force_detrend_f(isnan(summed_force_detrend_f)) = 0; %replace nan with 0 for filtering
+summed_force_detrend_f = filtfilt(b,a,summed_force_detrend_f);
 for i = 1:3
-    subplot(3,1,i)
+   s(i) = subplot(3,1,i);
     hold on
+    plot(summed_force_detrend_f(:,i),'r') %make sure you detrended newtons and not voltages or the plot will be wrong
     plot(summed_force_f(:,i),'b') 
-    plot(summed_force_detrend(:,i),'r') %make sure you detrended newtons and not voltages or the plot will be wrong
     grid on
     hold off
 end
 legend('drift summed force','detrended summed force')
 disp('done')
+linkaxes(s,'x')
