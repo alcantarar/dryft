@@ -12,59 +12,59 @@ clearvars
 close all
 clc
 %first import voltages (xyz*4 transducers = 12 channels)
-[filename pathname] = uigetfile('*.csv')
-data_v = csvread([pathname filename],5,2); %zero indexed, matches Nexus output
-data_v = data_v(:,1:12); %trim any extra signals columns at end of file
+[fname, fpath]=uigetfile('*.csv','Select GRF data file :');
+disp(fname)
+channels = readtable([fpath fname]); %read everything
+channels = channels(:,3:14); %keep signals
+ch_names = table2cell(channels(3,1:end)); %pull column names (sometimes in diff orders)
+channels.Properties.VariableNames = ch_names; %save column names
+channels = channels(5:end,:); %keep just signal values (no frames, colnames)
+channels = varfun(@str2double,channels, 'InputVariables',@(x) ~isnumeric(x)); %convert strings to numbers
+channels.Properties.VariableNames = ch_names; %re-insert column names
 
-%% convert to newtons and filter. CALMAT is specific to your treadmill. pull from v3d.
-calmat = [...
-    -36.5075 0 0 0 0 0 0 0 0 0 0 0;...
-    0 -36.3925 0 0 0 0 0 0 0 0 0 0;...
-    0 0 142.454 0 0 0 0 0 0 0 0 0;...
-    0 0 0 36.4102 0 0 0 0 0 0 0 0;...
-    0 0 0 0 36.2167 0 0 0 0 0 0 0;...
-    0 0 0 0 0 143.057 0 0 0 0 0 0;...
-    0 0 0 0 0 0 36.3198 0 0 0 0 0;...
-    0 0 0 0 0 0 0 36.4503 0 0 0 0;...
-    0 0 0 0 0 0 0 0 143.061 0 0 0;...
-    0 0 0 0 0 0 0 0 0 -36.3428 0 0;...
-    0 0 0 0 0 0 0 0 0 0 -36.4966 0;...
-    0 0 0 0 0 0 0 0 0 0 0 143.414]; %from v3d calibration matrix pipeline
-%apply matrix
-data_n = data_v*calmat;
-%sum transducers
-summed_force(:,1) = data_n(:,2)+data_n(:,5)+data_n(:,8)+data_n(:,11); %x
-summed_force(:,2) = data_n(:,1)+data_n(:,4)+data_n(:,7)+data_n(:,10); %y
-summed_force(:,3) = data_n(:,3)+data_n(:,6)+data_n(:,9)+data_n(:,12); %z
-% simple filter
+%% convert to newtons. CALMAT (in HighSpeedV2F_Table) is specific to your treadmill. pull from v3d.
+[volts_transducers, newtons_transducers, summed_force, colnames] = HighSpeedV2F_Table(channels);
+%% simple filter
 Fs_force = 1000;
 Fc_force = 30;
 fn = (Fs_force/2);
 [b a] = butter(4,Fc_force/fn);
 summed_force_f = filtfilt(b,a,summed_force);
-data_n_f = filtfilt(b,a,data_n);
+data_n_f = filtfilt(b,a,newtons_transducers);
+data_v_f = filtfilt(b,a,volts_data_array);
 %% chose signal to detrend. 
 %Options:
-% -> data_n is unfiltered transducer in newtons.
+% -> newtons_transducers is unfiltered transducer in newtons.
 % -> data_n_f is filtered transducer in newtons.
-% -> data_v is raw voltage
+% -> volts_transducers is raw voltage
+% -> data_v_f is filtered transducer in volts (idk why but why not)
+% -> summed_force is sum of transducers, unfiltered, in newtons
 % -> summed_force_f is sum of transducers, filtered, in newtons
-data_drift = data_n;
+data_drift = summed_force_f;
 
 %% visualize horizontal drift and filter for each transducer and compare to summed force. Force cancels -mostly.
 figure(1)
 t = 1;
-for i = [3 6 9 12]
+x = [1 4 7 10];
+y = [2 5 8 11];
+z = [3 6 9 12];
+
+axis_to_plot = z;
+
+for i = axis_to_plot
+    try
     subplot(3,2,t)
     plot(data_drift(:,i))
     t = t+1;
     grid on
     title('transducer drift')
+    catch
+        
     
 end
 
 subplot(3,2,5:6)
-plot(summed_force(:,i-9))
+plot(summed_force_f(:,i-9))
 grid on
 title('summed force')
 

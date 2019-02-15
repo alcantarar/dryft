@@ -23,47 +23,37 @@ channels = varfun(@str2double,channels, 'InputVariables',@(x) ~isnumeric(x)); %c
 channels.Properties.VariableNames = ch_names; %re-insert column names
 
 %% convert to newtons. CALMAT (in HighSpeedV2F_Table) is specific to your treadmill. pull from v3d.
-[volts_data_array, fd, sum_force, colnames] = HighSpeedV2F_Table(channels);
-%%
-data_n = data_v*calmat;
-%sum transducers
-summed_force(:,1) = data_n(:,2)+data_n(:,5)+data_n(:,8)+data_n(:,11); %x
-summed_force(:,2) = data_n(:,1)+data_n(:,4)+data_n(:,7)+data_n(:,10); %y
-summed_force(:,3) = data_n(:,3)+data_n(:,6)+data_n(:,9)+data_n(:,12); %z
-% simple filter
+[volts_transducers, newtons_transducers, summed_force, colnames] = HighSpeedV2F_Table(channels);
+%% simple filter
 Fs_force = 1000;
 Fc_force = 30;
 fn = (Fs_force/2);
 [b a] = butter(4,Fc_force/fn);
 summed_force_f = filtfilt(b,a,summed_force);
-data_n_f = filtfilt(b,a,data_n);
+data_n_f = filtfilt(b,a,newtons_transducers);
+data_v_f = filtfilt(b,a,volts_data_array);
 %% chose signal to detrend. 
 %Options:
-% -> data_n is unfiltered transducer in newtons.
+% -> newtons_transducers is unfiltered transducer in newtons.
 % -> data_n_f is filtered transducer in newtons.
-% -> data_v is raw voltage
+% -> volts_transducers is raw voltage
+% -> data_v_f is filtered transducer in volts (idk why but why not)
+% -> summed_force is sum of transducers, unfiltered, in newtons
 % -> summed_force_f is sum of transducers, filtered, in newtons
-data_drift = data_n;
+data_drift = summed_force_f;
 
 %% visualize horizontal drift and filter for each transducer and compare to summed force. Force cancels -mostly.
 figure(1)
-t = 1;
-for i = [1 4 7 10]
-    subplot(3,2,t)
-    plot(data_drift(:,i))
-    t = t+1;
-    grid on
-    title('transducer drift')
-    
-end
-
-subplot(3,2,5:6)
-plot(summed_force_f(:,i-9))
+plot(data_drift)
 grid on
-title('summed force')
+title('data_drift (user defined)')
+figure(2)
+plot(data_n_f)
+grid on
+legend(colnames);
+title('transducers (Newtons) filtered')
 
-
-%% step ID
+%% simple step ID
 
 step_threshold = 60; %newtons
 blah = summed_force_f(:,3) > step_threshold; %every data point that is over the threshold
