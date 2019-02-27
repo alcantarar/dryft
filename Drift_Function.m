@@ -28,7 +28,7 @@ channels.Properties.VariableNames = ch_names; %re-insert column names
 Fs_force = 1000;
 Fc_force = 30;
 fn = (Fs_force/2);
-[b a] = butter(4,Fc_force/fn);
+[b a] = butter(2,Fc_force/fn);
 %remove nans before filtering
 summed_force2 = summed_force;
 summed_force2(isnan(summed_force2) == 1) = 0;
