@@ -29,7 +29,11 @@ Fs_force = 1000;
 Fc_force = 30;
 fn = (Fs_force/2);
 [b a] = butter(4,Fc_force/fn);
-summed_force_f = filtfilt(b,a,summed_force);
+%remove nans before filtering
+summed_force2 = summed_force;
+summed_force2(isnan(summed_force2) == 1) = 0;
+%filter
+summed_force_f = filtfilt(b,a,summed_force2);
 data_n_f = filtfilt(b,a,newtons_transducers);
 data_v_f = filtfilt(b,a,volts_transducers);
 %% chose signal to detrend. 
@@ -46,20 +50,20 @@ data_drift = newtons_transducers;
 
 %% simple step ID
 
-step_threshold = 100; %newtons. be heavy-handed at first. 
+step_threshold = 300; %newtons. be heavy-handed at first. 
 blah = summed_force_f(:,3) > step_threshold; %every data point that is over the threshold
 events = diff(blah); % either x2-x1 = 0-1 = -1 (end of step) or x2-x1 = 1-0 = 1 (beginning of step)
 step_begin.all = find(events == 1); %index of step begin
 step_end.all = find(events == -1); %index of step end
 
-% %check steps if needed
-% figure(2)
-% hold on
-% plot(summed_force(:,3),'LineWidth',1)
-% plot(summed_force_f(:,3),'LineWidth',1)
-% plot(events*1000,'-k','Linewidth',1) %start & stop
-% grid on
-% hold off
+%check steps if needed
+figure(2)
+hold on
+plot(summed_force(:,3),'LineWidth',1)
+plot(summed_force_f(:,3),'LineWidth',1)
+plot(events*1000,'-k','Linewidth',1) %start & stop
+grid on
+hold off
 
 %if trial starts with end of step, 
 %ignore it so that trial starts with first whole step
@@ -68,8 +72,8 @@ step_begin.keep = step_begin.all(1:length(step_end.keep));
 %above compare indexes from begin #1 to every step end index, keep if end > begin is true
 
 %remove steps that are too short (not full step @ end of trial
-min_step = 0.15*Fs_force;
-max_step = 0.35*Fs_force;
+min_step = 0.1*Fs_force;
+max_step = 0.2*Fs_force;
 
 %calculate step length and compare to min step length
 step_len = step_end.keep - step_begin.keep;
@@ -160,7 +164,7 @@ for t_num = 1:12 %all transducers, all axes
     %calculate mean force during aerial phase for a given transducer
     %     for i = 1:length(aerial_begin)
     i = 1;
-    while i < min([length(step_begin.all), length(step_end.all)])-1
+    while i < min([length(step_begin.all), length(step_end.all)])
         aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i)+xtra:aerial_end(i)-xtra)); %trim of early/late aerial phase because of filter effect
         i = i + 1;
     end
@@ -186,13 +190,13 @@ for t_num = 1:12 %all transducers, all axes
     end
     diff_temp = (aerial_mean_t(i-1,t_num)+aerial_mean_t(i,t_num))/2; %mean of aerial phaes before/after given step (i)
     diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
-    data_detrend(step_begin.all(i):step_begin.all(i+1),t_num) = ...
-        trans(step_begin.all(i):step_begin.all(i+1)) - diff_temp;
+    data_detrend(step_begin.all(i+1):step_end.all(i+1),t_num) = ...
+        trans(step_begin.all(i+1):step_end.all(i+1)) - diff_temp;
 
     %calculate mean aerial phase for detrend data
     %     for i = 1:length(aerial_begin)
     i = 1;
-    while i < min([length(step_begin.all), length(step_end.all)])-1
+    while i < min([length(step_begin.all), length(step_end.all)])
         aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i)+xtra:aerial_end(i)-xtra,t_num));
         i = i+1;
     end
