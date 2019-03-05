@@ -26,7 +26,7 @@ channels.Properties.VariableNames = ch_names; %re-insert column names
 [volts_transducers, newtons_transducers, summed_force, colnames] = HighSpeedV2F_Table(channels);
 %% simple filter
 Fs_force = 1000;
-Fc_force = 30;
+Fc_force = 20;
 fn = (Fs_force/2);
 [b a] = butter(2,Fc_force/fn);
 %remove nans before filtering

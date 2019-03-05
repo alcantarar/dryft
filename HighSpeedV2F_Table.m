@@ -1,4 +1,4 @@
-function [volts_data_array, fd, sum_force, colnames] = HighSpeedV2F_Table(volts_data)
+function [volts_data_array, fd, sum_force, colnames] = HighSpeedV2F_Table(volts_data, scale)
 %HighSpeedV2F converts raw voltage output from CU's High Speed Treadmill to
 %Newtons. 
 %
@@ -40,6 +40,8 @@ calmat = [...
     0 0 0 0 0 0 0 0 0 -36.3428 0 0;...
     0 0 0 0 0 0 0 0 0 0 -36.4966 0;...
     0 0 0 0 0 0 0 0 0 0 0 143.414];
+%apply scale to calmat
+calmat = calmat*scale;
 %sort table columns
 ordered_cols = {'Fx1','Fy1','Fz1','Fx2','Fy2','Fz2','Fx3','Fy3','Fz3','Fx4','Fy4','Fz4'};
 volts_data = volts_data(:,ordered_cols);
