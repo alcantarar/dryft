@@ -63,23 +63,23 @@ step_begin.keep = step_begin.keep(good_step); %take those steps' beginnings
 step_end.keep = step_end.keep(good_step); %take those steps' ends
 
 %plot all separated steps
-if g
-    colors = parula(length(step_end.keep));
-    
-    figure(3)
-    hold on
-    for i = 1:size(step_end.keep)
-        plot(summed_force_f(step_begin.keep(i):step_end.keep(i),3),'color',colors(i,:))
-    end
-    grid on
-    title('all the separated steps')
-    hold off
-end
+% if g
+%     colors = parula(length(step_end.keep));
+%     
+%     figure(3)
+%     hold on
+%     for i = 1:size(step_end.keep)
+%         plot(summed_force_f(step_begin.keep(i):step_end.keep(i),3),'color',colors(i,:))
+%     end
+%     grid on
+%     title('all the separated steps')
+%     hold off
+% end
 %% Separate and trim aerial phases
 %define aerial phases
 aerial_begin = step_end.keep(1:end-1);
 aerial_end = step_begin.keep(2:end); 
-xtra = 40; %frames to trim off each end of aerial phase so filter effect at start/end of stance phase is minimized.
+xtra = 35; %frames to trim off each end of aerial phase so filter effect at start/end of stance phase is minimized.
 %initialize variables
 aerial_mean = NaN(length(aerial_begin),3); %x,y,z
 
@@ -190,57 +190,57 @@ summed_force_detrend(:,3) = data_detrend(:,3)+data_detrend(:,6)+data_detrend(:,9
 transducer_force_detrend = data_detrend;
 
 %% plot transducer specific drift
-if g
-    t_num = 3; %which axis to plot
-    
-    figure(7)
-    p1 = subplot(3,2,2);
-    title('drift at end of trial','fontsize',16)
-    hold on
-    plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),data_detrend(:,t_num),'r')
-    plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),transducer_force(:,t_num),'b')
-    xlim([length(data_detrend)/Fs_force-4,length(data_detrend)/Fs_force-1]) %last 3 seconds
-    xlabel('seconds')
-    legend('detrend','original')
-    grid on
-    hold off
-    
-    p2 = subplot(3,2,1);
-    title('drift at start of trial','fontsize',16)
-    hold on
-    plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),data_detrend(:,t_num),'r')
-    plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),transducer_force(:,t_num),'b')
-    xlim([0,3]) %first 3 seconds
-    xlabel('seconds')
-    grid on
-    hold off
-    
-    p3 = subplot(3,2,3:4);
-    title('drift over whole trial','fontsize',16)
-    hold on
-    plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),data_detrend(:,t_num),'r')
-    plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),transducer_force(:,t_num),'b')
-    xlabel('seconds')
-    grid on
-    hold off
-    
-    linkaxes([p1,p2,p3],'x')
-    
-    subplot(3,2,5:6);
-    title('mean of aerial phases','fontsize',16)
-    xlabel('steps')
-    hold on
-    for i = 1:length(aerial_mean_t)
-        plot(i,aerial_mean_t(i,t_num),'bo')
-        plot(i,aerial_mean_d(i,t_num),'ro')
-    end
-    fit1 = polyfit((1:length(aerial_mean_t))', aerial_mean_t(:,t_num),2);
-    plot(polyval(fit1,1:length(aerial_mean_t)),'b','LineWidth',1.5)
-    fit2 = polyfit((1:length(aerial_mean_t))', aerial_mean_d(:,t_num),2);
-    plot(polyval(fit2,1:length(aerial_mean_t)),'r','LineWidth',1.5)
-    grid on
-    hold off
-end
+% if g
+%     t_num = 3; %which transducer to plot
+%     
+%     figure(7)
+%     p1 = subplot(3,2,2);
+%     title('Transducer drift at end of trial','fontsize',16)
+%     hold on
+%     plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),data_detrend(:,t_num),'r')
+%     plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),transducer_force(:,t_num),'b')
+%     xlim([length(data_detrend)/Fs_force-4,length(data_detrend)/Fs_force-1]) %last 3 seconds
+%     xlabel('seconds')
+%     legend('detrend','original')
+%     grid on
+%     hold off
+%     
+%     p2 = subplot(3,2,1);
+%     title('Transducer drift at start of trial','fontsize',16)
+%     hold on
+%     plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),data_detrend(:,t_num),'r')
+%     plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),transducer_force(:,t_num),'b')
+%     xlim([0,3]) %first 3 seconds
+%     xlabel('seconds')
+%     grid on
+%     hold off
+%     
+%     p3 = subplot(3,2,3:4);
+%     title('Transducer drift over whole trial','fontsize',16)
+%     hold on
+%     plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),data_detrend(:,t_num),'r')
+%     plot(linspace(0,length(data_detrend)/Fs_force,length(data_detrend)),transducer_force(:,t_num),'b')
+%     xlabel('seconds')
+%     grid on
+%     hold off
+%     
+%     linkaxes([p1,p2,p3],'x')
+%     
+%     subplot(3,2,5:6);
+%     title('mean of Transducer aerial phases','fontsize',16)
+%     xlabel('steps')
+%     hold on
+%     for i = 1:length(aerial_mean_t)
+%         plot(i,aerial_mean_t(i,t_num),'bo')
+%         plot(i,aerial_mean_d(i,t_num),'ro')
+%     end
+%     fit1 = polyfit((1:length(aerial_mean_t))', aerial_mean_t(:,t_num),2);
+%     plot(polyval(fit1,1:length(aerial_mean_t)),'b','LineWidth',1.5)
+%     fit2 = polyfit((1:length(aerial_mean_t))', aerial_mean_d(:,t_num),2);
+%     plot(polyval(fit2,1:length(aerial_mean_t)),'r','LineWidth',1.5)
+%     grid on
+%     hold off
+% end
 %%
 %filter detrended data 
 summed_force_detrend_f = summed_force_detrend;
@@ -250,16 +250,42 @@ summed_force_detrend_f = filtfilt(b,a,summed_force_detrend_f);
 if g
     figure(8) %detrended summed FORCE vs drifted summed FORCE. going to have to zoom in to find differences ~ 10N
     for i = 1:3
-        s(i) = subplot(3,1,i);
+        s(i) = subplot(4,1,i);
         hold on
-        plot(summed_force_detrend_f(:,i),'r') %make sure you detrended newtons and not voltages or the plot will be wrong
         plot(summed_force_f(:,i),'b:','LineWidth',2)
+        plot(summed_force_detrend_f(:,i),'r') %make sure you detrended newtons and not voltages or the plot will be wrong
         grid on
         hold off
     end
-    legend('detrended summed force','drifted summed force')
     disp('done')
     linkaxes(s,'x')
+    
+    %get aerial phases of detrended summed data
+    aerial_mean_summed_d = NaN(length(aerial_mean), 3);
+    for i = 1:length(aerial_mean)
+        aerial_mean_summed_d(i,1) = mean(summed_force_detrend_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,1));
+        aerial_mean_summed_d(i,2) = mean(summed_force_detrend_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,2));
+        aerial_mean_summed_d(i,3) = mean(summed_force_detrend_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,3));
+    end
+    
+    %plot means of trimmed aerial phases
+    ax = 1;
+    subplot(4,1,4);
+    title('mean of trimmed aerial phases - summed force','fontsize',16)
+    xlabel('steps')
+    hold on
+    for i = 1:length(aerial_mean)
+        plot(i,aerial_mean(i,ax),'bo')
+        plot(i,aerial_mean_summed_d(i,ax),'ro')
+    end
+    fit1 = polyfit((1:length(aerial_mean))', aerial_mean(:,ax),2);
+    plot(polyval(fit1,1:length(aerial_mean)),'b','LineWidth',1.5)
+    fit2 = polyfit((1:length(aerial_mean))', aerial_mean_summed_d(:,ax),2);
+    plot(polyval(fit2,1:length(aerial_mean)),'r','LineWidth',1.5)
+    
+    legend('drifted summed force','detrended summed force')
+    grid on
+    hold off
 end
 
 end
