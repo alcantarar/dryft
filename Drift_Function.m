@@ -1,4 +1,4 @@
-function [summed_force_detrend,transducer_force_detrend] = Drift_Function(summed_force, transducer_force,Fs_force, step_threshold, min_step, max_step, g)
+function [summed_force_detrend,transducer_force_detrend] = Drift_Function(summed_force, transducer_force,Fs_force, step_threshold, min_step, max_step, trim, g)
 %Program detrends force signal in a step-specific manner.Subtracts mean of
 %aerial phase before and after given step across whole trial.
 %
@@ -11,6 +11,7 @@ function [summed_force_detrend,transducer_force_detrend] = Drift_Function(summed
 %                   high because may need to overcome significant drift
 % min_step          Minimum contact time (s) to define acceptable step
 % max_step          Max contact time (s) to define acceptable step
+% trim              number of frames to trim off beginning/end of aerial phase
 % g                 Logical to allow plotting of diagnostic graphs(1 == yes)
 %
 %OUTPUTS: Raw detrended force signals. Summed and Transducers force as separate arrays. 
@@ -79,14 +80,13 @@ step_end.keep = step_end.keep(good_step); %take those steps' ends
 %define aerial phases
 aerial_begin = step_end.keep(1:end-1);
 aerial_end = step_begin.keep(2:end); 
-xtra = 35; %frames to trim off each end of aerial phase so filter effect at start/end of stance phase is minimized.
 %initialize variables
 aerial_mean = NaN(length(aerial_begin),3); %x,y,z
 
 for i = 1:length(aerial_mean)
-    aerial_mean(i,1) = mean(summed_force_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,1));
-    aerial_mean(i,2) = mean(summed_force_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,2));
-    aerial_mean(i,3) = mean(summed_force_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,3));
+    aerial_mean(i,1) = mean(summed_force_f(aerial_begin(i)+trim:aerial_end(i)-trim,1));
+    aerial_mean(i,2) = mean(summed_force_f(aerial_begin(i)+trim:aerial_end(i)-trim,2));
+    aerial_mean(i,3) = mean(summed_force_f(aerial_begin(i)+trim:aerial_end(i)-trim,3));
 end
 
 if g
@@ -111,7 +111,7 @@ if g
     xlabel('frames')
     hold on
     for i = 1:length(aerial_begin)
-        plot(summed_force_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,ax),'color',colors(i,:))
+        plot(summed_force_f(aerial_begin(i)+trim:aerial_end(i)-trim,ax),'color',colors(i,:))
     end
     grid on
     hold off
@@ -145,11 +145,11 @@ for t_num = 1:12 %all transducers, all axes
     %calculate mean force during aerial phase for a given transducer
     i = 1;
     while i < min([length(step_begin.keep), length(step_end.keep)])
-        aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i)+xtra:aerial_end(i)-xtra)); %trim of early/late aerial phase because of filter effect
+        aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i)+trim:aerial_end(i)-trim)); %trim of early/late aerial phase because of filter effect
         i = i + 1;
     end
     %last one
-    aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i-1)+xtra:aerial_end(i-1)-xtra)); %trim of early/late aerial phase because of filter effect
+    aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i-1)+trim:aerial_end(i-1)-trim)); %trim of early/late aerial phase because of filter effect
 
     %first step, extend to end of file
     i = 1;
@@ -175,10 +175,10 @@ for t_num = 1:12 %all transducers, all axes
     %calculate mean aerial phase for detrend data
     i = 1;
     while i < min([length(step_begin.keep), length(step_end.keep)])
-        aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i)+xtra:aerial_end(i)-xtra,t_num));
+        aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i)+trim:aerial_end(i)-trim,t_num));
         i = i+1;
     end
-    aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i-1)+xtra:aerial_end(i-1)-xtra,t_num)); %repeat last one
+    aerial_mean_d(i,t_num) = mean(data_detrend(aerial_begin(i-1)+trim:aerial_end(i-1)-trim,t_num)); %repeat last one
 
 end
 
@@ -263,9 +263,9 @@ if g
     %get aerial phases of detrended summed data
     aerial_mean_summed_d = NaN(length(aerial_mean), 3);
     for i = 1:length(aerial_mean)
-        aerial_mean_summed_d(i,1) = mean(summed_force_detrend_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,1));
-        aerial_mean_summed_d(i,2) = mean(summed_force_detrend_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,2));
-        aerial_mean_summed_d(i,3) = mean(summed_force_detrend_f(aerial_begin(i)+xtra:aerial_end(i)-xtra,3));
+        aerial_mean_summed_d(i,1) = mean(summed_force_detrend_f(aerial_begin(i)+trim:aerial_end(i)-trim,1));
+        aerial_mean_summed_d(i,2) = mean(summed_force_detrend_f(aerial_begin(i)+trim:aerial_end(i)-trim,2));
+        aerial_mean_summed_d(i,3) = mean(summed_force_detrend_f(aerial_begin(i)+trim:aerial_end(i)-trim,3));
     end
     
     %plot means of trimmed aerial phases
