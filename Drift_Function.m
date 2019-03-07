@@ -1,22 +1,22 @@
-function [summed_force_detrend,data_detrend] = Drift_Function(summed_force, transducer_force,Fs_force, step_threshold, min_step, max_step, g)
+function [summed_force_detrend,transducer_force_detrend] = Drift_Function(summed_force, transducer_force,Fs_force, step_threshold, min_step, max_step, g)
 %Program detrends force signal in a step-specific manner.Subtracts mean of
 %aerial phase before and after given step across whole trial.
-%Inputs: location of data_v (volts from HighSpeed Treadmill),
-% line 52 (signal to detrend), and line 131 if needed (amount to trim off 
-% the beginning and end of aerial phase).
-
-%inputs:
-%summed force (nx3)
-%transducer_force (nx12)
-%Fs_force (Hz)
-%step_threshold (N)
-%min_step (s)
-%max_step (s)
-%g (1/0) for graphs
-
-%Outputs: crap ton of plots and data_detrend variable
+%
+% INPUTS:
+% summed_force:     n x 3 array of raw force data [horiz, horiz, vertical] (Newtons)
+% transducer_force: n x 12 array of force data from transducers. Assumes
+%                   order is Fx1, Fy1, Fz1, Fx2, Fy2, Fz2, Fx3... (Newtons)
+% Fs_force:         Sampling frequency of treadmill (Hz)
+% step_threshold    Force threshold to define step start/end. Default is
+%                   high because may need to overcome significant drift
+% min_step          Minimum contact time (s) to define acceptable step
+% max_step          Max contact time (s) to define acceptable step
+% g                 Logical to allow plotting of diagnostic graphs(1 == yes)
+%
+%OUTPUTS: Raw detrended force signals. Summed and Transducers force as separate arrays. 
+%
 %Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 %% simple filter
 Fc_force = 30;%hz
 fn = (Fs_force/2);
@@ -178,6 +178,8 @@ end
 summed_force_detrend(:,1) = data_detrend(:,2)+data_detrend(:,5)+data_detrend(:,8)+data_detrend(:,11); %x
 summed_force_detrend(:,2) = data_detrend(:,1)+data_detrend(:,4)+data_detrend(:,7)+data_detrend(:,10); %y
 summed_force_detrend(:,3) = data_detrend(:,3)+data_detrend(:,6)+data_detrend(:,9)+data_detrend(:,12); %z
+
+transducer_force_detrend = data_detrend;
 
 %% plot transducer specific drift
 if g
