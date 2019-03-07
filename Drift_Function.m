@@ -151,7 +151,14 @@ for t_num = 1:12 %all transducers, all axes
     %last one
     aerial_mean_t(i,t_num) = mean(trans(aerial_begin(i-1)+xtra:aerial_end(i-1)-xtra)); %trim of early/late aerial phase because of filter effect
 
+    %first step, extend to end of file
     i = 1;
+    diff_temp = (aerial_mean_t(i,t_num)+aerial_mean_t(i+1,t_num))/2; %mean of aerial phaes before/after given step (i)
+    diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
+    data_detrend(1:step_begin.keep(i+1),t_num) = ...
+        trans(1:step_begin.keep(i+1)) - diff_temp;
+    %2:n-1 steps
+    i = 2;
     while i < min([length(step_begin.keep), length(step_end.keep)])
         diff_temp = (aerial_mean_t(i,t_num)+aerial_mean_t(i+1,t_num))/2; %mean of aerial phaes before/after given step (i)
         diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
@@ -159,10 +166,11 @@ for t_num = 1:12 %all transducers, all axes
             trans(step_begin.keep(i):step_begin.keep(i+1)) - diff_temp;
         i = i+1;
     end
+    %last step, extend to end of file
     diff_temp = (aerial_mean_t(i-1,t_num)+aerial_mean_t(i,t_num))/2; %mean of aerial phaes before/after given step (i)
     diff_vals(i,t_num) = diff_temp; %hang onto value subtracted from each step across the 12 channels
-    data_detrend(step_begin.keep(i):step_end.keep(i),t_num) = ...
-        trans(step_begin.keep(i):step_end.keep(i)) - diff_temp;
+    data_detrend(step_begin.keep(i):length(transducer_force),t_num) = ...
+        trans(step_begin.keep(i):length(transducer_force)) - diff_temp;
 
     %calculate mean aerial phase for detrend data
     i = 1;
