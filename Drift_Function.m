@@ -58,8 +58,10 @@ max_step = max_step*Fs_force;
 
 %calculate step length and compare to min step length
 step_len = step_end.keep - step_begin.keep;
-good_step = step_len >= min_step; %which steps meet minimum length req
-good_step = good_step <= max_step; %which steps meet max length req
+good_step1 = step_len >= min_step; %which steps meet minimum length req
+good_step2 = step_len <= max_step; %which steps meet max length req
+good_step = (good_step1 + good_step2 == 2);
+
 step_begin.keep = step_begin.keep(good_step); %take those steps' beginnings
 step_end.keep = step_end.keep(good_step); %take those steps' ends
 
