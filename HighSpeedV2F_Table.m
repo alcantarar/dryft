@@ -1,4 +1,4 @@
-function [volts_data_array, fd, sum_force, colnames] = HighSpeedV2F_Table(volts_data, scale)
+function [volts_data_array, transducer_force, summed_force, colnames] = HighSpeedV2F_Table(volts_data, scale)
 %HighSpeedV2F converts raw voltage output from CU's High Speed Treadmill to
 %Newtons. 
 %
@@ -53,13 +53,13 @@ end
 volts_data_array = table2array(volts_data);
 %apply calibration matrix
 if size(volts_data_array,2) == 12
-    fd = volts_data_array(:,:)*calmat; %12 force channels (xyz*4t transducers)
+    transducer_force = volts_data_array(:,:)*calmat; %12 force channels (xyz*4t transducers)
     %swap X & Y
     force_data = NaN(length(volts_data_array),3); %initialize
-    force_data(:,1) = fd(:,2) + fd(:,5) + fd(:,8) + fd(:,11);
-    force_data(:,2) = fd(:,1) + fd(:,4) + fd(:,7) + fd(:,10);
-    force_data(:,3) = fd(:,3) + fd(:,6) + fd(:,9) + fd(:,12);
-    sum_force = force_data;
+    force_data(:,1) = transducer_force(:,2) + transducer_force(:,5) + transducer_force(:,8) + transducer_force(:,11);
+    force_data(:,2) = transducer_force(:,1) + transducer_force(:,4) + transducer_force(:,7) + transducer_force(:,10);
+    force_data(:,3) = transducer_force(:,3) + transducer_force(:,6) + transducer_force(:,9) + transducer_force(:,12);
+    summed_force = force_data;
 else
     error('volts_data not 12 channels')
 end
