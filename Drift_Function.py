@@ -30,7 +30,7 @@ def step_ID(force, threshold, Fs, min_step, max_step):
     
     Example
     -------------
-    >>> step_begin_all, step_end_all = step_ID(force_filtered, 20, 1000, 60, 90) #20N threshold, 1000Hz, 60-90 frame step length OK
+     step_begin_all, step_end_all = step_ID(force_filtered, 20, 1000, 60, 90) #20N threshold, 1000Hz, 60-90 frame step length OK
     Number of step begin/end: 77 77
     array([101, 213, 323, 435]) #step_begin_all
     array([177, 289, 401, 511]) #step_end_all   
@@ -74,7 +74,7 @@ def plot_separated_steps(force,begin,end):
     '''
     Plots separated steps on top of each other. Requires an array of beginning/end of stance phase indexes and 3d (dim: Nx3) force data.
     Example: 
-    >>> plot_separated_steps(force_filtered, steps[:,0], steps[:,1])
+     plot_separated_steps(force_filtered, steps[:,0], steps[:,1])
     '''
     colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))     
 
@@ -209,10 +209,10 @@ def detrend_force(filename,Fs,Fc,min_step,step_threshold = 100,plots = False):
         
     Examples
     -------------
-    >>> fname = '/Users/alcantarar/data/drifting_forces.csv'    
-    >>> force_fd, aerial_means, aerial_means_d = detrend_force(fname, Fs=300, Fc=60, min_step=60) #step_threshold = 100N, no plots
+     fname = '/Users/alcantarar/data/drifting_forces.csv'
+     force_fd, aerial_means, aerial_means_d = detrend_force(fname, Fs=300, Fc=60, min_step=60) #step_threshold = 100N, no plots
     #OR
-    >>> force_fd,_,_ = detrend_force('drifting_forces.csv',300,60,60,100,True) #suppress aerial means outputs 
+     force_fd,_,_ = detrend_force('drifting_forces.csv',300,60,60,100,True) #suppress aerial means outputs
     
     '''
     force = readcheck_input(filename)
@@ -299,11 +299,11 @@ def detrend_force(filename,Fs,Fc,min_step,step_threshold = 100,plots = False):
                      label = 'detrended signal')
             meancomp.legend(['original signal','detrended signal'], loc = 1) #don't want it in loop, but it needs it?
         plt.tight_layout()
+        plt.show(block = True)
+    
+    return force_fd, aerial_means, aerial_means_d
 
-    plt.show(block = False)
-    
-    return force_fd, aerial_means, aerial_means_d 
-    
+
 # %% EXAMPLE:
-force_fd, aerial_means, aerial_means_d = detrend_force('cat6.csv',Fs = 1000, Fc = 30,min_step = 40, step_threshold = 200, plots = True)
+force_fd, aerial_means, aerial_means_d = detrend_force('drifting_forces.txt', Fs=300, Fc=60, min_step=60, step_threshold = 100, plots = True)
 
