@@ -19,5 +19,8 @@ print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.s
 # dp.plotsteps(GRF_filt[:,2], step_begin, step_end)
 
 # trim filtering artefact and calculate mean of each aerial phase
-trim = dp.trim_aerial_phases(GRF_filt[:,2], step_begin, step_end)
+trim, aerial_means = dp.trim_aerial_phases(GRF_filt[:,2], step_begin, step_end)
+
+# one of the aerial phases is apparently 3000 frames long and messing it all up.
+dp.plot_aerial_phases(GRF_filt[:,2], aerial_means, aerial_begin_all, aerial_end_all, trim)
 

@@ -89,7 +89,7 @@ def plotsteps(force,begin,end):
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
     plt.pause(.5)
-    plt.show()
+    plt.show(block = False)
 
 
 def trim_aerial_phases(force, begin, end):
@@ -152,4 +152,72 @@ def trim_aerial_phases(force, begin, end):
     if np.any(aerial_len < trim * 2): raise IndexError(
         'Trim amount is greater than aerial phase length. If trim selection was reasonable, adjust threshold or min_step_len.')
 
-    return trim
+    # calculate mean force during aerial phase (foot not on ground, should be zero)
+    # aerial_means = np.full([aerial_begin.shape[0] + 1,], np.nan)
+    if force.ndim == 1: #one axis only
+        aerial_means = np.full([aerial_begin.shape[0] + 1,], np.nan)
+        i = 0
+        while i < min(begin.shape[0], end.shape[0]) - 1:
+            aerial_means[i,] = np.mean(force[aerial_begin[i] + trim:aerial_end[i] - trim])
+            i = i + 1
+        #last step
+        aerial_means[i] = np.mean(force[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim])
+    else: #if user inputs more than 1 column (x,y,z)
+        aerial_means = np.full([aerial_begin.shape[0] + 1, force.shape[0]], np.nan)
+        i = 0
+        while i < min(begin.shape[0], end.shape[0]) -1:
+            aerial_means[i,:] = np.mean(force[aerial_begin[i] + trim:aerial_end[i] - trim,:])
+            i = i + 1
+        # last step:
+        aerial_means[i,:] = np.mean(force[aerial_begin[i-1] + trim:aerial_end[i-1] - trim,:])
+    #
+    # # all but last step
+    # i = 0
+    # while i < min(begin.shape[0], end.shape[0]) - 1:
+    #     # aerial_means[i, 0] = np.mean(force_f[aerial_begin_all[i] + trim:aerial_end_all[i] - trim, 0])
+    #     # aerial_means[i, 1] = np.mean(force_f[aerial_begin_all[i] + trim:aerial_end_all[i] - trim, 1])
+    #     # aerial_means[i, 2] = np.mean(force_f[aerial_begin_all[i] + trim:aerial_end_all[i] - trim, 2])
+    #     i = i + 1
+    # # last step
+    # aerial_means[i, 0] = np.mean(force_f[aerial_begin_all[i - 1] + trim:aerial_end_all[i - 1] - trim, 0])
+    # aerial_means[i, 1] = np.mean(force_f[aerial_begin_all[i - 1] + trim:aerial_end_all[i - 1] - trim, 1])
+    # aerial_means[i, 2] = np.mean(force_f[aerial_begin_all[i - 1] + trim:aerial_end_all[i - 1] - trim, 2])
+
+    return trim, aerial_means
+
+
+# %%
+def plot_aerial_phases(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
+    '''
+    Plotting function for detrend_force. Plots 1) All the untrimmed aerial phases, 2) All the trimmed aerial phases,
+    and 3) the means of the trimmed aerial phases. Visualizes the means used to account for drift in detrend_force function.
+
+    '''
+    if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
+        colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
+        plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
+
+        # plot of untrimmed aerial phases
+        untrimp.set_title('untrimmed aerial phases')
+        untrimp.set_ylabel('force (N)')
+        untrimp.grid()
+        for i in range(begin.shape[0]):
+            untrimp.plot(force[begin[i]:end[i]],
+                         color=colors[i])
+            # plot of trimmed aerial phases
+        trimp.set_title('trimmed aerial phases')
+        trimp.set_ylabel('force (N)')
+        trimp.grid()
+        for i in range(begin.shape[0]):
+            trimp.plot(force[begin[i] + trim:end[i] - trim],
+                       color=colors[i])
+        # plot all the means of trimmed aerial phases
+        meanp.set_title('mean of trimmed aerial phases')
+        meanp.set_xlabel('steps')
+        meanp.set_ylabel('force (N)')
+        meanp.grid()
+        for i in range(aerial_means.shape[0]):
+            meanp.plot(i, aerial_means[i],
+                       marker='o',
+                       color=colors[i])
+        plt.show(block=False)
