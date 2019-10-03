@@ -96,10 +96,16 @@ def trim_aerial_phases(force, begin, end):
     '''
     Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase.
     This is done because filtering can cause artificial negative values where zero values rapidly change to positive values.
-    These changes primarly occur during the beginning/end of stance phase.
+    These changes primarily occur during the beginning/end of stance phase.
 
     Graph appears with vertical black lines at the beginning/end of the a aerial phase. Function is
     waiting for two mouse clicks on plot where you'd like to trim the aerial phase. Click within the two black vertical lines!
+
+    Input:
+    -------------
+    force :       1d array of vertical ground reaction force (vGF) data.
+    begin :       array of frames indicating start of stance phase
+    end :         array of frames indicating end of stance phase
 
     Returns:
     -------------
