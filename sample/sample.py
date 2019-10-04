@@ -19,10 +19,10 @@ print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.s
 # step.plot(GRF_filt[:,2], step_begin, step_end)
 
 # trim filtering artefact and calculate mean of each aerial phase
-trim = aerial.trim(GRF_filt[:,2], step_begin, step_end)
-aerial_means = aerial.calc_aerial_force(GRF_filt, step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
+trim = aerial.trim(GRF_filt[:,1], step_begin, step_end)
+aerial_means = aerial.calc_aerial_force(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
 # one of the aerial phases is apparently 3000 frames long and messing it all up.
-aerial.plot(GRF_filt[:,2], aerial_means[:,2], aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
+aerial.plot(GRF_filt[:,2], aerial_means, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
 
 # Detrend signal
-force_fd, aerial_means_d = signal.detrend(GRF_filt, Fs, aerial_means, step_begin, step_end, trim, plots=True) #grf_filt and aerial_means must be same width
+force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2], Fs, aerial_means, step_begin, step_end, trim, plots=True) #grf_filt and aerial_means must be same width

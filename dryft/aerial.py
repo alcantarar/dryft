@@ -22,38 +22,39 @@ def trim(force, begin, end):
 
     '''
     # plot a first 2 steps and get user input for how much to trim off beginning/end of aerial phase
-    trim_fig, ax = plt.subplots()
-    ax.plot(force[begin[0]:end[1]],
-            color='tab:blue')
-    start_a = force[begin[0]:end[1]] == force[end[0]]
-    end_a = force[begin[0]:end[1]] == force[begin[1]]
-    ax.axvline(start_a.nonzero(), color='k')
-    ax.axvline(end_a.nonzero(), color='k')
-    ax.set_title('select how much to trim off beginning/end \n of aerial phase (between black lines)')
-    ax.set_xlabel('frames')
-    ax.set_ylabel('force (N)')
-    plt.tight_layout()
+    if force.ndim == 1:  # one axis only
+        trim_fig, ax = plt.subplots()
+        ax.plot(force[begin[0]:end[1]],
+                color='tab:blue')
+        start_a = force[begin[0]:end[1]] == force[end[0]]
+        end_a = force[begin[0]:end[1]] == force[begin[1]]
+        ax.axvline(start_a.nonzero(), color='k')
+        ax.axvline(end_a.nonzero(), color='k')
+        ax.set_title('select how much to trim off beginning/end \n of aerial phase (between black lines)')
+        ax.set_xlabel('frames')
+        ax.set_ylabel('force (N)')
+        plt.tight_layout()
 
-    # user input from mouse click
-    bad_points = 1
-    while bad_points:
-        points = np.asarray(plt.ginput(2, timeout=0), dtype=int)
+        # user input from mouse click
+        bad_points = 1
+        while bad_points:
+            points = np.asarray(plt.ginput(2, timeout=0), dtype=int)
 
-        if sum(points[:, 0] < start_a.nonzero()[0][0]) > 0 or sum(points[:, 0] > end_a.nonzero()[0][0]) > 0:
-            # points outside of range
-            print("Can't trim negative amount. Select 2 points between start/end of aerial phase")
-        elif points[1, 0] < points[0, 0]:
-            # points in wrong order
-            print(
-                "First select amount to trim off the start, then select the amount to trim off the end of aerial phase")
-        else:
-            trim = (
-                np.round((points[0, 0] - start_a.nonzero()[0][0] + end_a.nonzero()[0][0] - points[1, 0]) / 2)).astype(
-                int)
-            print('trimming ', trim, ' frames from the start/end of aerial phase')
-            bad_points = 0
-            plt.close(trim_fig)
-
+            if sum(points[:, 0] < start_a.nonzero()[0][0]) > 0 or sum(points[:, 0] > end_a.nonzero()[0][0]) > 0:
+                # points outside of range
+                print("Can't trim negative amount. Select 2 points between start/end of aerial phase")
+            elif points[1, 0] < points[0, 0]:
+                # points in wrong order
+                print(
+                    "First select amount to trim off the start, then select the amount to trim off the end of aerial phase")
+            else:
+                trim = (
+                    np.round((points[0, 0] - start_a.nonzero()[0][0] + end_a.nonzero()[0][0] - points[1, 0]) / 2)).astype(
+                    int)
+                print('trimming ', trim, ' frames from the start/end of aerial phase')
+                bad_points = 0
+                plt.close(trim_fig)
+    else: raise IndexError('force.ndim != 1')
     return trim
 
 def calc_aerial_force(force, begin, end, trim ):
@@ -74,14 +75,7 @@ def calc_aerial_force(force, begin, end, trim ):
             i = i + 1
         # last step
         aerial_means[i] = np.mean(force[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim])
-    else:  # if user inputs more than 1 column (x,y,z)
-        aerial_means = np.full([aerial_begin.shape[0] + 1, force.shape[1]], np.nan)
-        i = 0
-        while i < min(begin.shape[0], end.shape[0]) - 1:
-            aerial_means[i, :] = np.mean(force[aerial_begin[i] + trim:aerial_end[i] - trim, :],axis=0)
-            i = i + 1
-        # last step:
-        aerial_means[i, :] = np.mean(force[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim, :], axis=0)
+    else: raise IndexError('force.ndim != 1')
 
     return aerial_means
 
