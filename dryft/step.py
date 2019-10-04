@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def split(vGRF, threshold, Fs, min_tc, max_tc):
+def split(vGRF, threshold, Fs, min_tc, max_tc, plot = False):
     '''
     This function reads in FILTERED running* ground reaction force data and splits steps based on a force threshold.
 
@@ -40,6 +40,11 @@ def split(vGRF, threshold, Fs, min_tc, max_tc):
         events = np.diff(compare)
         step_begin = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
         step_end = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
+
+        if plot:
+            plt.plot(vGRF)
+            plt.plot(events*500)
+            plt.show()
 
         # if trial starts with end of step, ignore
         step_end = step_end[step_end > step_begin[0]]
@@ -89,5 +94,5 @@ def plot(force,begin,end):
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
     plt.pause(.5)
-    plt.show(block = False)
+    plt.show()
 

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
+def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
     '''
     This function reads in a text file of 3D *running* ground reaction force data and removes drift in a stepwise manner.
     Author: Ryan Alcantara || ryan.alcantara@colorado.edu || github.com/alcantarar
@@ -15,7 +15,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
     step_threshold :    (optional) threshold in Newtons used to define heel-strike and toe-off. Default is 100N because
                         it is better to be aggressive for detrending. Can re-run Step_ID function with a reasonable 
                         step_threshold once signal is detrended.
-    plots :             (optional) Logical input to receive graphs depicting detrend process.
+    plot :             (optional) Logical input to receive graphs depicting detrend process.
 
     Returns
     -------------
@@ -29,12 +29,12 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
         if imported file is not Nx3 dimensions. Requires 3D force data: [horizontal, horizontal, vertical].
 
     IndexError
-        if aerial phase is exceptionally short. Happens when step identification is poor. Check plots and increase step_threshold or min_step 
+        if aerial phase is exceptionally short. Happens when step identification is poor. Check plot and increase step_threshold or min_step
 
     Examples
     -------------
      fname = '/Users/alcantarar/data/drifting_forces.csv'
-     force_fd, aerial_means, aerial_means_d = detrend_force(fname, Fs=300, Fc=60, min_step=60) #step_threshold = 100N, no plots
+     force_fd, aerial_means, aerial_means_d = detrend_force(fname, Fs=300, Fc=60, min_step=60) #step_threshold = 100N, no plot
     #OR
      force_fd,_,_ = detrend_force('drifting_forces.csv',300,60,60,100,True) #suppress aerial means outputs
 
@@ -55,7 +55,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
     # print('Number of aerial begin/end:', aerial_begin.shape[0],
     #       aerial_end.shape[0])  # matching number of step beginnings/ends
     # 
-    # if plots:
+    # if plot:
     #     plot_separated_steps(force_f, step_begin, step_end)
     #     plt.tight_layout()
     # 
@@ -77,7 +77,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
     # aerial_means[i, 2] = np.mean(force_f[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim, 2])
     # 
     # # plot aerial phases
-    # if plots:
+    # if plot:
     #     plot_aerial_phases(force_f, aerial_means, aerial_begin, aerial_end, trim)
     #     plt.tight_layout()
 
@@ -92,28 +92,28 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
     i = 0
     diff_temp = (aerial_means[i] + aerial_means[i + 1]) / 2
     diff_vals.append(diff_temp)
-    force_fd[0:step_begin[i + 1], :] = force_f[0:step_begin[i + 1], :] - diff_temp
+    force_fd[0:step_begin[i + 1],] = force_f[0:step_begin[i + 1],] - diff_temp
     # 1:n-1 steps
     i = 1
     while i < min(step_begin.shape[0], step_end.shape[0]) - 1:
         diff_temp = (aerial_means[i] + aerial_means[i + 1]) / 2
         diff_vals.append(diff_temp)
-        force_fd[step_begin[i]:step_begin[i + 1], :] = force_f[step_begin[i]:step_begin[i + 1], :] - diff_temp
+        force_fd[step_begin[i]:step_begin[i + 1],] = force_f[step_begin[i]:step_begin[i + 1],] - diff_temp
         i = i + 1
     # last step [n], extended to end of file
     diff_temp = (aerial_means[i - 1] + aerial_means[i]) / 2
     diff_vals.append(diff_temp)
-    force_fd[step_begin[i]:force_f.shape[0], :] = force_f[step_begin[i]:force_f.shape[0], :] - diff_temp
+    force_fd[step_begin[i]:force_f.shape[0],] = force_f[step_begin[i]:force_f.shape[0],] - diff_temp
 
-    if plots:
+    if plot:
         # plot raw vs detrended
         plt.detrendp, (sigcomp, meancomp) = plt.subplots(2, 1, sharex=False, figsize=(15, 7))
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-                     force_f[:, 2],
+                     force_f,
                      color='tab:blue',
                      alpha=0.7)  # converted to sec
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-                     force_fd[:, 2],
+                     force_fd,
                      color='tab:red',
                      alpha=0.7)  # converted to sec
         sigcomp.grid()
@@ -126,10 +126,10 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
     # gb - could use list comp (?) here to speed it up
     for i in range(aerial_begin.shape[0]):
         aerial_means_d[i] = np.mean(
-            force_fd[aerial_begin[i] + trim:aerial_end[i] - trim, 2])  # just vertical force
+            force_fd[aerial_begin[i] + trim:aerial_end[i] - trim,])
     aerial_means_d = aerial_means_d[aerial_means_d != 0.0]
 
-    if plots:
+    if plot:
         # plot detrend vs old mean aerial
         meancomp.set_title('mean of aerial phases')
         meancomp.set_xlabel('steps')
@@ -137,7 +137,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plots=False):
         meancomp.grid()
         # np.ylim([-20,20])
         for i in range(aerial_means.shape[0] - 1):
-            meancomp.plot(i, aerial_means[i, 2],
+            meancomp.plot(i, aerial_means[i],
                           marker='.',
                           color='tab:blue',
                           label='original signal')
