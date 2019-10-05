@@ -2,86 +2,55 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
-    '''
-    This function reads in a text file of 3D *running* ground reaction force data and removes drift in a stepwise manner.
-    Author: Ryan Alcantara || ryan.alcantara@colorado.edu || github.com/alcantarar
+    """Remove linear or non-linear drift from running ground reaction force data in a step-wise manner.
+
+    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
+
 
     Parameters
-    -------------
-    filename :          filename of Nx3 array of 3D [horizontal,horizontal,vertical] force data to import via pd.read_csv.
-    Fs :                Sampling frequency of force data.
-    Fc :                Cut off frequency for 4th order zero-lag butterworth filter.
-    min_step :          Minimum number of frames the step ID algorithm will consider 1 step. Default max_step is 0.4*Fs.
-    step_threshold :    (optional) threshold in Newtons used to define heel-strike and toe-off. Default is 100N because
-                        it is better to be aggressive for detrending. Can re-run Step_ID function with a reasonable 
-                        step_threshold once signal is detrended.
-    plot :             (optional) Logical input to receive graphs depicting detrend process.
+    ----------
+    force_f : `ndarray`
+        Filtered ground reaction force signal [n,]. Using unfiltered signal may cause unreliable results.
+    Fs : `number`
+        Sampling frequency of force signal
+    aerial_means : `ndarray`
+        Array of mean force signal measured during each aerial phase.
+    step_begin : `ndarray`
+        Array of frame indexes for start of each stance phase.
+    step_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`.
+    trim : `number`
+        Number of frames removed from start and end of aerial phase when calculating `aerial_means` in `aerial.trim`.
+    plot : `bool` Default=False
+        If true, show plots comparing signal pre vs. post stepwise detrend.
 
     Returns
-    -------------
-    force_fd :          Nx3 array of filtered, detrended 3D force data 
-    aerial_means :      Mean of force during aerial phase for original signal
-    aerial_means_d :    Mean of force during aerial phase for detrended signal
-
-    Raises
-    -------------
-    ValueError
-        if imported file is not Nx3 dimensions. Requires 3D force data: [horizontal, horizontal, vertical].
-
-    IndexError
-        if aerial phase is exceptionally short. Happens when step identification is poor. Check plot and increase step_threshold or min_step
+    -------
+    force_fd : `ndarray`
+        Array with shape of force_f, but with drift removed (detrended).
+    aerial_means_d : `ndarray`
+        Array of mean force signal during aerial phase for detrended signal. Compare to `aerial_means`.
 
     Examples
-    -------------
-     fname = '/Users/alcantarar/data/drifting_forces.csv'
-     force_fd, aerial_means, aerial_means_d = detrend_force(fname, Fs=300, Fc=60, min_step=60) #step_threshold = 100N, no plot
-    #OR
-     force_fd,_,_ = detrend_force('drifting_forces.csv',300,60,60,100,True) #suppress aerial means outputs
+    --------
+    from dryft import signal
+    import matplotlib.pyplot as plt
 
-    '''
-    # force = readcheck_input(filename)
-    # # filter 4th order zero lag butterworth
-    # fn = (Fs / 2)
-    # b, a = butter(2, Fc / fn)
-    # force_f = filtfilt(b, a, force, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
+    force_fd, aerial_means_d = signal.detrend(force_f = GRF[:,2],
+                                              Fs = 300,
+                                              aerial_means = aerial_means,
+                                              step_begin = step_begin,
+                                              step_end = step_end,
+                                              trim = 8,
+                                              plot=False)
 
-    # %% split steps and create aerial phases
-    # max_step = 0.4 * Fs
-    # step_begin, step_end = step_ID(force_f, step_threshold, Fs, min_step, max_step)
-    # 
-    # # create aerial phases (foot not on ground) and trim artefacts from filtering
-    # aerial_begin = step_end[:-1]
-    # aerial_end = step_begin[1:]
-    # print('Number of aerial begin/end:', aerial_begin.shape[0],
-    #       aerial_end.shape[0])  # matching number of step beginnings/ends
-    # 
-    # if plot:
-    #     plot_separated_steps(force_f, step_begin, step_end)
-    #     plt.tight_layout()
-    # 
-    # # %% trim filtering artefact and calculate mean of each aerial phase
-    # trim = trim_aerial_phases(force_f, step_begin, step_end)
-    # 
-    # # calculate mean force during aerial phase (foot not on ground, should be zero)
-    # aerial_means = np.full([aerial_begin.shape[0] + 1, 3], np.nan)
-    # # all but last step
-    # i = 0
-    # while i < min(step_begin.shape[0], step_end.shape[0]) - 1:
-    #     aerial_means[i, 0] = np.mean(force_f[aerial_begin[i] + trim:aerial_end[i] - trim, 0])
-    #     aerial_means[i, 1] = np.mean(force_f[aerial_begin[i] + trim:aerial_end[i] - trim, 1])
-    #     aerial_means[i, 2] = np.mean(force_f[aerial_begin[i] + trim:aerial_end[i] - trim, 2])
-    #     i = i + 1
-    # # last step
-    # aerial_means[i, 0] = np.mean(force_f[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim, 0])
-    # aerial_means[i, 1] = np.mean(force_f[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim, 1])
-    # aerial_means[i, 2] = np.mean(force_f[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim, 2])
-    # 
-    # # plot aerial phases
-    # if plot:
-    #     plot_aerial_phases(force_f, aerial_means, aerial_begin, aerial_end, trim)
-    #     plt.tight_layout()
+    plt.plot(force_fd)
+    plt.plot(GRF[:,2])
+    plt.legend(['detrended signal', 'original signal'])
+    plt.show()
 
-    # %% Detrend signal    
+    """
+    
     force_fd = np.zeros(force_f.shape)
     diff_vals = []
 
