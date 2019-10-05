@@ -109,13 +109,31 @@ def calc_aerial_force(force, begin, end, trim ):
 
     return aerial_means
 
-# %%
-def plot(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
-    '''
-    Plotting function for detrend_force. Plots 1) All the untrimmed aerial phases, 2) All the trimmed aerial phases,
-    and 3) the means of the trimmed aerial phases. Visualizes the means used to account for drift in detrend_force function.
 
-    '''
+def plot(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
+    """Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
+
+    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
+
+    Visualizes the means used to account for drift in `dryft.signal.detrend` .
+
+    Parameters
+    ----------
+    force : `ndarray`
+        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
+    aerial_means : `ndarray`
+        Array of mean force signal measured during each aerial phase.
+    begin : `ndarray`
+        Array of frame indexes for start of each stance phase.
+    end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`.
+    trim : `number`
+        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
+    colormap : `colormap`
+        Default is `matplotlib.plt.cm.viridis`
+
+    """
+
     if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
         colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
         plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
@@ -143,4 +161,4 @@ def plot(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
             meanp.plot(i, aerial_means[i],
                        marker='o',
                        color=colors[i])
-        plt.show()
+        plt.show(block = False)
