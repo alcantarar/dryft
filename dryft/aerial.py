@@ -2,25 +2,32 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def trim(force, begin, end):
-    '''
-    Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase.
-    This is done because filtering can cause artificial negative values where zero values rapidly change to positive values.
-    These changes primarily occur during the beginning/end of stance phase.
+    """Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase.
 
-    Graph appears with vertical black lines at the beginning/end of the a aerial phase. Function is
-    waiting for two mouse clicks on plot where you'd like to trim the aerial phase. Click within the two black vertical lines!
+    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
-    Input:
-    -------------
-    force :       1d array of vertical ground reaction force (vGF) data.
-    begin :       array of frames indicating start of stance phase
-    end :         array of frames indicating end of stance phase
+    Trimming is required when detrending a force signal as filtering can cause artificial negative values where zero
+    values rapidly change to positive values. These changes primarily occur during the beginning/end of stance phase. A
+    graph appears with vertical black lines at the beginning/end of the a aerial phase. Function is waiting for two
+    mouse clicks on plot where you'd like to trim the aerial phase. Click within the two black vertical lines!
 
-    Returns:
-    -------------
-    trim :        Amount of frames to trim off the beginning and end of each aerial phase. Is average of userinputs.
+    Parameters
+    ----------
+    force : `ndarray`
+        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
+    begin : `ndarray`
+        Array of frame indexes for start of each stance phase.
+    end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`.
 
-    '''
+    Returns
+    -------
+    trim : `number`
+        Number of frames to trim off the beginning and end of each aerial phase when degrending force signa.
+        Is calculated as average of user inputs.
+        
+    """
+
     # plot a first 2 steps and get user input for how much to trim off beginning/end of aerial phase
     if force.ndim == 1:  # one axis only
         trim_fig, ax = plt.subplots()
