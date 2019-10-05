@@ -9,7 +9,7 @@ Fc = 60
 Fn = (Fs / 2)
 b,a = butter(2, Fc/Fn)
 GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
-
+temp = GRF_filt[:,2]
 step_begin, step_end = step.split(vGRF = GRF_filt[:,2],threshold = 110, Fs = 300, min_tc = 0.2, max_tc = 0.4, plot=False)
 
 aerial_begin_all = step_end[:-1]
