@@ -15,6 +15,7 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Read in filtered running* vertical ground reaction force (vGRF) signal and split steps based on a set threshold.
     *Running, hopping, or activity where 1 foot is on the force plate at a time.
+    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Split steps are compared to min/max contact time (tc) to eliminate steps that are too short/long. Update these
     parameters and threshold if little-no steps are identified. Setting plots=True can aid in troubleshooting.
@@ -47,14 +48,10 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     --------
      from dryft import step
      step_begin, step_end = step.split(vGRF=force_filt[:,2], threshold=20, Fs=300, min_tc=0.2, max_tc=0.4, plot=False)
-
      step_begin
     array([102, 215, 325])
      step_end
     array([171, 285, 397])
-
-    Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar
-    License: MIT License in root directory
 
     '''
 
@@ -103,11 +100,30 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         raise IndexError('Did not separate steps. min_tc > max_tc.')
 
 
-def plot(force,begin,end):
+def plot(force, begin, end):
     '''
-    Plots separated steps on top of each other. Requires an array of beginning/end of stance phase indexes and 1d force data.
-    Example:
-     plot_separated_steps(force_filtered, steps[:,0], steps[:,1])
+    plot(force, begin, end)
+
+    Plots separated steps on top of each other. Requires an ndarray of beginning/end of stance phase indexes and 1d force data.
+    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
+
+    Parameters
+    ----------
+    force : ndarray [n,]
+        Filtered vertical ground reaction force (vGRF) signal. Using unfiltered signal will cause unreliable results.
+    begin : ndarray
+        Array of frame indexes for start of each stance phase.
+    end : ndarray
+        Array of frame indexes for end of each stance phase. Same size as [begin]
+
+    Returns
+    -------
+    matplotlib.pyplot figure of each step overlayed.
+
+    Examples
+    --------
+    plot_separated_steps(force_filtered, begin_steps[:,0], end_steps[:,1])
+
     '''
     colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
 
@@ -120,4 +136,3 @@ def plot(force,begin,end):
     plt.tight_layout()
     plt.pause(.5)
     plt.show()
-
