@@ -64,7 +64,7 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         if plot:
             plt.plot(vGRF)
             plt.plot(events*500)
-            plt.show()
+            plt.show(block = False)
 
         # if trial starts with end of step, ignore
         step_end_all = step_end_all[step_end_all > step_begin_all[0]]
@@ -133,4 +133,4 @@ def plot(force, begin, end):
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
     plt.pause(.5)
-    plt.show()
+    plt.show(block = False)
