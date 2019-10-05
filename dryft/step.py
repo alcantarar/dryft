@@ -10,8 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
-    '''
-    split(vGRF, threshold, Fs, min_tc, max_tc, plot=False)
+    """split(vGRF, threshold, Fs, min_tc, max_tc, plot=False)
 
     Read in filtered running* vertical ground reaction force (vGRF) signal and split steps based on a set threshold.
     *Running, hopping, or activity where 1 foot is on the force plate at a time.
@@ -22,26 +21,26 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Parameters
     ----------
-    vGRF : ndarray [n,]
-        Filtered vertical ground reaction force (vGRF) signal. Using unfiltered signal will cause unreliable results.
-    threshold : number
+    vGRF : `ndarray`
+        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
+    threshold : `number`
         Determines when initial contact and final contact are defined. In the same units as vGRF signal. Please be
         responsible and set to < 50N for running data.
-    Fs : number
+    Fs : `number`
         Sampling frequency of signal.
-    min_tc : number
+    min_tc : `number`
         Minimum contact time, in seconds, to consider as a real step. Jogging > 0.2s
     max_tc : number
         Maximum contact time, in seconds, to consider as a real step. Jogging > 0.4s
-    plot : bool
+    plot : `bool`
         If true, return plot showing vGRF signal with initial and final contact points identified. Helpful for
         determining appropriate threshold, min_tc, and max_tc values.
 
     Returns
     -------
-    step_begin : ndarray
+    step_begin : `ndarray`
         Array of frame indexes for start of stance phase.
-    step_end : ndarray
+    step_end : `ndarray`
         Array of frame indexes for end of stance phase.
 
     Examples
@@ -53,7 +52,7 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
      step_end
     array([171, 285, 397])
 
-    '''
+    """
 
     if min_tc < max_tc:
         # step Identification Forces over step_threshold register as step (foot on ground).
@@ -101,30 +100,30 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
 
 def plot(force, begin, end):
-    '''
-    plot(force, begin, end)
+    """plot(force, begin, end)
 
-    Plots separated steps on top of each other. Requires an ndarray of beginning/end of stance phase indexes and 1d force data.
+    Plots separated steps on top of each other. Requires an `ndarray` of beginning/end of stance phase indexes and 1d
+    force data. Use to check `step.split` output.
     Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Parameters
     ----------
-    force : ndarray [n,]
-        Filtered vertical ground reaction force (vGRF) signal. Using unfiltered signal will cause unreliable results.
-    begin : ndarray
+    force : `ndarray`
+        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
+    begin : `ndarray`
         Array of frame indexes for start of each stance phase.
-    end : ndarray
-        Array of frame indexes for end of each stance phase. Same size as [begin]
+    end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`.
 
     Returns
     -------
-    matplotlib.pyplot figure of each step overlayed.
+    `matplotlib.pyplot` figure of each step overlayed.
 
     Examples
     --------
     plot_separated_steps(force_filtered, begin_steps[:,0], end_steps[:,1])
 
-    '''
+    """
     colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
 
     fig, ax = plt.subplots()
