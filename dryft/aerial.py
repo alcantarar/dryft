@@ -25,7 +25,7 @@ def trim(force, begin, end):
     trim : `number`
         Number of frames to trim off the beginning and end of each aerial phase when degrending force signa.
         Is calculated as average of user inputs.
-        
+
     """
 
     # plot a first 2 steps and get user input for how much to trim off beginning/end of aerial phase
@@ -64,13 +64,36 @@ def trim(force, begin, end):
     else: raise IndexError('force.ndim != 1')
     return trim
 
+
 def calc_aerial_force(force, begin, end, trim ):
-    # can't trim more than step length, but assume trim is good and step length is bad.
+    """Calculate mean force signal during aerial phase of running.
+
+    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
+
+    Parameters
+    ----------
+    force : `ndarray`
+        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
+    begin : `ndarray`
+        Array of frame indexes for start of each stance phase.
+    end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`.
+    trim : `number`
+        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
+
+    Returns
+    -------
+    trim : `number`
+        Number of frames to trim off the beginning and end of each aerial phase when degrending force signa.
+        Is calculated as average of user inputs.
+
+    """
+
     aerial_begin = end[:-1]
     aerial_end = begin[1:]
     aerial_len = aerial_end - aerial_begin
     if np.any(aerial_len < trim * 2): raise IndexError(
-        'Trim amount is greater than aerial phase length. If trim selection was reasonable, adjust threshold or min_step_len.')
+        'Trim amount is greater than aerial phase length. If trim selection was reasonable, adjust threshold or min_step_len in step.split.')
 
     # calculate mean force during aerial phase (foot not on ground, should be zero)
     # aerial_means = np.full([aerial_begin.shape[0] + 1,], np.nan)
