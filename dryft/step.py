@@ -73,8 +73,8 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
         # initialize
         step_len = np.full(step_begin_all.shape, np.nan)  # step begin and end should be same length...
-        step_begin_all = np.full(step_begin_all.shape, np.nan)
-        step_end_all = np.full(step_end_all.shape, np.nan)
+        step_begin = np.full(step_begin_all.shape, np.nan)
+        step_end = np.full(step_end_all.shape, np.nan)
         # calculate step length and compare to min/max step lengths
 
         step_len = step_end_all - step_begin_all

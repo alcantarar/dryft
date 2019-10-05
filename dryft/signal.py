@@ -50,7 +50,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
     plt.show()
 
     """
-    
+
     force_fd = np.zeros(force_f.shape)
     diff_vals = []
 
