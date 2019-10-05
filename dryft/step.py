@@ -10,12 +10,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
-    """split(vGRF, threshold, Fs, min_tc, max_tc, plot=False)
+    """Read in filtered vertical ground reaction force (vGRF) signal and split steps based on a threshold.
 
-    Read in filtered running* vertical ground reaction force (vGRF) signal and split steps based on a set threshold.
-    *Running, hopping, or activity where 1 foot is on the force plate at a time.
     Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
+    Designed for running, hopping, or activity where 1 foot is on the force plate at a time.
     Split steps are compared to min/max contact time (tc) to eliminate steps that are too short/long. Update these
     parameters and threshold if little-no steps are identified. Setting plots=True can aid in troubleshooting.
 
@@ -100,11 +99,11 @@ def split(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
 
 def plot(force, begin, end):
-    """plot(force, begin, end)
+    """Plots separated steps on top of each other.
 
-    Plots separated steps on top of each other. Requires an `ndarray` of beginning/end of stance phase indexes and 1d
-    force data. Use to check `step.split` output.
     Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
+
+    Requires an `ndarray` of beginning/end of stance phase indexes and 1d force data. Use to confirm `step.split`.
 
     Parameters
     ----------
