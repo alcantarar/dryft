@@ -192,9 +192,9 @@ def plotaerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
     aerial_means : `ndarray`
         Array of mean force signal measured during each aerial phase.
     begin : `ndarray`
-        Array of frame indexes for start of each stance phase.
+        Array of frame indexes for start of each aerial phase.
     end : `ndarray`
-        Array of frame indexes for end of each stance phase. Same size as `begin`.
+        Array of frame indexes for end of each aerial phase. Same size as `begin`.
     trim : `number`
         Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
     colormap : `colormap`
