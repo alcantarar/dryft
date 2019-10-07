@@ -71,7 +71,7 @@ good_step = (good_step1 + good_step2 == 2);
 step_begin = step_begin.keep(good_step); %take those steps' beginnings
 step_end = step_end.keep(good_step); %take those steps' ends
 
-disp(['Number of contact time begin/ends: ', length(step_begin), length(step_end)])
+disp(['Number of contact time begin/ends: ', num2str(length(step_begin)), '/', num2str(length(step_end))])
 
 end
 
