@@ -351,7 +351,7 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
             print('Out of', step_len.shape[0], 'steps,', sum(step_len > max_tc*Fs), ' > ',
                   max_tc, 'seconds.')
         # print sizes
-        print('Number of step begin/end:', step_end.shape[0], step_begin.shape[0])
+        print('Number of contact time begin/end:', step_begin.shape[0], step_end.shape[0])
 
         return step_begin, step_end
 

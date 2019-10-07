@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.signal import butter, filtfilt
 import matplotlib.pyplot as plt
 # Read in data from force plate
-GRF = pd.read_csv('sample/drifting_forces.txt', header=None)
+GRF = pd.read_csv('drifting_forces.txt', header=None)
 
 # Apply Butterworth Filter
 Fs = 600
