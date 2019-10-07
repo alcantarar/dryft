@@ -108,7 +108,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
     for i in range(aerial_begin.shape[0]):
         aerial_means_d[i] = np.mean(
             force_fd[aerial_begin[i] + trim:aerial_end[i] - trim,])
-    aerial_means_d = aerial_means_d[aerial_means_d != 0.0]
+    aerial_means_d = aerial_means_d[aerial_means_d != 0.0] # why is this here?
 
     if plot:
         # plot detrend vs old mean aerial
