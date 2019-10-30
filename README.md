@@ -9,8 +9,10 @@ MATLAB functions](MATLAB) that operate like the Python package. However, this re
 focus on the use of the Python package.
 
 ## Table of Contents
-* [test](#recommended-installation)
-
+* [Dependencies](#dependencies)
+* [Recommended Installation](#recommended-installation)
+* [How `dryft` Works](#how-dryft-works)
+* [Using `dryft`](#using-dryft)
 
 ## Dependencies
 This package was designed to work with and was tested with Python 3.6.7. 
