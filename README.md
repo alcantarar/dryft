@@ -8,6 +8,10 @@ prevalence of MATLAB in the field of Biomechanics, I have also developed a [set 
 MATLAB functions](MATLAB) that operate like the Python package. However, this readme will 
 focus on the use of the Python package.
 
+## Table of Contents
+* [test](#recommended-installation)
+
+
 ## Dependencies
 This package was designed to work with and was tested with Python 3.6.7. 
 Other python 3.X versions may be supported, provided dependency compatibilities and requirements are met.
