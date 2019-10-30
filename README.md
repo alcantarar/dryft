@@ -5,7 +5,7 @@ Dryft is an open-source Python package that corrects running ground reaction for
 signal drift. This package was developed for biomechanical researchers using force plates
 or a force-measuring treadmill to collect an individual's GRF during running. Due to the
 unfortunate prevalence of MATLAB in the field of Biomechanics, I have also developed a set of 
-[MATLAB functions](dryft/MATLAB) that operate like the Python package.
+[MATLAB functions](MATLAB) that operate like the Python package.
 
 ## Dependencies
 This package was designed to work with and was tested with Python 3.6.7. 
