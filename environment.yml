@@ -8,3 +8,4 @@ dependencies:
   - matplotlib
   - pandas
   - python=3.6.*
+  - scipy

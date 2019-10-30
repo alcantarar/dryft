@@ -7,6 +7,8 @@ Distributed here: https://github.com/alcantarar/dryft
 
 
 """
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
