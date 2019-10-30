@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.1" />
 <title>dryft API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Removes linear or non-linear ground reaction force signal drift in a stepwise manner. It is intended
+for running ground reaction force data commonly …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,14 +21,42 @@
 <h1 class="title">Module <code>dryft</code></h1>
 </header>
 <section id="section-intro">
+<p>Removes linear or non-linear ground reaction force signal drift in a stepwise manner. It is intended
+for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
+a given stance phase are used to tare the signal instead of assuming an overall linear trend or signal offset.</p>
+<p>Licensed under an MIT License (c) Ryan Alcantara 2019</p>
+<p><a href="https://alcantarar.github.io">https://alcantarar.github.io</a></p>
+<p>Distributed here: <a href="https://github.com/alcantarar/dryft">https://github.com/alcantarar/dryft</a></p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+
+Removes linear or non-linear ground reaction force signal drift in a stepwise manner. It is intended
+for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
+a given stance phase are used to tare the signal instead of assuming an overall linear trend or signal offset.
+
+Licensed under an MIT License (c) Ryan Alcantara 2019
+
+https://alcantarar.github.io
+
+Distributed here: https://github.com/alcantarar/dryft
+
+&#34;&#34;&#34;</code></pre>
+</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
+<dt><code class="name"><a title="dryft.plot" href="plot.html">dryft.plot</a></code></dt>
+<dd>
+<section class="desc"><p>View separated aerial phases and steps produced in dryft.signal …</p></section>
+</dd>
 <dt><code class="name"><a title="dryft.signal" href="signal.html">dryft.signal</a></code></dt>
 <dd>
-<section class="desc"><p>'dryft' is a library used to remove non-linear ground reaction force signal drift in a stepwise manner. It is intended
-for running ground reaction …</p></section>
+<section class="desc"><p>Removes non-linear ground reaction force signal drift in a stepwise manner. It is intended
+for running ground reaction force data commonly analyzed in …</p></section>
 </dd>
 </dl>
 </section>
@@ -46,6 +75,7 @@ for running ground reaction …</p></section>
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
+<li><code><a title="dryft.plot" href="plot.html">dryft.plot</a></code></li>
 <li><code><a title="dryft.signal" href="signal.html">dryft.signal</a></code></li>
 </ul>
 </li>

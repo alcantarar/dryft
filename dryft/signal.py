@@ -5,6 +5,7 @@ for running ground reaction force data commonly analyzed in the field of Biomech
 a given step are used to tare the signal instead of assuming an overall linear trend or signal offset.
 
 Licensed under an MIT License (c) Ryan Alcantara 2019
+
 Distributed here: https://github.com/alcantarar/dryft
 
 
@@ -45,7 +46,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         from dryft import signal
         import matplotlib.pyplot as plt
 
-        force_fd, aerial_means_d = dr.detrend(GRF_filt[:,2],
+        force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
                                               Fs,
                                               aerial_means,
                                               step_begin,
@@ -203,8 +204,8 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Examples
     --------
-        import dryft.signal as dr
-        step_begin, step_end = dr.splitsteps(vGRF=GRF_filt[:,2],
+        from dryft import signal
+        step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                              threshold=110,
                                              Fs=300,
                                              min_tc=0.2,

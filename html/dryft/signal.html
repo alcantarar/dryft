@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.1" />
 <title>dryft.signal API documentation</title>
-<meta name="description" content="&#39;dryft&#39; is a library used to remove non-linear ground reaction force signal drift in a stepwise manner. It is intended
-for running ground reaction …" />
+<meta name="description" content="Removes non-linear ground reaction force signal drift in a stepwise manner. It is intended
+for running ground reaction force data commonly analyzed in …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -21,22 +21,23 @@ for running ground reaction …" />
 <h1 class="title">Module <code>dryft.signal</code></h1>
 </header>
 <section id="section-intro">
-<p>'dryft' is a library used to remove non-linear ground reaction force signal drift in a stepwise manner. It is intended
+<p>Removes non-linear ground reaction force signal drift in a stepwise manner. It is intended
 for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
 a given step are used to tare the signal instead of assuming an overall linear trend or signal offset.</p>
-<p>Licensed under an MIT License (c) Ryan Alcantara 2019
-Distributed here: <a href="https://github.com/alcantarar/dryft">https://github.com/alcantarar/dryft</a></p>
+<p>Licensed under an MIT License (c) Ryan Alcantara 2019</p>
+<p>Distributed here: <a href="https://github.com/alcantarar/dryft">https://github.com/alcantarar/dryft</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 
-&#39;dryft&#39; is a library used to remove non-linear ground reaction force signal drift in a stepwise manner. It is intended
+Removes non-linear ground reaction force signal drift in a stepwise manner. It is intended
 for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
 a given step are used to tare the signal instead of assuming an overall linear trend or signal offset.
 
 Licensed under an MIT License (c) Ryan Alcantara 2019
+
 Distributed here: https://github.com/alcantarar/dryft
 
 
@@ -47,9 +48,6 @@ import matplotlib.pyplot as plt
 
 def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
     &#34;&#34;&#34;Remove linear or non-linear drift from running ground reaction force data in a step-wise manner.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
 
     Parameters
     ----------
@@ -80,18 +78,13 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         from dryft import signal
         import matplotlib.pyplot as plt
 
-        force_fd, aerial_means_d = signal.detrend(force_f = GRF[:,2],
-                                                  Fs = 300,
-                                                  aerial_means = aerial_means,
-                                                  step_begin = step_begin,
-                                                  step_end = step_end,
-                                                  trim = 8,
-                                                  plot=False)
-
-        plt.plot(force_fd)
-        plt.plot(GRF[:,2])
-        plt.legend([&#39;detrended signal&#39;, &#39;original signal&#39;])
-        plt.show()
+        force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
+                                              Fs,
+                                              aerial_means,
+                                              step_begin,
+                                              step_end,
+                                              trim,
+                                              plot=True)
 
     &#34;&#34;&#34;
 
@@ -168,8 +161,6 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
 def meanaerialforce(force, begin, end, trim ):
     &#34;&#34;&#34;Calculate mean force signal during aerial phase of running.
 
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
     Parameters
     ----------
     force : `ndarray`
@@ -210,102 +201,10 @@ def meanaerialforce(force, begin, end, trim ):
     return aerial_means
 
 
-def plotaerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
-    &#34;&#34;&#34;Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
-    Visualizes the means used to account for drift in `dryft.signal.detrend` .
-
-    Parameters
-    ----------
-    force : `ndarray`
-        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    aerial_means : `ndarray`
-        Array of mean force signal measured during each aerial phase.
-    begin : `ndarray`
-        Array of frame indexes for start of each aerial phase.
-    end : `ndarray`
-        Array of frame indexes for end of each aerial phase. Same size as `begin`.
-    trim : `number`
-        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
-    colormap : `colormap`
-        Default is `matplotlib.plt.cm.viridis`
-
-    &#34;&#34;&#34;
-
-    if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
-        colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
-        plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
-
-        # plot of untrimmed aerial phases
-        untrimp.set_title(&#39;untrimmed aerial phases&#39;)
-        untrimp.set_ylabel(&#39;force (N)&#39;)
-        untrimp.grid()
-        for i in range(begin.shape[0]):
-            untrimp.plot(force[begin[i]:end[i]],
-                         color=colors[i])
-            # plot of trimmed aerial phases
-        trimp.set_title(&#39;trimmed aerial phases&#39;)
-        trimp.set_ylabel(&#39;force (N)&#39;)
-        trimp.grid()
-        for i in range(begin.shape[0]):
-            trimp.plot(force[begin[i] + trim:end[i] - trim],
-                       color=colors[i])
-        # plot all the means of trimmed aerial phases
-        meanp.set_title(&#39;mean of trimmed aerial phases&#39;)
-        meanp.set_xlabel(&#39;steps&#39;)
-        meanp.set_ylabel(&#39;force (N)&#39;)
-        meanp.grid()
-        for i in range(aerial_means.shape[0]):
-            meanp.plot(i, aerial_means[i],
-                       marker=&#39;o&#39;,
-                       color=colors[i])
-        plt.show(block = False)
-
-
-def plotsteps(force, begin, end):
-    &#34;&#34;&#34;Plots separated steps on top of each other.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
-    Requires an `ndarray` of beginning/end of stance phase indexes and 1d force data. Use to confirm `step.split`.
-
-    Parameters
-    ----------
-    force : `ndarray`
-        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    begin : `ndarray`
-        Array of frame indexes for start of each stance phase.
-    end : `ndarray`
-        Array of frame indexes for end of each stance phase. Same size as `begin`.
-
-    Returns
-    -------
-    `matplotlib.pyplot` figure of each step overlayed.
-
-    Examples
-    --------
-        plot_separated_steps(force_filtered, begin_steps[:,0], end_steps[:,1])
-
-    &#34;&#34;&#34;
-    colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
-
-    fig, ax = plt.subplots()
-    ax.set_title(&#39;All separated steps&#39;)
-    ax.grid()
-    ax.set_xlabel(&#39;frames&#39;)
-    ax.set_ylabel(&#39;force (N)&#39;)
-    for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
-    plt.tight_layout()
-    plt.pause(.5)
-    plt.show(block = False)
 
 
 def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     &#34;&#34;&#34;Read in filtered vertical ground reaction force (vGRF) signal and split steps based on a threshold.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Designed for running, hopping, or activity where 1 foot is on the force plate at a time.
     Split steps are compared to min/max contact time (tc) to eliminate steps that are too short/long. Update these
@@ -337,11 +236,17 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Examples
     --------
-        from dryft import step
-        step_begin, step_end = step.split(vGRF=force_filt[:,2], threshold=20, Fs=300, min_tc=0.2, max_tc=0.4, plot=False)
+        from dryft import signal
+        step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+                                             threshold=110,
+                                             Fs=300,
+                                             min_tc=0.2,
+                                             max_tc=0.4,
+                                             plot=False)
         step_begin
-    array([102, 215, 325])
         step_end
+
+    array([102, 215, 325])
     array([171, 285, 397])
 
     &#34;&#34;&#34;
@@ -393,8 +298,6 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
 def trimaerial(force, begin, end):
     &#34;&#34;&#34;Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Trimming is required when detrending a force signal as filtering can cause artificial negative values where zero
     values rapidly change to positive values. These changes primarily occur during the beginning/end of stance phase. A
@@ -467,7 +370,6 @@ def trimaerial(force, begin, end):
 </code></dt>
 <dd>
 <section class="desc"><p>Remove linear or non-linear drift from running ground reaction force data in a step-wise manner.</p>
-<p>Created by Ryan Alcantara (ryan.alcantara@colorado.edu)</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>force_f</code></strong> :&ensp;<code>ndarray</code></dt>
@@ -496,18 +398,13 @@ def trimaerial(force, begin, end):
 <pre><code>from dryft import signal
 import matplotlib.pyplot as plt
 
-force_fd, aerial_means_d = signal.detrend(force_f = GRF[:,2],
-                                          Fs = 300,
-                                          aerial_means = aerial_means,
-                                          step_begin = step_begin,
-                                          step_end = step_end,
-                                          trim = 8,
-                                          plot=False)
-
-plt.plot(force_fd)
-plt.plot(GRF[:,2])
-plt.legend(['detrended signal', 'original signal'])
-plt.show()
+force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
+                                      Fs,
+                                      aerial_means,
+                                      step_begin,
+                                      step_end,
+                                      trim,
+                                      plot=True)
 </code></pre></section>
 <details class="source">
 <summary>
@@ -515,9 +412,6 @@ plt.show()
 </summary>
 <pre><code class="python">def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
     &#34;&#34;&#34;Remove linear or non-linear drift from running ground reaction force data in a step-wise manner.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
 
     Parameters
     ----------
@@ -548,18 +442,13 @@ plt.show()
         from dryft import signal
         import matplotlib.pyplot as plt
 
-        force_fd, aerial_means_d = signal.detrend(force_f = GRF[:,2],
-                                                  Fs = 300,
-                                                  aerial_means = aerial_means,
-                                                  step_begin = step_begin,
-                                                  step_end = step_end,
-                                                  trim = 8,
-                                                  plot=False)
-
-        plt.plot(force_fd)
-        plt.plot(GRF[:,2])
-        plt.legend([&#39;detrended signal&#39;, &#39;original signal&#39;])
-        plt.show()
+        force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
+                                              Fs,
+                                              aerial_means,
+                                              step_begin,
+                                              step_end,
+                                              trim,
+                                              plot=True)
 
     &#34;&#34;&#34;
 
@@ -638,7 +527,6 @@ plt.show()
 </code></dt>
 <dd>
 <section class="desc"><p>Calculate mean force signal during aerial phase of running.</p>
-<p>Created by Ryan Alcantara (ryan.alcantara@colorado.edu)</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>force</code></strong> :&ensp;<code>ndarray</code></dt>
@@ -662,8 +550,6 @@ Is calculated as average of user inputs.</dd>
 </summary>
 <pre><code class="python">def meanaerialforce(force, begin, end, trim ):
     &#34;&#34;&#34;Calculate mean force signal during aerial phase of running.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Parameters
     ----------
@@ -705,155 +591,11 @@ Is calculated as average of user inputs.</dd>
     return aerial_means</code></pre>
 </details>
 </dd>
-<dt id="dryft.signal.plotaerial"><code class="name flex">
-<span>def <span class="ident">plotaerial</span></span>(<span>force, aerial_means, begin, end, trim, colormap=&lt;matplotlib.colors.ListedColormap object&gt;)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.</p>
-<p>Created by Ryan Alcantara (ryan.alcantara@colorado.edu)</p>
-<p>Visualizes the means used to account for drift in <a title="dryft.signal.detrend" href="#dryft.signal.detrend"><code>detrend()</code></a> .</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>force</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.</dd>
-<dt><strong><code>aerial_means</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of mean force signal measured during each aerial phase.</dd>
-<dt><strong><code>begin</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for start of each aerial phase.</dd>
-<dt><strong><code>end</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for end of each aerial phase. Same size as <code>begin</code>.</dd>
-<dt><strong><code>trim</code></strong> :&ensp;<code>number</code></dt>
-<dd>Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.</dd>
-<dt><strong><code>colormap</code></strong> :&ensp;<code>colormap</code></dt>
-<dd>Default is <code>matplotlib.plt.cm.viridis</code></dd>
-</dl></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def plotaerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
-    &#34;&#34;&#34;Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
-    Visualizes the means used to account for drift in `dryft.signal.detrend` .
-
-    Parameters
-    ----------
-    force : `ndarray`
-        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    aerial_means : `ndarray`
-        Array of mean force signal measured during each aerial phase.
-    begin : `ndarray`
-        Array of frame indexes for start of each aerial phase.
-    end : `ndarray`
-        Array of frame indexes for end of each aerial phase. Same size as `begin`.
-    trim : `number`
-        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
-    colormap : `colormap`
-        Default is `matplotlib.plt.cm.viridis`
-
-    &#34;&#34;&#34;
-
-    if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
-        colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
-        plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
-
-        # plot of untrimmed aerial phases
-        untrimp.set_title(&#39;untrimmed aerial phases&#39;)
-        untrimp.set_ylabel(&#39;force (N)&#39;)
-        untrimp.grid()
-        for i in range(begin.shape[0]):
-            untrimp.plot(force[begin[i]:end[i]],
-                         color=colors[i])
-            # plot of trimmed aerial phases
-        trimp.set_title(&#39;trimmed aerial phases&#39;)
-        trimp.set_ylabel(&#39;force (N)&#39;)
-        trimp.grid()
-        for i in range(begin.shape[0]):
-            trimp.plot(force[begin[i] + trim:end[i] - trim],
-                       color=colors[i])
-        # plot all the means of trimmed aerial phases
-        meanp.set_title(&#39;mean of trimmed aerial phases&#39;)
-        meanp.set_xlabel(&#39;steps&#39;)
-        meanp.set_ylabel(&#39;force (N)&#39;)
-        meanp.grid()
-        for i in range(aerial_means.shape[0]):
-            meanp.plot(i, aerial_means[i],
-                       marker=&#39;o&#39;,
-                       color=colors[i])
-        plt.show(block = False)</code></pre>
-</details>
-</dd>
-<dt id="dryft.signal.plotsteps"><code class="name flex">
-<span>def <span class="ident">plotsteps</span></span>(<span>force, begin, end)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Plots separated steps on top of each other.</p>
-<p>Created by Ryan Alcantara (ryan.alcantara@colorado.edu)</p>
-<p>Requires an <code>ndarray</code> of beginning/end of stance phase indexes and 1d force data. Use to confirm <code>step.split</code>.</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>force</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.</dd>
-<dt><strong><code>begin</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for start of each stance phase.</dd>
-<dt><strong><code>end</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p><code>matplotlib.pyplot</code> figure of each step overlayed.</p>
-<h2 id="examples">Examples</h2>
-<pre><code>plot_separated_steps(force_filtered, begin_steps[:,0], end_steps[:,1])
-</code></pre></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def plotsteps(force, begin, end):
-    &#34;&#34;&#34;Plots separated steps on top of each other.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
-
-    Requires an `ndarray` of beginning/end of stance phase indexes and 1d force data. Use to confirm `step.split`.
-
-    Parameters
-    ----------
-    force : `ndarray`
-        Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    begin : `ndarray`
-        Array of frame indexes for start of each stance phase.
-    end : `ndarray`
-        Array of frame indexes for end of each stance phase. Same size as `begin`.
-
-    Returns
-    -------
-    `matplotlib.pyplot` figure of each step overlayed.
-
-    Examples
-    --------
-        plot_separated_steps(force_filtered, begin_steps[:,0], end_steps[:,1])
-
-    &#34;&#34;&#34;
-    colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
-
-    fig, ax = plt.subplots()
-    ax.set_title(&#39;All separated steps&#39;)
-    ax.grid()
-    ax.set_xlabel(&#39;frames&#39;)
-    ax.set_ylabel(&#39;force (N)&#39;)
-    for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
-    plt.tight_layout()
-    plt.pause(.5)
-    plt.show(block = False)</code></pre>
-</details>
-</dd>
 <dt id="dryft.signal.splitsteps"><code class="name flex">
 <span>def <span class="ident">splitsteps</span></span>(<span>vGRF, threshold, Fs, min_tc, max_tc, plot=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Read in filtered vertical ground reaction force (vGRF) signal and split steps based on a threshold.</p>
-<p>Created by Ryan Alcantara (ryan.alcantara@colorado.edu)</p>
 <p>Designed for running, hopping, or activity where 1 foot is on the force plate at a time.
 Split steps are compared to min/max contact time (tc) to eliminate steps that are too short/long. Update these
 parameters and threshold if little-no steps are identified. Setting plots=True can aid in troubleshooting.</p>
@@ -882,12 +624,17 @@ determining appropriate threshold, min_tc, and max_tc values.</dd>
 <dd>Array of frame indexes for end of stance phase.</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code>from dryft import step
-step_begin, step_end = step.split(vGRF=force_filt[:,2], threshold=20, Fs=300, min_tc=0.2, max_tc=0.4, plot=False)
+<pre><code>from dryft import signal
+step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+                                     threshold=110,
+                                     Fs=300,
+                                     min_tc=0.2,
+                                     max_tc=0.4,
+                                     plot=False)
 step_begin
+step_end
 </code></pre>
 <p>array([102, 215, 325])
-step_end
 array([171, 285, 397])</p></section>
 <details class="source">
 <summary>
@@ -895,8 +642,6 @@ array([171, 285, 397])</p></section>
 </summary>
 <pre><code class="python">def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     &#34;&#34;&#34;Read in filtered vertical ground reaction force (vGRF) signal and split steps based on a threshold.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Designed for running, hopping, or activity where 1 foot is on the force plate at a time.
     Split steps are compared to min/max contact time (tc) to eliminate steps that are too short/long. Update these
@@ -928,11 +673,17 @@ array([171, 285, 397])</p></section>
 
     Examples
     --------
-        from dryft import step
-        step_begin, step_end = step.split(vGRF=force_filt[:,2], threshold=20, Fs=300, min_tc=0.2, max_tc=0.4, plot=False)
+        from dryft import signal
+        step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+                                             threshold=110,
+                                             Fs=300,
+                                             min_tc=0.2,
+                                             max_tc=0.4,
+                                             plot=False)
         step_begin
-    array([102, 215, 325])
         step_end
+
+    array([102, 215, 325])
     array([171, 285, 397])
 
     &#34;&#34;&#34;
@@ -987,7 +738,6 @@ array([171, 285, 397])</p></section>
 </code></dt>
 <dd>
 <section class="desc"><p>Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase.</p>
-<p>Created by Ryan Alcantara (ryan.alcantara@colorado.edu)</p>
 <p>Trimming is required when detrending a force signal as filtering can cause artificial negative values where zero
 values rapidly change to positive values. These changes primarily occur during the beginning/end of stance phase. A
 graph appears with vertical black lines at the beginning/end of the a aerial phase. Function is waiting for two
@@ -1013,8 +763,6 @@ Is calculated as average of user inputs.</dd>
 </summary>
 <pre><code class="python">def trimaerial(force, begin, end):
     &#34;&#34;&#34;Receives user input to determine how much it needs to trim off the beginning and end of the aerial phase.
-
-    Created by Ryan Alcantara (ryan.alcantara@colorado.edu)
 
     Trimming is required when detrending a force signal as filtering can cause artificial negative values where zero
     values rapidly change to positive values. These changes primarily occur during the beginning/end of stance phase. A
@@ -1092,11 +840,9 @@ Is calculated as average of user inputs.</dd>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="dryft.signal.detrend" href="#dryft.signal.detrend">detrend</a></code></li>
 <li><code><a title="dryft.signal.meanaerialforce" href="#dryft.signal.meanaerialforce">meanaerialforce</a></code></li>
-<li><code><a title="dryft.signal.plotaerial" href="#dryft.signal.plotaerial">plotaerial</a></code></li>
-<li><code><a title="dryft.signal.plotsteps" href="#dryft.signal.plotsteps">plotsteps</a></code></li>
 <li><code><a title="dryft.signal.splitsteps" href="#dryft.signal.splitsteps">splitsteps</a></code></li>
 <li><code><a title="dryft.signal.trimaerial" href="#dryft.signal.trimaerial">trimaerial</a></code></li>
 </ul>

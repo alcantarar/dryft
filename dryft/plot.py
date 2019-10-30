@@ -3,6 +3,7 @@
 View separated aerial phases and steps produced in dryft.signal.
 
 Licensed under an MIT License (c) Ryan Alcantara 2019
+
 Distributed here: https://github.com/alcantarar/dryft
 
 
@@ -83,6 +84,7 @@ def stance(force, begin, end):
 
     Examples
     --------
+        from dryft import plot
         plot.stance(GRF_filt[:,2], step_begin, step_end)
 
     """
