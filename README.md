@@ -1,6 +1,9 @@
 # Dryft
-#### Created by Ryan Alcantara 
-##### ryan.alcantara@colorado.edu
+##### Created by [Ryan Alcantara](https://alcantarar.github.io)
+
+Dryft is an open-source Python package that corrects running ground reaction force (GRF) 
+signal drift. :wink: 
+
 This library was created in an effort to correct any drift in a force-measuring 
 treadmill or force plate signal when someone is running on it. When running, a 
 person has only 1 foot on the ground at a time, with an aerial phase inbetween each step. 
