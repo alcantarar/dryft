@@ -1,6 +1,7 @@
 README.md
 setup.py
 dryft/__init__.py
+dryft/plot.py
 dryft/signal.py
 dryft.egg-info/PKG-INFO
 dryft.egg-info/SOURCES.txt

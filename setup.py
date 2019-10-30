@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name = "dryft",
-    version = "1.0.3",
+    version = "1.0.4",
     packages = find_packages(),
     install_requires = ['numpy','pandas','matplotlib','scipy'],
     author = "Ryan Alcantara",
