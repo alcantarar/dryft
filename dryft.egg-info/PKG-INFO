@@ -1,6 +1,6 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: dryft
-Version: 1.0.1
+Version: 1.0.2
 Summary: A package to process biomechanical running data
 Home-page: http://github.com/alcantarar/dryft
 Author: Ryan Alcantara
@@ -21,3 +21,4 @@ Description: # Dryft
         
         ``
 Platform: UNKNOWN
+Description-Content-Type: text/markdown
