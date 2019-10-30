@@ -18,3 +18,5 @@ setup(
 
     # could also include long_description, download_url, classifiers, etc.
 )
+
+# instructions for installing packages: https://packaging.python.org/tutorials/packaging-projects/
