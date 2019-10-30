@@ -54,6 +54,76 @@ or an [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
 
 **[Groucho Running](https://www.ncbi.nlm.nih.gov/pubmed/3610929) is an exception* 
 
-## Using dryft
-### API Documentation
-Please refer to the [API Documentation]()
+## Using `dryft`
+### Documentation
+Please refer to the [API Documentation](https://alcantarar.github.io/dryft/index.html)
+### Example
+The following tutorial and its supporting documents is found in `setup.py`located in [sample](sample)
+#### Read force signal data
+The three-dimensional force data modified from [Fukuchi *et al* (2017)](https://peerj.com/articles/3298/). There is a sine wave
+with an amplitude of 100 Newtons and wavelength equal to trial length added to the force signal. 
+```
+from dryft import signal, plot
+import pandas as pd
+from scipy.signal import butter, filtfilt
+
+GRF = pd.read_csv('drifting_forces.txt', header=None)
+```
+#### Filter signal
+Filtering data will improve step identification methods. Here I apply a zero-lag 4th order butterworth
+filter with a 60Hz cutoff.
+```
+# Apply Butterworth Filter
+Fs = 600
+Fc = 60
+Fn = (Fs / 2)
+b,a = butter(2, Fc/Fn)
+GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
+```
+
+#### Identify where stance and aerial phases occur
+Note the unusually high force threshold to define a step. This will depend upon the amount of
+drift present in your signal. `GRF_filt[:,2]` is the vertical component of the ground reaction
+ force signal (vGRF) and has an artificial drift of 100 Newtons, so a threshold of 110 Newtons 
+ will suffice for separating steps.
+
+```
+# stance phase
+step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+                                  threshold=110,
+                                  Fs=300,
+                                  min_tc=0.2,
+                                  max_tc=0.4,
+                                  plot=False)
+# plot stance phases
+plot.stance(GRF_filt[:,2], step_begin, step_end)
+
+# aerial phase
+aerial_begin_all = step_end[:-1]
+aerial_end_all = step_begin[1:]
+print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.shape[0])
+```
+#### Determine average force signal during aerial phase
+To calculate the force measured during aerial phase, the beginning and end of each 
+aerial phase must be ignored. This provides a better sense of what the true force value
+is during aerial phase.
+```
+# trim beginning/end of aerial phase prior to calculation of mean
+trim = signal.trimaerial(GRF_filt[:,2], step_begin, step_end)
+aerial_means = signal.meanaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
+
+# plot aerial phases
+plot.aerial(GRF_filt[:,2], aerial_means, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
+```
+#### Remove force signal drift
+This is performed on a per-step basis.
+```
+force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
+                                          Fs,
+                                          aerial_means,
+                                          step_begin,
+                                          step_end,
+                                          trim,
+                                          plot=True) #grf_filt and aerial_means must be same width
+ 
+```
