@@ -1,5 +1,5 @@
 # `dryft`
-##### Created by [Ryan Alcantara](https://alcantarar.github.io)
+#### Created by [Ryan Alcantara](https://alcantarar.github.io)
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
 signal drift. This package was developed for biomechanical researchers using force plates
