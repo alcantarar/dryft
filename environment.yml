@@ -1,0 +1,10 @@
+name: dryft
+
+channels:
+  - conda-forge
+
+dependencies:
+  - numpy
+  - matplotlib
+  - pandas
+  - python=3.6.*

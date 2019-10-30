@@ -5,4 +5,5 @@ dryft/signal.py
 dryft.egg-info/PKG-INFO
 dryft.egg-info/SOURCES.txt
 dryft.egg-info/dependency_links.txt
+dryft.egg-info/requires.txt
 dryft.egg-info/top_level.txt

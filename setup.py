@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setup(
     name = "dryft",
-    version = "1.0.2",
+    version = "1.0.3",
     packages = find_packages(),
-    # metadata for upload to PyPI
+    install_requires = ['numpy','pandas','matplotlib'],
     author = "Ryan Alcantara",
     description = "A package to process biomechanical running data",
     long_description=long_description,
