@@ -1,7 +1,7 @@
-# Dryft
+# `dryft`
 ##### Created by [Ryan Alcantara](https://alcantarar.github.io)
 
-Dryft is an open-source Python package that corrects running ground reaction force (GRF) 
+`dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
 signal drift. This package was developed for biomechanical researchers using force plates
 or a force-measuring treadmill to collect an individual's GRF during running. Due to the
 prevalence of MATLAB in the field of Biomechanics, I have also developed a [set of 
@@ -55,3 +55,5 @@ or an [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
 **[Groucho Running](https://www.ncbi.nlm.nih.gov/pubmed/3610929) is an exception* 
 
 ## Using dryft
+### API Documentation
+Please refer to the [API Documentation]()
