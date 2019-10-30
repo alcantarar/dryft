@@ -14,6 +14,7 @@ focus on the use of the Python package.
 * [How `dryft` Works](#how-dryft-works)
 * [Using `dryft`](#using-dryft)
 * [Contributing](#contributing)
+* [Licensing](#licensing)
 
 ## Dependencies
 This package was designed to work with and was tested with Python 3.6.7. 
