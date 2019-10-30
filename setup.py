@@ -5,6 +5,8 @@ setup(
     packages = find_packages(),
     # metadata for upload to PyPI
     author = "Ryan Alcantara",
+    description = "A package to process biomechanical running data",
+    long_description = open('README.md').read(),
     author_email = "ryan.alcantara@colorado.edu",
     description = "This is an Example Package",
     license = "MIT",
