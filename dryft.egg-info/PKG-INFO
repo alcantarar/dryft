@@ -1,28 +1,10 @@
-Metadata-Version: 2.1
+Metadata-Version: 1.0
 Name: dryft
-Version: 1.0
-Summary: A package for running biomechanics force data
-Home-page: https://github.com/alcantarar/dryft
+Version: 1.0.1
+Summary: This is an Example Package
+Home-page: http://github.com/alcantarar/dryft
 Author: Ryan Alcantara
 Author-email: ryan.alcantara@colorado.edu
-License: UNKNOWN
-Description: # Dryft
-        #### Created by Ryan Alcantara 
-        ##### ryan.alcantara@colorado.edu
-        This library was created in an effort to correct any drift in a force-measuring 
-        treadmill or force plate signal when someone is running on it. When running, a 
-        person has only 1 foot on the ground at a time, with an aerial phase inbetween each step. 
-        Here, I assume that the force measured by the treadmill during any given aerial phase should be zero, 
-        and use the aerial phases before and after a given step to tare the force signal. This will 
-        effectively correct for drift in the signal step-wise manner. 
-        
-        The python library was developed first and has been tested . A MATLAB version was
-        created afterwards as it is a common language used in the field of biomechanics.
-        
-        ``
+License: MIT
+Description: UNKNOWN
 Platform: UNKNOWN
-Classifier: Programming Language :: Python :: 3
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Operating System :: OS Independent
-Requires-Python: >=3.6
-Description-Content-Type: text/markdown
