@@ -28,7 +28,7 @@ The package requires the following dependencies:
 
 I recommend using the [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 environment to use this package.
 If you wish to setup a new environment, an Anaconda [environment](environment.yml) file is included
-to automatically install most dependencies. To setup a new environment for Dryft, type the following 
+to automatically install most dependencies. To setup a new environment for `dryft`, type the following 
 command into Anaconda Prompt:
 ```
 conda env create -f path\to\environment.yml
