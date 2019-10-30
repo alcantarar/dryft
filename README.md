@@ -130,13 +130,13 @@ force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
                                           plot=True) #grf_filt and aerial_means must be same width
  
 ```
-#### Contributing
+## Contributing
 
 To report an problem with `dryft`, please create a new [issue](https://github.com/alcantarar/dryft/issues).
 
 Contact [alcantarar](https://github.com/alcantarar) with any support or general questions about `dryft`. I also welcome
 meaningful contributions via [pull requests](https://github.com/alcantarar/dryft/pulls).
 
-#### Licensing
+## Licensing
 
 This package is licensed under the MIT License. Copyright 2019 [Ryan Alcantara](https://alcantarar.github.io).
