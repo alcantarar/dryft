@@ -1,7 +1,10 @@
 function plot_aerial(force, aerial_means, aerial_begin, aerial_end, trim)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
-
+%PLOT_AERIAL Plots untrimmed aerial phases, trimmed aerial phases, and the
+%means of the trimmed aerial phases. 
+%   Visualizes the means used to account for the drift in [detrend.m]
+%
+% Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
+%
 colors = parula(length(aerial_begin));
 %plot all untrimmed aerial phases
 figure
