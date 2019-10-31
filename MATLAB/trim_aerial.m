@@ -10,6 +10,17 @@ function [trim] = trim_aerial(force, step_begin, step_end)
 %   you'd like to trim the aerial phase. Click within the two black
 %   vertical lines! Will apply mean of beginning/end trim to all steps.
 %
+%   INPUTS
+%   ------
+%   force: Nx1 array of force signal
+%   step_begin: array of frames for initial contact. Output from
+%       [split_steps.m].
+%   step_end: array of frames for toe-off. Output from [split_steps.m]
+%
+%   OUTPUT
+%   ------
+%   trim: % number of frames to trim from beginning/end of aerial phase.
+%
 % Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
 %
 
