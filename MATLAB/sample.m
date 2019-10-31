@@ -1,8 +1,16 @@
 %Script corrects force signal drift in a step-specific manner. Subtracts 
 %mean of aerial phase before and after each step for whole trial.
 %
-% Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
+%   Calls on the following functions: 
+%   split_steps.m
+%   trim_aerial.m
+%   mean_aerial_force.m
+%   plot_aerial.m (optional)
+%   detrend.m
 %
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 %% Read in data from force plate
 GRF = dlmread('../sample/drifting_forces.txt');

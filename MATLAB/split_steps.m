@@ -1,7 +1,9 @@
 function [step_begin,step_end] = split_steps(force_f,threshold, Fs_force, min_tc, max_tc, d)
 %SPLIT_STEPS reads in FILTERED running ground reaction force data and splits steps based on a force threshold.
 %
-%   Author: Ryan Alcantara || ryan.alcantara@colorado.edu || github.com/alcantarar
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 %
 %   INPUTS
 %   -------------

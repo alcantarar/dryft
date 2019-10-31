@@ -21,8 +21,9 @@ function [trim] = trim_aerial(force, step_begin, step_end)
 %   ------
 %   trim: % number of frames to trim from beginning/end of aerial phase.
 %
-% Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
-%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 figure
 hold on

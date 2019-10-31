@@ -21,8 +21,9 @@ function [force_fd,aerial_means_d] = detrend(force_f, Fs, aerial_means, step_beg
 %       close to zero. May be able to apply [detrend.m] multiple times if
 %       signal not detrended enough (NOT TESTED).
 %
-% Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
-%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu 
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 force_fd = NaN(size(force_f));
 aerial_begin = step_end(1:end-1);

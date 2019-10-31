@@ -22,8 +22,10 @@ function plot_aerial(force, aerial_means, aerial_begin, aerial_end, trim)
 %
 %   plot_aerial(GRF_filt(:,3), aerial_means, aerial_begin, aerial_end, trim)
 %
-% Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
-%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
+
 colors = parula(length(aerial_begin));
 %plot all untrimmed aerial phases
 figure

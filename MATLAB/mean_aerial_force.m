@@ -14,8 +14,9 @@ function [aerial_means] = mean_aerial_force(force, step_begin, step_end, trim)
 %   ------
 %   aerial_means: mean force signal for all aerial phases in trial.
 %
-% Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
-%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 %define aerial phases
 aerial_begin = step_end(1:end-1);
