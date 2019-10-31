@@ -14,6 +14,13 @@ function [force_fd,aerial_means_d] = detrend(force_f, Fs, aerial_means, step_beg
 %       Output from [trim_aerial.m].
 %   d: binary argument to display plots. Helpful for troubleshooting.
 %
+%   OUTPUT
+%   ------
+%   force_fd: detrended force signal
+%   aerial_means_d: means of aerial phase for detrended signal. Should be
+%       close to zero. May be able to apply [detrend.m] multiple times if
+%       signal not detrended enough (NOT TESTED).
+%
 % Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
 %
 
