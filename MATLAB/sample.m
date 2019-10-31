@@ -8,12 +8,15 @@
 %   plot_aerial.m (optional)
 %   detrend.m
 %
+%   Relies on this modified dataset from Fukuchi et al. (2017):
+%   drifting_forces.txt
+%
 %   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
 %   License: MIT (c) 2019 Ryan Alcantara
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 %% Read in data from force plate
-GRF = dlmread('../sample/drifting_forces.txt');
+GRF = dlmread('drifting_forces.txt');
 
 %% Apply Butterworth filter
 Fs = 600;
