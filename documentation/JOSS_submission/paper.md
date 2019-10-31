@@ -19,7 +19,7 @@ bibliography: paper.bib
 ---
 
 # Background
-GRFs are the force exerted by the body on the ground during activities like walking and running. 
+Ground reaction forces (GRFs) are the force exerted by the body on the ground during activities like walking and running. 
 GRFs are clinically relevant and commonly measured in biomechanics.
 To collect GRFs more easily, researchers use force plates and treadmills instrumented with force transducers.
 Instrumented treadmills are special though, because they allow for the measurement of GRFs over long periods of time. 
@@ -35,36 +35,31 @@ Signal drift can cause an increasing (or decreasing) amount of the vertical GRF 
 artificially increasing the variation in contact time or other time-dependent biomechanical variables (Figure 1).
 
 ![Figure 1](Figure_1.png)
-*Figure 1. Vertical ground reaction force signal where signal drifts postiively 100 Newtons. 
+*Figure 1. Vertical ground reaction force signal where signal drifts positively 100 Newtons. 
 Contact time increases by ~0.04s, or ~17%.* 
  
 To combat signal drift, it is best practice to zero the force transducer signal between trials during data collection. 
 This must be done when no force is being applied to the force transducers to ensure accurate signals.
 However, zeroing of force transducers may not be feasible for protocols requiring extended periods of continuous
 running on an instrumented treadmill, causing GRF signals to drift over time.
-Signal drift is not unique to running biomechanics, as there are signal processing methods available to remove offsets 
-[v3d] and linear drift [scipy/matlab detrend]. However, drift in GRF signals over time are not guaranteed to be
-linear. 
-Here, I introduce `dryft`, a Python and MATLAB package that is designed to remove non-linear drift in an individual's 
-GRF signal during running by taking a stepwise approach. 
+There are signal processing methods available to remove offsets [v3d] and linear drift [scipy/matlab detrend], but 
+drift in GRF signals is not guaranteed to be linear. 
+Here, I introduce `dryft`, a Python and MATLAB package that takes a stepwise approach to removing non-linear drift in 
+the GRF signal of a person during running.
 
 
 # Summary
-During the aerial phase, the body is exerting no forces on the ground and we assume any forces measured by the 
-instrumented treadmill are due to the motion of the belt or drift. 
-A common method of correcting for drift and noise in the baseline signal is to subtract the forces measured during an 
-aerial phase at the beginning of the recording and subtracting it from the raw force signal, effectively taring the 
-signal (Visual3d FP_ZERO parameter). 
-However, this method cannot account for changes in the direction or magnitude of drift within a given trial. 
-Our stepwise approach tares each step individually by subtracting the mean of the aerial phase directly before and 
-after the given step.
+During the aerial phase of running, the body is exerting no force on the ground. 
+I assume any substantial forces measured by the instrumented treadmill during an aerial phase are due to signal drift. 
+`dryft` implements a stepwise approach that tares each step individually by subtracting the mean of the aerial phase 
+directly before and after a step, represented by:
 
-$$S_n = D_n - \frac{aerial_n + aerial_{n+1}}{2}$$
+$$S_n = D_n - \frac{A_n + A_{n+1}}{2}$$
 
-Where $n$ is a given step, $aerial$ is the mean vertical GRF during the aerial phase, $D$ is the drifting signal 
+Where $n$ is a given step, $A$ is the mean vertical GRF during the aerial phase, $D$ is the drifting signal 
 signal, and $S$ is the returned signal with drift removed. 
 This process is repeated for all steps present in a trial, with drift of the first and last step estimated from 
-an adjacent step.
+an adjacent step. Figure 2 illustrates the change in aerial phase values using this method.
 
 ![Figure 2](mean_aerial_phases.png)
 *Figure 2. Mean aerial phase vertical ground reaction force for 78 steps before (blue dots) and after (red dots) 
