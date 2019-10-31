@@ -28,11 +28,11 @@ GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
 [step_begin,step_end] = split_steps(GRF_filt(:,3),... %vertical GRF
+    Fs,... %Sampling Frequency
     110,... %threshold
     0.2,... %min_tc
     0.4,... %max_tc
-    Fs,... %Sampling Frequency 
-    0); %(d)isplay plots = False
+    1); %(d)isplay plots = True
 
 %% Identify where aerial phase occurs (feet not on ground)                                
 aerial_begin =  step_end(1:end-1);
