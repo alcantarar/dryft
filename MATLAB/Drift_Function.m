@@ -1,5 +1,5 @@
 function [summed_force_detrend,transducer_force_detrend] = Drift_Function(summed_force, transducer_force,Fs_force, step_threshold, min_step, max_step, trim, g)
-%Program detrends force signal in a step-specific manner.Subtracts mean of
+%Script detrends force signal in a step-specific manner.Subtracts mean of
 %aerial phase before and after given step across whole trial.
 %
 % INPUTS:
@@ -18,17 +18,7 @@ function [summed_force_detrend,transducer_force_detrend] = Drift_Function(summed
 %
 %Created by: Ryan Alcantara - ryan.alcantara@colorado.edu
 %
-%% simple filter
-Fc_force = 30;%hz
-fn = (Fs_force/2);
-[b, a] = butter(2,Fc_force/fn);
-%convert nans to 0 before filtering the summed force
-if isnan(summed_force)
-    warning('converting NaNs to 0')
-    summed_force(isnan(summed_force) == 1) = 0;
-end
-%filter
-summed_force_f = filtfilt(b,a,summed_force);
+
 %% simple step ID
 blah = summed_force_f(:,3) > step_threshold; %every data point that is over the threshold
 events = diff(blah); % either x2-x1 = 0-1 = -1 (end of step) or x2-x1 = 1-0 = 1 (beginning of step)
