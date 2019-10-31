@@ -1,7 +1,7 @@
 # `dryft` port for MATLAB
 #### Created by [Ryan Alcantara](https://alcantarar.github.io)
 While `dryft` is a python package, I've ported it to MATLAB because many biomechanical researchers only know how to use 
-MATLAB. Here is a quick overview of how to use the `dryft` MATLAB code. Open an [issue](https://github.com/alcantarar/dryft/issues) 
+MATLAB :disappointed:. Here is a quick overview of how to use the `dryft` MATLAB code. Open an [issue](https://github.com/alcantarar/dryft/issues) 
 if there are problems or better yet, contribute code via a [pull requests](https://github.com/alcantarar/dryft/pulls) 
 to improve this MATLAB version! 
 
