@@ -18,37 +18,51 @@ bibliography: paper.bib
 
 ---
 
+# Background
+GRFs are the force exerted by the body on the ground during activities like walking and running. 
+GRFs are clinically relevant and commonly measured in biomechanics.
+To collect GRFs more easily, researchers use force plates and treadmills instrumented with force transducers.
+Instrumented treadmills are special though, because they allow for the measurement of GRFs over long periods of time. 
+However, force signals can be affected by changes in temperature or signal amplifiers, causing the signal to drift over time.
+Signal drift, if ignored, can result in the loss of data if GRFs exceed the range of the force transducer. 
+
+Even if a GRF signal does not exceed the range of the transducer, drift can still result in inaccurate data.
+For example, signal drift can have additive effects on the measurement of stride kinematics like contact time during 
+running. 
+Contact time is the time the foot is in contact with the ground and is often defined as the duration when the vertical 
+GRF is above a threshold.  
+Signal drift can cause an increasing (or decreasing) amount of the vertical GRF signal to fall below the threshold, 
+artificially increasing the variation in contact time or other time-dependent biomechanical variables (Figure 1).
+
+![Figure 1](Figure_1.png)
+*Figure 1. Vertical ground reaction force signal where signal drifts postiively 100 Newtons. 
+Contact time increases by ~0.04s, or ~17%.* 
+ 
+To combat signal drift, it is best practice to zero the force transducer signal between trials during data collection. 
+This must be done when no force is being applied to the force transducers to ensure accurate signals.
+However, zeroing of force transducers may not be feasible for protocols requiring extended periods of continuous
+running on an instrumented treadmill, causing GRF signals to drift over time.
+Signal drift is not unique to running biomechanics, as there are signal processing methods available to remove offsets 
+[v3d] and linear drift [scipy/matlab detrend]. However, drift in GRF signals over time are not guaranteed to be
+linear. 
+Here, I introduce `dryft`, a Python and MATLAB package that is designed to remove non-linear drift in an individual's 
+GRF signal during running by taking a stepwise approach. 
+
+
 # Summary
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean luctus sem tempus tincidunt lacinia. Morbi lacinia 
-non purus sed varius. Ut ut fermentum ante. Sed blandit est sapien, sit amet suscipit tellus ornare ut. Proin blandit
-luctus augue a pretium. Integer facilisis tellus diam, suscipit sodales ex semper sed. Pellentesque congue, lorem in 
-bibendum congue, felis odio vehicula eros, ut commodo ex sem vel mi. Donec ac lorem id lacus laoreet gravida. Duis 
-dapibus accumsan elit ut egestas. Maecenas dignissim, orci mollis egestas bibendum, leo turpis pulvinar quam, eu 
-ornare lacus tortor quis sem. Cras auctor mauris ut pulvinar gravida. Fusce vestibulum ante id mauris maximus 
-interdum. Donec non est dignissim, rutrum magna vitae, hendrerit dolor. Morbi mattis volutpat dolor, vel consectetur 
-nunc malesuada at.
+During the aerial phase, the body is exerting no forces on the ground and we assume any forces measured by the 
+instrumented treadmill are due to the motion of the belt or drift. 
+A common method of correcting for drift and noise in the baseline signal is to subtract the forces measured during an 
+aerial phase at the beginning of the recording and subtracting it from the raw force signal, effectively taring the 
+signal (Visual3d FP_ZERO parameter). 
+However, this method cannot account for changes in the direction or magnitude of drift within a given trial. 
+Our stepwise approach tares each step individually by subtracting the mean of the aerial phase directly before and 
+after the given step.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean luctus sem tempus tincidunt lacinia. Morbi lacinia 
-non purus sed varius. Ut ut fermentum ante. Sed blandit est sapien, sit amet suscipit tellus ornare ut. Proin blandit
-luctus augue a pretium. Integer facilisis tellus diam, suscipit sodales ex semper sed. Pellentesque congue, lorem in 
-bibendum congue, felis odio vehicula eros, ut commodo ex sem vel mi. Donec ac lorem id lacus laoreet gravida. Duis 
-dapibus accumsan elit ut egestas. Maecenas dignissim, orci mollis egestas bibendum, leo turpis pulvinar quam, eu 
-ornare lacus tortor quis sem. Cras auctor mauris ut pulvinar gravida. Fusce vestibulum ante id mauris maximus 
-interdum. Donec non est dignissim, rutrum magna vitae, hendrerit dolor. Morbi mattis volutpat dolor, vel consectetur 
-nunc malesuada at.
+$$Dstep_n = Ostep_n - 0.5*(Aerial_n + Aerial_n+1)$$
 
-This is how an inline citation is made inline [@test].
-
-# Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
+Where $n$ is the step number, $Aerial$ is the mean vertical GRF during the aerial phase, and $Ostep$ and $Dstep$ are 
+the original and detrended force signals for a given step.
 
 
 # Citations
@@ -66,7 +80,7 @@ For a quick reference, the following citation commands can be used:
 
 Figures can be included like this: 
 
-![Example figure.](test_figure.jpg)
+![Example figure.](mean_aerial_phases.png)
 
 # Acknowledgements
 
