@@ -10,8 +10,6 @@ authors:
   - name: Ryan S. Alcantara
     orcid: 0000-0002-8539-711X
     affiliation: "1"
-  - name: Author Without ORCID
-    affiliation: 2
 affiliations:
  - name: Department of Integrative Physiology, University of Colorado Boulder, Boulder CO, USA 
    index: 1
