@@ -16,10 +16,12 @@
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 %% Read in data from force plate
+clear
+close
 GRF = dlmread('drifting_forces.txt');
 
 %% Apply Butterworth filter
-Fs = 600;
+Fs = 300; % From Fukuchi et al. (2017) dataset
 Fc = 60;
 Fn = (Fs/2);
 [b, a] = butter(2, Fc/Fn);
@@ -28,8 +30,8 @@ GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
 [step_begin,step_end] = split_steps(GRF_filt(:,3),... %vertical GRF
-    Fs,... %Sampling Frequency
     110,... %threshold
+    Fs,... %Sampling Frequency
     0.2,... %min_tc
     0.4,... %max_tc
     1); %(d)isplay plots = True
