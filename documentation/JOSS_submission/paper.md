@@ -59,7 +59,7 @@ However, this method cannot account for changes in the direction or magnitude of
 Our stepwise approach tares each step individually by subtracting the mean of the aerial phase directly before and 
 after the given step.
 
-$$D_n = GRF_n - (aerial_n + aerial_{n+1})/2$$
+$$D_n = GRF_n - \frac{aerial_n + aerial_{n+1}}{2}$$
 
 Where for step $n$, $aerial$ is the mean vertical GRF during the aerial phase, $GRF$ is the original 
 signal, and D$ is the detrended signal. 
