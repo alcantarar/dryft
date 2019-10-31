@@ -66,7 +66,7 @@ For a quick reference, the following citation commands can be used:
 
 Figures can be included like this: 
 
-![Example figure.](test_figure.jpg | width=100)
+![Example figure.](test_figure.jpg)
 
 # Acknowledgements
 
