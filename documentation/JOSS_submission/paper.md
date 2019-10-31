@@ -72,5 +72,5 @@ Figures can be included like this:
 
 The author would like to thank MRP for their support as well as GB and 
 [/r/learnpython](https://reddit.com/r/learnpython) for their feedback during package development. 
-[comment]: <> (https://www.reddit.com/r/learnpython/comments/9s76n3/newtopython_programmer_seeking_feedback/)
+
 # References
