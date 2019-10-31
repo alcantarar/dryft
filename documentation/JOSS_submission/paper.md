@@ -59,29 +59,23 @@ However, this method cannot account for changes in the direction or magnitude of
 Our stepwise approach tares each step individually by subtracting the mean of the aerial phase directly before and 
 after the given step.
 
-$$D_n = GRF_n - \frac{aerial_n + aerial_{n+1}}{2}$$
+$$S_n = D_n - \frac{aerial_n + aerial_{n+1}}{2}$$
 
-Where for step $n$, $aerial$ is the mean vertical GRF during the aerial phase, $GRF$ is the original 
-signal, and D$ is the detrended signal. 
-This process is repeated for all steps present in a trial, with GRF of the first and last step being estimated from 
-an adjacent step's aerial phase.
+Where $n$ is a given step, $aerial$ is the mean vertical GRF during the aerial phase, $D$ is the drifting signal 
+signal, and $S$ is the returned signal with drift removed. 
+This process is repeated for all steps present in a trial, with drift of the first and last step estimated from 
+an adjacent step.
+
+![Figure 2](mean_aerial_phases.png)
+*Figure 2. Mean aerial phase vertical ground reaction force for 78 steps before (blue dots) and after (red dots) 
+correcting for signal drift. `dryft` brings aerial phase values closer to zero and works on positive and 
+negative drift across a range of slopes.*  
 
 # Citations
 
 Citations to entries in paper.bib should be in
 [rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
 format.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
-Figures can be included like this: 
-
-![Example figure.](mean_aerial_phases.png)
 
 # Acknowledgements
 
