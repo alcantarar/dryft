@@ -59,11 +59,12 @@ However, this method cannot account for changes in the direction or magnitude of
 Our stepwise approach tares each step individually by subtracting the mean of the aerial phase directly before and 
 after the given step.
 
-$$Dstep_n = Ostep_n - 0.5*(Aerial_n + Aerial_n+1)$$
+$$D_n = GRF_n - (aerial_n + aerial_(n+1))/2$$
 
-Where $n$ is the step number, $Aerial$ is the mean vertical GRF during the aerial phase, and $Ostep$ and $Dstep$ are 
-the original and detrended force signals for a given step.
-
+Where for step $n$, $aerial$ is the mean vertical GRF during the aerial phase, $GRF$ is the original 
+signal, and D$ is the detrended signal. 
+This process is repeated for all steps present in a trial, with GRF of the first and last step being estimated from 
+an adjacent step's aerial phase.
 
 # Citations
 
