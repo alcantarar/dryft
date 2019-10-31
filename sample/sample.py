@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 GRF = pd.read_csv('drifting_forces.txt', header=None)
 
 # Apply Butterworth Filter
-Fs = 600
+Fs = 300
 Fc = 60
 Fn = (Fs / 2)
 b,a = butter(2, Fc/Fn)
