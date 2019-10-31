@@ -1,6 +1,22 @@
 function [aerial_means] = mean_aerial_force(force, step_begin, step_end, trim)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%MEAN_AERIAL_FORCE Calculates mean force signal during aerial phase of
+%running.
+%   INPUTS
+%   ------
+%   force: nx1 array of force signal to be detrended
+%   step_begin: array of frames for initial contact. Output from
+%       [split_steps.m].
+%   step_end: array of frames for toe-off. Output from [split_steps.m]
+%   trim: number of frames to trim from beginning/end of aerial phase.
+%       Output from [trim_aerial.m].
+%
+%   OUTPUT
+%   ------
+%   aerial_means: mean force signal for all aerial phases in trial.
+%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 %define aerial phases
 aerial_begin = step_end(1:end-1);

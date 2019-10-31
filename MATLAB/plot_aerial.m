@@ -1,6 +1,30 @@
 function plot_aerial(force, aerial_means, aerial_begin, aerial_end, trim)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+%PLOT_AERIAL Plots untrimmed aerial phases, trimmed aerial phases, and the
+%means of the trimmed aerial phases. 
+%   Visualizes the means used to account for the drift in [detrend.m]
+%
+%   INPUTS
+%   ------
+%   force: Nx1 array of force signal
+%   aerial_means: mean force signal for aerial phase. Output from
+%       [trim_aerial.m].
+%   aerial_begin: array of frames where aerial phase begins. see EXAMPLE.
+%   aerial_end: array of frames where aerial phase ends. see EXAMPLE.
+%   trim: number of frames to trim from beginning/end of aerial phase.
+%       Output from [trim_aerial.m].
+%
+%   EXAMPLE from [sample.m]
+%   -------
+%   aerial_begin =  step_end(1:end-1);
+%   aerial_end = step_begin(2:end);
+%   trim = trim_aerial(GRF_filt(:,3), step_begin, step_end);                         
+%   aerial_means = mean_aerial_force(GRF_filt(:,3), step_begin, step_end, trim);
+%
+%   plot_aerial(GRF_filt(:,3), aerial_means, aerial_begin, aerial_end, trim)
+%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 colors = parula(length(aerial_begin));
 %plot all untrimmed aerial phases

@@ -1,7 +1,29 @@
 function [force_fd,aerial_means_d] = detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, d)
-%UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here
-
+%DETREND Removes linear or non-linear drift from running ground reaction
+%force data in a stepwise manner.
+%   INPUT
+%   -----
+%   force_f: nx1 array containing force signal to be detrended
+%   Fs: Sampling frequency of force signal
+%   aerial_means: mean force signal for aerial phase. Output from
+%       [trim_aerial.m].
+%   step_begin: array of frames for initial contact. Output from
+%       [split_steps.m].
+%   step_end: array of frames for toe-off. Output from [split_steps.m]
+%   trim: number of frames to trim from beginning/end of aerial phase.
+%       Output from [trim_aerial.m].
+%   d: binary argument to display plots. Helpful for troubleshooting.
+%
+%   OUTPUT
+%   ------
+%   force_fd: detrended force signal
+%   aerial_means_d: means of aerial phase for detrended signal. Should be
+%       close to zero. May be able to apply [detrend.m] multiple times if
+%       signal not detrended enough (NOT TESTED).
+%
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu 
+%   License: MIT (c) 2019 Ryan Alcantara
+%   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 force_fd = NaN(size(force_f));
 aerial_begin = step_end(1:end-1);
