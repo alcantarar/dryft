@@ -1,6 +1,6 @@
 function [step_begin,step_end] = split_steps(force_f,threshold, Fs_force, min_tc, max_tc, d)
-%STEP_ID_RA reads in FILTERED running ground reaction force data and splits steps based on a force threshold.
-% %
+%SPLIT_STEPS reads in FILTERED running ground reaction force data and splits steps based on a force threshold.
+%
 %   Author: Ryan Alcantara || ryan.alcantara@colorado.edu || github.com/alcantarar
 %
 %   INPUTS
@@ -31,7 +31,7 @@ function [step_begin,step_end] = split_steps(force_f,threshold, Fs_force, min_tc
 %   min_tc = 0.2; %seconds
 %   max_tc = 0.4; %seconds
 %   d = 1; 
-%   [step_begin,step_end, step_len] = step_ID_RA(force_f,threshold, Fs_force min_tc, max_tc, d)
+%   [step_begin,step_end, step_len] = split_steps(force_f,threshold, Fs_force min_tc, max_tc, d)
 %
 if max_tc < min_tc
     error('max_tc must be greater than min_tc')
