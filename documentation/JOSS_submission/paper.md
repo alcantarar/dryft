@@ -64,12 +64,11 @@ For a quick reference, the following citation commands can be used:
 
 # Figures
 
-Figures can be included like this: ![Example figure.](test_figure.jpg)
+Figures can be included like this: ![Example figure.](test_figure.jpg | width = 100)
 
 # Acknowledgements
 
 The author would like to thank MRP for their support as well as GB and 
-[/r/learnpython](https://reddit.com/r/learnpython) for their feedback during package development. 
-#https://www.reddit.com/r/learnpython/comments/9s76n3/newtopython_programmer_seeking_feedback/
+[/r/learnpython](https://reddit.com/r/learnpython) for their feedback during package development. # https://www.reddit.com/r/learnpython/comments/9s76n3/newtopython_programmer_seeking_feedback/
 
 # References
