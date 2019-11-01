@@ -137,9 +137,8 @@ def meanaerialforce(force, begin, end, trim ):
 
     Returns
     -------
-    trim : `number`
-        Number of frames to trim off the beginning and end of each aerial phase when degrending force signa.
-        Is calculated as average of user inputs.
+    aerial_means : `ndarray`
+        Array containing means of aerial phase force signal. Excludes part of start/end of aerial phase as defined by `trim`.
 
     """
 
