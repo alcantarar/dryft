@@ -293,7 +293,7 @@ def trimaerial(force, begin, end):
         ax.set_xlabel('frames')
         ax.set_ylabel('force (N)')
         plt.tight_layout()
-
+        plt.show(block = False)
         # user input from mouse click
         bad_points = 1
         while bad_points:
@@ -312,7 +312,8 @@ def trimaerial(force, begin, end):
                     int)
                 print('trimming ', trim, ' frames from the start/end of aerial phase')
                 bad_points = 0
-                plt.close(trim_fig)
     else: raise IndexError('force.ndim != 1')
+
+    plt.close()
     return trim
 

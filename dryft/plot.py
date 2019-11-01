@@ -34,7 +34,7 @@ def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
 
     """
 
-    if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
+    if aerial_means.shape[0] == begin.shape[0]  == end.shape[0]:
         colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
         plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
 
@@ -62,6 +62,7 @@ def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
                        marker='o',
                        color=colors[i])
         plt.show(block = False)
+    else: raise IndexError("Number of aerial_means isn't number of steps - 1.")
 
 
 def stance(force, begin, end):
