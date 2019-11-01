@@ -22,6 +22,8 @@ step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
 # plot.stance(GRF_filt[:,2], step_begin, step_end)
 
 # Identify where aerial phase occurs (feet not on ground)
+#Use aerial phase after first step to the aerial phase before the last whole step.
+# This method guarantees aerial phases per signal.splitsteps()
 aerial_begin_all = step_end[:-1]
 aerial_end_all = step_begin[1:]
 print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.shape[0])

@@ -64,18 +64,18 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
 
     # first step [0], extended from beginning of file
     i = 0
-    diff_temp = (aerial_means[i] + aerial_means[i + 1]) / 2
+    diff_temp = aerial_means[i] # just use aerial phase after first step. guaranteed to be there.
     diff_vals.append(diff_temp)
     force_fd[0:step_begin[i + 1],] = force_f[0:step_begin[i + 1],] - diff_temp
     # 1:n-1 steps
     i = 1
-    while i < min(step_begin.shape[0], step_end.shape[0]) - 1:
-        diff_temp = (aerial_means[i] + aerial_means[i + 1]) / 2
+    while i < min(step_begin.shape[0], step_end.shape[0])-1: #less than 79
+        diff_temp = (aerial_means[i-1] + aerial_means[i]) / 2
         diff_vals.append(diff_temp)
         force_fd[step_begin[i]:step_begin[i + 1],] = force_f[step_begin[i]:step_begin[i + 1],] - diff_temp
         i = i + 1
     # last step [n], extended to end of file
-    diff_temp = (aerial_means[i - 1] + aerial_means[i]) / 2
+    diff_temp = aerial_means[i] # just use aerial phase right before last step. guaranteed to be there
     diff_vals.append(diff_temp)
     force_fd[step_begin[i]:force_f.shape[0],] = force_f[step_begin[i]:force_f.shape[0],] - diff_temp
 
@@ -85,17 +85,18 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
                      force_f,
                      color='tab:blue',
-                     alpha=0.7)  # converted to sec
+                     alpha=1)  # converted to sec
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
                      force_fd,
                      color='tab:red',
-                     alpha=0.7)  # converted to sec
+                     alpha=1)  # converted to sec
         sigcomp.grid()
         sigcomp.legend(['original signal', 'detrended signal'], loc=1)
         sigcomp.set_xlabel('Seconds')
         sigcomp.set_ylabel('force (N)')
 
     # calculate mean aerial for detrend data
+    # FIX THIS. NOT ALL AERIAL MEANS ARE BEING INSERTED, RESULTING IN FALSE 0 FROM np.zeros. MAKE SURE AERIAL PHASES MATCH
     aerial_means_d = np.zeros(aerial_means.shape[0])
     for i in range(aerial_begin.shape[0]):
         aerial_means_d[i] = np.mean(
@@ -109,7 +110,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         meancomp.set_ylabel('force (N)')
         meancomp.grid()
         # np.ylim([-20,20])
-        for i in range(aerial_means.shape[0] - 1):
+        for i in range(aerial_means.shape[0]):
             meancomp.plot(i, aerial_means[i],
                           marker='.',
                           color='tab:blue',
