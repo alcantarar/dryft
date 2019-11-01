@@ -1,0 +1,39 @@
+==> 2019-11-01 10:40:19 <==
+# cmd: /anaconda3/bin/conda-env update --prefix .env --file environment.yml --prune
+# conda version: 4.6.14
++conda-forge::ca-certificates-2019.9.11-hecc5488_0
++conda-forge::certifi-2019.6.16-py36_1
++conda-forge::cycler-0.10.0-py_2
++conda-forge::freetype-2.10.0-h24853df_1
++conda-forge::kiwisolver-1.1.0-py36h770b8ee_0
++conda-forge::libblas-3.8.0-14_openblas
++conda-forge::libcblas-3.8.0-14_openblas
++conda-forge::libcxx-9.0.0-h89e68fa_1
++conda-forge::libffi-3.2.1-h6de7cb9_1006
++conda-forge::libgfortran-4.0.0-2
++conda-forge::liblapack-3.8.0-14_openblas
++conda-forge::libopenblas-0.3.7-h4bb4525_2
++conda-forge::libpng-1.6.37-h2573ce8_0
++conda-forge::llvm-openmp-9.0.0-h40edb58_0
++conda-forge::matplotlib-3.1.1-py36_1
++conda-forge::matplotlib-base-3.1.1-py36h3a684a6_1
++conda-forge::ncurses-6.1-h0a44026_1002
++conda-forge::numpy-1.17.3-py36hde6bac1_0
++conda-forge::openssl-1.1.1c-h01d97ff_0
++conda-forge::pandas-0.25.3-py36h4f17bb1_0
++conda-forge::pip-19.3.1-py36_0
++conda-forge::pyparsing-2.4.2-py_0
++conda-forge::python-3.6.7-h94afb7f_1005
++conda-forge::python-dateutil-2.8.0-py_0
++conda-forge::pytz-2019.3-py_0
++conda-forge::readline-8.0-hcfe32e1_0
++conda-forge::scipy-1.3.1-py36h7e0e109_2
++conda-forge::setuptools-41.6.0-py36_0
++conda-forge::six-1.12.0-py36_1000
++conda-forge::sqlite-3.30.1-h93121df_0
++conda-forge::tk-8.6.9-h2573ce8_1003
++conda-forge::tornado-6.0.3-py36h01d97ff_0
++conda-forge::wheel-0.33.6-py36_0
++conda-forge::xz-5.2.4-h1de35cc_1001
++conda-forge::zlib-1.2.11-h0b31af3_1006
+# update specs: ['matplotlib', 'scipy', 'pandas', 'python=3.6', 'numpy']

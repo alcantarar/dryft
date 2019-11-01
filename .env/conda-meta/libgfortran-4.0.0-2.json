@@ -1,0 +1,102 @@
+{
+  "build": "2",
+  "build_number": 2,
+  "channel": "https://conda.anaconda.org/conda-forge/osx-64",
+  "constrains": [],
+  "depends": [
+    "llvm-openmp >=8.0.0",
+    "llvm-openmp >=8.0.1"
+  ],
+  "extracted_package_dir": "/anaconda3/pkgs/libgfortran-4.0.0-2",
+  "features": "",
+  "files": [
+    "lib/libgcc_s.1.dylib",
+    "lib/libgcc_s_ppc64.1.dylib",
+    "lib/libgcc_s_x86_64.1.dylib",
+    "lib/libgfortran.4.dylib",
+    "lib/libgfortran.dylib",
+    "lib/libgomp.1.dylib",
+    "lib/libgomp.dylib",
+    "lib/libquadmath.0.dylib",
+    "lib/libquadmath.dylib"
+  ],
+  "fn": "libgfortran-4.0.0-2.tar.bz2",
+  "license": "GPL 3 (with GCC Runtime Library Exception 3.1)",
+  "license_family": "GPL",
+  "link": {
+    "source": "/anaconda3/pkgs/libgfortran-4.0.0-2",
+    "type": 1
+  },
+  "md5": "c22c451e64f8f5a6644b2f02febac8a6",
+  "name": "libgfortran",
+  "package_tarball_full_path": "/anaconda3/pkgs/libgfortran-4.0.0-2.tar.bz2",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "lib/libgcc_s.1.dylib",
+        "path_type": "hardlink",
+        "sha256": "c53781f29e73ae812705e7d695db43cbfd73850e67df49f09082233b50b115ec",
+        "sha256_in_prefix": "c53781f29e73ae812705e7d695db43cbfd73850e67df49f09082233b50b115ec",
+        "size_in_bytes": 135744
+      },
+      {
+        "_path": "lib/libgcc_s_ppc64.1.dylib",
+        "path_type": "softlink",
+        "sha256": "c53781f29e73ae812705e7d695db43cbfd73850e67df49f09082233b50b115ec",
+        "size_in_bytes": 135744
+      },
+      {
+        "_path": "lib/libgcc_s_x86_64.1.dylib",
+        "path_type": "softlink",
+        "sha256": "c53781f29e73ae812705e7d695db43cbfd73850e67df49f09082233b50b115ec",
+        "size_in_bytes": 135744
+      },
+      {
+        "_path": "lib/libgfortran.4.dylib",
+        "path_type": "hardlink",
+        "sha256": "bdcad19938e924816da1326e2d15be153029402e90c2f69b307c0864c312bcb4",
+        "sha256_in_prefix": "bdcad19938e924816da1326e2d15be153029402e90c2f69b307c0864c312bcb4",
+        "size_in_bytes": 1851728
+      },
+      {
+        "_path": "lib/libgfortran.dylib",
+        "path_type": "softlink",
+        "sha256": "bdcad19938e924816da1326e2d15be153029402e90c2f69b307c0864c312bcb4",
+        "size_in_bytes": 1851728
+      },
+      {
+        "_path": "lib/libgomp.1.dylib",
+        "path_type": "softlink",
+        "sha256": "72921890730463e5df568657bc7e402f457ea7d95bce5aace3b7246b9cd9c655",
+        "size_in_bytes": 644832
+      },
+      {
+        "_path": "lib/libgomp.dylib",
+        "path_type": "softlink",
+        "sha256": "72921890730463e5df568657bc7e402f457ea7d95bce5aace3b7246b9cd9c655",
+        "size_in_bytes": 644832
+      },
+      {
+        "_path": "lib/libquadmath.0.dylib",
+        "path_type": "hardlink",
+        "sha256": "ca939de7691efcd828b4e3477cc2a7cad51ddd7d11926eff1f7ef00302042907",
+        "sha256_in_prefix": "ca939de7691efcd828b4e3477cc2a7cad51ddd7d11926eff1f7ef00302042907",
+        "size_in_bytes": 236428
+      },
+      {
+        "_path": "lib/libquadmath.dylib",
+        "path_type": "softlink",
+        "sha256": "ca939de7691efcd828b4e3477cc2a7cad51ddd7d11926eff1f7ef00302042907",
+        "size_in_bytes": 236428
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "size": 733051,
+  "subdir": "osx-64",
+  "timestamp": 1566249811279,
+  "track_features": "",
+  "url": "https://conda.anaconda.org/conda-forge/osx-64/libgfortran-4.0.0-2.tar.bz2",
+  "version": "4.0.0"
+}

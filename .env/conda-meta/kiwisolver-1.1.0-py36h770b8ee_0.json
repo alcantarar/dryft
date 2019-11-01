@@ -1,0 +1,86 @@
+{
+  "build": "py36h770b8ee_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/osx-64",
+  "constrains": [],
+  "depends": [
+    "libcxx >=4.0.1",
+    "python >=3.6,<3.7.0a0"
+  ],
+  "extracted_package_dir": "/anaconda3/pkgs/kiwisolver-1.1.0-py36h770b8ee_0",
+  "features": "",
+  "files": [
+    "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/INSTALLER",
+    "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/METADATA",
+    "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/RECORD",
+    "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/WHEEL",
+    "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/top_level.txt",
+    "lib/python3.6/site-packages/kiwisolver.cpython-36m-darwin.so"
+  ],
+  "fn": "kiwisolver-1.1.0-py36h770b8ee_0.tar.bz2",
+  "license": "BSD 3-Clause",
+  "license_family": "BSD",
+  "link": {
+    "source": "/anaconda3/pkgs/kiwisolver-1.1.0-py36h770b8ee_0",
+    "type": 1
+  },
+  "md5": "00faa306e0576e64cf0789cc8e9cd3ef",
+  "name": "kiwisolver",
+  "package_tarball_full_path": "/anaconda3/pkgs/kiwisolver-1.1.0-py36h770b8ee_0.tar.bz2",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+        "sha256_in_prefix": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+        "size_in_bytes": 4
+      },
+      {
+        "_path": "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "9cd217fd0a3609309e2fa9cf64bae1afe4cd4ab60ccd8a7f2ab71d7fd5369e84",
+        "sha256_in_prefix": "9cd217fd0a3609309e2fa9cf64bae1afe4cd4ab60ccd8a7f2ab71d7fd5369e84",
+        "size_in_bytes": 1789
+      },
+      {
+        "_path": "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "24043bd0e2571e9b83c17de4e07005b9b0af82ee2b788bfa2cd29b2d5feb83fb",
+        "sha256_in_prefix": "24043bd0e2571e9b83c17de4e07005b9b0af82ee2b788bfa2cd29b2d5feb83fb",
+        "size_in_bytes": 498
+      },
+      {
+        "_path": "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "ed162b1cbc22e3a1125fe6046d7f7a01bb7af112ada4c44abb37fe379eb77374",
+        "sha256_in_prefix": "ed162b1cbc22e3a1125fe6046d7f7a01bb7af112ada4c44abb37fe379eb77374",
+        "size_in_bytes": 110
+      },
+      {
+        "_path": "lib/python3.6/site-packages/kiwisolver-1.1.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "c6ac168fba121e5a488dcc3640c25bf29b9314f7630c13bbf00669f608d387d7",
+        "sha256_in_prefix": "c6ac168fba121e5a488dcc3640c25bf29b9314f7630c13bbf00669f608d387d7",
+        "size_in_bytes": 11
+      },
+      {
+        "_path": "lib/python3.6/site-packages/kiwisolver.cpython-36m-darwin.so",
+        "file_mode": "binary",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/usr/local/miniconda/conda-bld/kiwisolver_1556163490956/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_pl",
+        "sha256": "031109a87181bb5f7e75c5b6700f38ad8d80a6c9d271b8a5b682ee9c97738d4c",
+        "sha256_in_prefix": "39130befd0f316f03bec0c95e934b4d403252b22b2b9f5703cdc30e256521d24",
+        "size_in_bytes": 157456
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "size": 58289,
+  "subdir": "osx-64",
+  "timestamp": 1556163637988,
+  "track_features": "",
+  "url": "https://conda.anaconda.org/conda-forge/osx-64/kiwisolver-1.1.0-py36h770b8ee_0.tar.bz2",
+  "version": "1.1.0"
+}
