@@ -78,5 +78,6 @@ Rplots.pdf
 ### Other things to ignore ###
 .DS_Store
 .idea
+.env
 
 # End of https://www.gitignore.io/api/r,matlab
