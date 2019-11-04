@@ -59,14 +59,21 @@ This process is repeated for all steps present in a trial, with drift of the fir
 only one adjacent aerial phase.
 
 I generated a drifting signal by adding a sine wave (amplitude: 100 N, wavelength: 30 s) to a 
-30-second vGRF signal collected by an instrumented signal available from Fukuchi et al. (2017).
-Figure 2 illustrates the improvement in mean aerial phase values when using `dryft` to correct the signal’s drift.
+30-second vGRF signal collected by an instrumented signal (available from Fukuchi et al. (2017)).
+Figure 2 and 3 illustrate improvements in mean aerial phase values and vertical GRF signal when using `dryft` to 
+correct drift.
 `dryft` can be repeatedly implemented to further reduce signal drift, although substantial improvements are
 observed with a single use.
 
-![Figure 2](mean_aerial_phases.png)
-*Figure 2. Vertical ground reaction forces (top) and mean aerial phase values (bottom) before (blue dots) and after 
-(red dots) using `dryft` to correct for signal drift.*  
+![Figure 2](steps.png)
+*Figure 2. Mean aerial phase values before (orange) and after 
+(blue) using `dryft` to correct for signal drift of +/- 100 Newtons over 30 seconds of running.* 
+
+![Figure3](waveform.png)
+*Figure 3. Representative vertical ground reaction force signal before (orange) and after
+(blue) using `dryft` to correct for drift. 
+Data and code to produce this result are located in `sample` folder.*
+ 
 
 The primary application of the `dryft` package is to remove signal drift in GRF signals produced during treadmill running, 
 but one of its supporting functions, `signal.splitsteps()` may also be useful to biomechanical researchers.
