@@ -42,3 +42,6 @@ force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
                                           step_end,
                                           trim,
                                           plot=True) #grf_filt and aerial_means must be same width
+
+# Can be applied again to further reduce drift
+force_fdd, aerial_means_dd = signal.detrend(force_fd, Fs, aerial_means_d, step_begin, step_end, trim, plot = True)

@@ -85,11 +85,11 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
                      force_f,
                      color='tab:blue',
-                     alpha=1)  # converted to sec
+                     alpha=0.75)  # converted to sec
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
                      force_fd,
                      color='tab:red',
-                     alpha=1)  # converted to sec
+                     alpha=0.75)  # converted to sec
         sigcomp.grid()
         sigcomp.legend(['original signal', 'detrended signal'], loc=1)
         sigcomp.set_xlabel('Seconds')
@@ -116,7 +116,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
                           label='detrended signal')
             meancomp.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
         plt.tight_layout()
-        plt.show(block=True)
+        plt.show(block=False)
 
     return force_fd, aerial_means_d
 
@@ -214,6 +214,7 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         compare = (vGRF > threshold).astype(int)
 
         events = np.diff(compare)
+        print(sum((compare)))
         step_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
         step_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
 
