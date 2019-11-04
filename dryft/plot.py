@@ -65,7 +65,7 @@ def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
     else: raise IndexError("Number of aerial_means isn't number of steps - 1.")
 
 
-def stance(force, begin, end):
+def stance(force, begin, end, colormap=plt.cm.viridis):
     """Plots separated steps on top of each other.
 
     Requires an `ndarray` of beginning/end of stance phase indexes and 1d force data. Use to confirm `step.split`.
@@ -78,6 +78,9 @@ def stance(force, begin, end):
         Array of frame indexes for start of each stance phase.
     end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`.
+    colormap : `colormap`
+        Default is `matplotlib.plt.cm.viridis`
+
 
     Returns
     -------
@@ -89,7 +92,7 @@ def stance(force, begin, end):
         plot.stance(GRF_filt[:,2], step_begin, step_end)
 
     """
-    colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
+    colors = colormap(np.linspace(0,1,begin.shape[0]))
 
     fig, ax = plt.subplots()
     ax.set_title('All separated steps')
