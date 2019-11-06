@@ -31,19 +31,19 @@ aerial_end = step_begin(2:end);
 
 %first step, extend from beginning of trial
 i = 1;
-diff_temp = (aerial_means(i)+aerial_means(i+1))/2; %mean of aerial phaes before/after given step (i)
+diff_temp = aerial_means(i); %mean of aerial phase after first step guranteed to be there
 diff_vals(i) = diff_temp; %hang onto value subtracted from each step
 force_fd(1:step_begin(i+1)) = force_f(1:step_begin(i+1)) - diff_temp;
 %2:n-1 steps
 i = 2;
-while i < min([length(step_begin), length(step_end)]) -1
-    diff_temp = (aerial_means(i)+aerial_means(i+1))/2; %mean of aerial phaes before/after given step (i)
+while i < min([length(step_begin), length(step_end)])
+    diff_temp = (aerial_means(i-1)+aerial_means(i))/2; %mean of aerial phaes before/after given step (i)
     diff_vals(i) = diff_temp; %hang onto value subtracted from each step
     force_fd(step_begin(i):step_begin(i+1)) = force_f(step_begin(i):step_begin(i+1)) - diff_temp;
     i = i+1;
 end
 %last step, extend to end of file
-diff_temp = (aerial_means(i-1)+aerial_means(i))/2; %mean of aerial phaes before/after given step (i)
+diff_temp = aerial_means(i-1); %mean of aerial phaes before last step
 diff_vals(i) = diff_temp; %hang onto value subtracted from each step
 force_fd(step_begin(i):end) = force_f(step_begin(i):end) - diff_temp;
 
@@ -60,10 +60,7 @@ if d
 end    
 
 %calculate mean aerial phase for detrend data
-for i = 1:length(aerial_begin)
-    aerial_means_d(i) = mean(force_fd(aerial_begin(i)+trim:aerial_end(i)-trim));
-end
-aerial_means_d = aerial_means_d(aerial_means_d ~=0.0);
+aerial_means_d = mean_aerial_force(force_fd, step_begin, step_end, trim);
 
 % i = 1;
 % while i < min([length(step_begin), length(step_end)])
@@ -75,7 +72,7 @@ aerial_means_d = aerial_means_d(aerial_means_d ~=0.0);
 if d
     subplot(2,1,2)
     hold on
-    for i = 1:length(aerial_means)-1
+    for i = 1:length(aerial_means)
         plot(i, aerial_means(i), 'b.')
         plot(i, aerial_means_d(i), 'r.')
     end
