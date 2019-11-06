@@ -64,18 +64,18 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
 
     # first step [0], extended from beginning of file
     i = 0
-    diff_temp = (aerial_means[i] + aerial_means[i + 1]) / 2
+    diff_temp = aerial_means[i] # just use aerial phase after first step. guaranteed to be there.
     diff_vals.append(diff_temp)
     force_fd[0:step_begin[i + 1],] = force_f[0:step_begin[i + 1],] - diff_temp
     # 1:n-1 steps
     i = 1
-    while i < min(step_begin.shape[0], step_end.shape[0]) - 1:
-        diff_temp = (aerial_means[i] + aerial_means[i + 1]) / 2
+    while i < min(step_begin.shape[0], step_end.shape[0])-1: #less than 79
+        diff_temp = (aerial_means[i-1] + aerial_means[i]) / 2
         diff_vals.append(diff_temp)
         force_fd[step_begin[i]:step_begin[i + 1],] = force_f[step_begin[i]:step_begin[i + 1],] - diff_temp
         i = i + 1
     # last step [n], extended to end of file
-    diff_temp = (aerial_means[i - 1] + aerial_means[i]) / 2
+    diff_temp = aerial_means[i-1] # just use aerial phase right before last step. guaranteed to be there
     diff_vals.append(diff_temp)
     force_fd[step_begin[i]:force_f.shape[0],] = force_f[step_begin[i]:force_f.shape[0],] - diff_temp
 
@@ -85,22 +85,18 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
                      force_f,
                      color='tab:blue',
-                     alpha=0.7)  # converted to sec
+                     alpha=0.75)  # converted to sec
         sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
                      force_fd,
                      color='tab:red',
-                     alpha=0.7)  # converted to sec
+                     alpha=0.75)  # converted to sec
         sigcomp.grid()
         sigcomp.legend(['original signal', 'detrended signal'], loc=1)
         sigcomp.set_xlabel('Seconds')
         sigcomp.set_ylabel('force (N)')
 
     # calculate mean aerial for detrend data
-    aerial_means_d = np.zeros(aerial_means.shape[0])
-    for i in range(aerial_begin.shape[0]):
-        aerial_means_d[i] = np.mean(
-            force_fd[aerial_begin[i] + trim:aerial_end[i] - trim,])
-    # aerial_means_d = aerial_means_d[aerial_means_d != 0.0]
+    aerial_means_d = meanaerialforce(force_fd, step_begin, step_end,trim)
 
     if plot:
         # plot detrend vs old mean aerial
@@ -109,7 +105,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         meancomp.set_ylabel('force (N)')
         meancomp.grid()
         # np.ylim([-20,20])
-        for i in range(aerial_means.shape[0] - 1):
+        for i in range(aerial_means.shape[0]):
             meancomp.plot(i, aerial_means[i],
                           marker='.',
                           color='tab:blue',
@@ -141,9 +137,8 @@ def meanaerialforce(force, begin, end, trim ):
 
     Returns
     -------
-    trim : `number`
-        Number of frames to trim off the beginning and end of each aerial phase when degrending force signa.
-        Is calculated as average of user inputs.
+    aerial_means : `ndarray`
+        Array containing means of aerial phase force signal. Excludes part of start/end of aerial phase as defined by `trim`.
 
     """
 
@@ -156,13 +151,9 @@ def meanaerialforce(force, begin, end, trim ):
     # calculate mean force during aerial phase (foot not on ground, should be zero)
     # aerial_means = np.full([aerial_begin.shape[0] + 1,], np.nan)
     if force.ndim == 1:  # one axis only
-        aerial_means = np.full([aerial_begin.shape[0] + 1, ], np.nan)
-        i = 0
-        while i < min(begin.shape[0], end.shape[0]) - 1:
+        aerial_means = np.full([aerial_begin.shape[0], ], np.nan)
+        for i in range(aerial_means.shape[0]):
             aerial_means[i,] = np.mean(force[aerial_begin[i] + trim:aerial_end[i] - trim])
-            i = i + 1
-        # last step
-        aerial_means[i] = np.mean(force[aerial_begin[i - 1] + trim:aerial_end[i - 1] - trim])
     else: raise IndexError('force.ndim != 1')
 
     return aerial_means
@@ -223,6 +214,7 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         compare = (vGRF > threshold).astype(int)
 
         events = np.diff(compare)
+        print(sum((compare)))
         step_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
         step_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
 
@@ -282,8 +274,8 @@ def trimaerial(force, begin, end):
 
     Returns
     -------
-    trim : `number`
-        Number of frames to trim off the beginning and end of each aerial phase when degrending force signa.
+    trim : `integer`
+        Number of frames to trim off the beginning and end of each aerial phase when calculating mean during aerial phase.
         Is calculated as average of user inputs.
 
     """
@@ -301,7 +293,7 @@ def trimaerial(force, begin, end):
         ax.set_xlabel('frames')
         ax.set_ylabel('force (N)')
         plt.tight_layout()
-
+        plt.show(block = False)
         # user input from mouse click
         bad_points = 1
         while bad_points:
@@ -320,7 +312,8 @@ def trimaerial(force, begin, end):
                     int)
                 print('trimming ', trim, ' frames from the start/end of aerial phase')
                 bad_points = 0
-                plt.close(trim_fig)
     else: raise IndexError('force.ndim != 1')
+
+    plt.close()
     return trim
 

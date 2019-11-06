@@ -29,14 +29,11 @@ elseif size(force,2) > 1
     error('size(force,2) > 1. Must be nx1 array.')
 end
 
-i = 1;
-%all but last step
-while i < min([length(step_begin), length(step_end)]) - 1
-    aerial_means(i) = mean(force(aerial_begin(i)+trim:aerial_end(i)-trim));
-    i = i + 1;
+for i = 1:length(aerial_begin)
+    aerial_means(i) = mean(force(aerial_begin(i)+trim : aerial_end(i)-trim));
 end
-%last step
-aerial_means(i) = mean(force(aerial_begin(i-1)+trim:aerial_end(i-1) - trim));
+
+
 
 end
 

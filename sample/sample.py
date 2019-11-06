@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 GRF = pd.read_csv('drifting_forces.txt', header=None)
 
 # Apply Butterworth Filter
-Fs = 600
+Fs = 300
 Fc = 60
 Fn = (Fs / 2)
 b,a = butter(2, Fc/Fn)
@@ -18,10 +18,12 @@ step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                   Fs=300,
                                   min_tc=0.2,
                                   max_tc=0.4,
-                                  plot=False)
+                                  plot=True)
 # plot.stance(GRF_filt[:,2], step_begin, step_end)
 
 # Identify where aerial phase occurs (feet not on ground)
+#Use aerial phase after first step to the aerial phase before the last whole step.
+# This method guarantees aerial phases per signal.splitsteps()
 aerial_begin_all = step_end[:-1]
 aerial_end_all = step_begin[1:]
 print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.shape[0])
@@ -40,3 +42,6 @@ force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
                                           step_end,
                                           trim,
                                           plot=True) #grf_filt and aerial_means must be same width
+
+# Can be applied again to further reduce drift
+# force_fdd, aerial_means_dd = signal.detrend(force_fd, Fs, aerial_means_d, step_begin, step_end, trim, plot = True)
