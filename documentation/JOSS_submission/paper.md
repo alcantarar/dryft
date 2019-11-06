@@ -53,8 +53,8 @@ before and after a step, represented by:
 
 $$S_n = D_n - \frac{A_n + A_{n+1}}{2}$$
 
-Where $n$ is a given step, $A$ is the mean vertical GRF during the aerial phase, $D$ is the drifting signal 
-signal, and $S$ is the returned signal with drift removed. 
+Where $n$ is a given step, $A$ is the mean vertical GRF during the aerial phase, $D$ is the drifting signal, and $S$ 
+is the returned signal with drift removed. 
 This process is repeated for all steps present in a trial, with drift of the first and last step in a trial estimated from 
 only one adjacent aerial phase.
 
