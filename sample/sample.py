@@ -18,7 +18,7 @@ step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                   Fs=300,
                                   min_tc=0.2,
                                   max_tc=0.4,
-                                  plot=False)
+                                  plot=True)
 # plot.stance(GRF_filt[:,2], step_begin, step_end)
 
 # Identify where aerial phase occurs (feet not on ground)

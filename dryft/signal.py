@@ -116,7 +116,7 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
                           label='detrended signal')
             meancomp.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
         plt.tight_layout()
-        plt.show(block=False)
+        plt.show(block=True)
 
     return force_fd, aerial_means_d
 
