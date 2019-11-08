@@ -31,13 +31,14 @@ print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.s
 # Determine average force signal during aerial phase
 # Must trim beginning and end of aerial phase to get true aerial phase value
 trim = signal.trimaerial(GRF_filt[:,2], step_begin, step_end)
-aerial_means = signal.meanaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
-plot.aerial(GRF_filt[:,2], aerial_means, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
+aerial_means, aerial_means_loc = signal.meanaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
+plot.aerial(GRF_filt[:,2], aerial_means, aerial_means_loc, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
 
 # Detrend signal
 force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
                                           Fs,
                                           aerial_means,
+                                          aerial_means_loc,
                                           step_begin,
                                           step_end,
                                           trim,

@@ -12,9 +12,10 @@ Distributed here: https://github.com/alcantarar/dryft
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import interpolate
+import pandas as pd
 
-
-def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
+def detrend(force_f, Fs, aerial_means, aerial_means_loc, step_begin, step_end, trim, plot=False):
     """Remove linear or non-linear drift from running ground reaction force data in a step-wise manner.
 
     Parameters
@@ -61,23 +62,32 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
 
     aerial_begin = step_end[:-1]
     aerial_end = step_begin[1:]
+    #
+    # # first step [0], extended from beginning of file
+    # i = 0
+    # diff_temp = aerial_means[i] # just use aerial phase after first step. guaranteed to be there.
+    # diff_vals.append(diff_temp)
+    # force_fd[0:step_begin[i + 1],] = force_f[0:step_begin[i + 1],] - diff_temp
+    # # 1:n-1 steps
+    # i = 1
+    # while i < min(step_begin.shape[0], step_end.shape[0])-1: #less than 79
+    #     diff_temp = (aerial_means[i-1] + aerial_means[i]) / 2
+    #     diff_vals.append(diff_temp)
+    #     force_fd[step_begin[i]:step_begin[i + 1],] = force_f[step_begin[i]:step_begin[i + 1],] - diff_temp
+    #     i = i + 1
+    # # last step [n], extended to end of file
+    # diff_temp = aerial_means[i-1] # just use aerial phase right before last step. guaranteed to be there
+    # diff_vals.append(diff_temp)
+    # force_fd[step_begin[i]:force_f.shape[0],] = force_f[step_begin[i]:force_f.shape[0],] - diff_temp
 
-    # first step [0], extended from beginning of file
-    i = 0
-    diff_temp = aerial_means[i] # just use aerial phase after first step. guaranteed to be there.
-    diff_vals.append(diff_temp)
-    force_fd[0:step_begin[i + 1],] = force_f[0:step_begin[i + 1],] - diff_temp
-    # 1:n-1 steps
-    i = 1
-    while i < min(step_begin.shape[0], step_end.shape[0])-1: #less than 79
-        diff_temp = (aerial_means[i-1] + aerial_means[i]) / 2
-        diff_vals.append(diff_temp)
-        force_fd[step_begin[i]:step_begin[i + 1],] = force_f[step_begin[i]:step_begin[i + 1],] - diff_temp
-        i = i + 1
-    # last step [n], extended to end of file
-    diff_temp = aerial_means[i-1] # just use aerial phase right before last step. guaranteed to be there
-    diff_vals.append(diff_temp)
-    force_fd[step_begin[i]:force_f.shape[0],] = force_f[step_begin[i]:force_f.shape[0],] - diff_temp
+    # interp/extrap aerial_means to length of force_f
+    drift_signal = np.full(force_f.shape, np.nan)
+    drift_signal[aerial_means_loc] = aerial_means
+    drift_signal_p = pd.Series(drift_signal)
+    drift_signal_p = drift_signal_p.interpolate(method = 'spline', order = 3, s = 0, limit_direction= 'both') #sline works between values, doesn't extend
+    drift_signal = drift_signal_p.to_numpy()
+
+    force_fd = force_f - drift_signal
 
     if plot:
         # plot raw vs detrended
@@ -96,7 +106,13 @@ def detrend(force_f, Fs, aerial_means, step_begin, step_end, trim, plot=False):
         sigcomp.set_ylabel('force (N)')
 
     # calculate mean aerial for detrend data
-    aerial_means_d = meanaerialforce(force_fd, step_begin, step_end,trim)
+    step_begin_d, step_end_d = splitsteps(vGRF=force_fd[:,],
+                                             threshold=10,
+                                             Fs=300,
+                                             min_tc=0.2,
+                                             max_tc=0.4,
+                                             plot=False)
+    aerial_means_d, aerial_means_loc_d = meanaerialforce(force_fd[:,], step_begin_d, step_end_d,trim=10)
 
     if plot:
         # plot detrend vs old mean aerial
@@ -141,6 +157,10 @@ def meanaerialforce(force, begin, end, trim ):
         Array containing means of aerial phase force signal. Excludes part of start/end of aerial phase as defined by `trim`.
 
     """
+    def closest_to_median(array):
+        array = np.asarray(array)
+        ind = (np.abs(array-np.median(array))).argmin()
+        return array[ind]
 
     aerial_begin = end[:-1]
     aerial_end = begin[1:]
@@ -152,11 +172,15 @@ def meanaerialforce(force, begin, end, trim ):
     # aerial_means = np.full([aerial_begin.shape[0] + 1,], np.nan)
     if force.ndim == 1:  # one axis only
         aerial_means = np.full([aerial_begin.shape[0], ], np.nan)
+        aerial_means_loc = np.full([aerial_begin.shape[0], ], np.nan)
+
         for i in range(aerial_means.shape[0]):
-            aerial_means[i,] = np.mean(force[aerial_begin[i] + trim:aerial_end[i] - trim])
+            aerial_means[i,] = closest_to_median(force[aerial_begin[i] + trim:aerial_end[i] - trim])
+            aerial_means_loc[i,] = aerial_begin[i] + trim + np.argwhere(force[aerial_begin[i] + trim:aerial_end[i] - trim] == aerial_means[i,])
+        aerial_means_loc = aerial_means_loc.astype(int)
     else: raise IndexError('force.ndim != 1')
 
-    return aerial_means
+    return aerial_means, aerial_means_loc
 
 
 

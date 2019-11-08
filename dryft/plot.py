@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
+def aerial(force, aerial_means, aerial_means_loc, begin, end, trim, colormap=plt.cm.viridis):
     """Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
 
     Visualizes the means used to account for drift in `dryft.signal.detrend` .
@@ -57,8 +57,9 @@ def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
         meanp.set_xlabel('steps')
         meanp.set_ylabel('force (N)')
         meanp.grid()
+        meanp.plot(force)
         for i in range(aerial_means.shape[0]):
-            meanp.plot(i, aerial_means[i],
+            meanp.plot(aerial_means_loc[i], aerial_means[i],
                        marker='o',
                        color=colors[i])
         plt.show(block = False)
