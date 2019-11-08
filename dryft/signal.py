@@ -12,20 +12,20 @@ Distributed here: https://github.com/alcantarar/dryft
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import interpolate
 import pandas as pd
 
-def detrend(force_f, aerial_means, aerial_means_loc):
+
+def detrend(force_f, aerial_medians, aerial_medians_loc):
     """Remove drift from running ground reaction force signal based on aerial phases.
 
     Parameters
     ----------
     force_f : `ndarray`
         Filtered ground reaction force signal [n,]. Using unfiltered signal may cause unreliable results.
-    aerial_means : `ndarray`
-        Array of mean force signal measured during each aerial phase.
-    aerial_means_loc : `ndarray`
-        Array of frame indexes for values in aerial_means. output from `meanaerialforce()`
+    aerial_medians : `ndarray`
+        Array of median force signal measured during each aerial phase.
+    aerial_medians_loc : `ndarray`
+        Array of frame indexes for values in aerial_medians. output from `medianaerialforce()`
 
     Returns
     -------
@@ -36,13 +36,13 @@ def detrend(force_f, aerial_means, aerial_means_loc):
     --------
         from dryft import signal
 
-        force_fd = signal.detrend(force_f, aerial_means, aerial_means_loc)
+        force_fd = signal.detrend(force_f, aerial_medians, aerial_medians_loc)
 
     """
 
-    # Create NaN array with aerial_means values at respective frame locations
+    # Create NaN array with aerial_medians values at respective frame locations
     drift_signal = np.full(force_f.shape, np.nan)
-    drift_signal[aerial_means_loc] = aerial_means
+    drift_signal[aerial_medians_loc] = aerial_medians
     # Use 3rd order spline to fill NaNs, creating the underlying drift of the signal.
     drift_signal_p = pd.Series(drift_signal)
     drift_signal_p = drift_signal_p.interpolate(method = 'spline', order = 3, s = 0, limit_direction= 'both')
@@ -53,8 +53,8 @@ def detrend(force_f, aerial_means, aerial_means_loc):
     return force_fd
 
 
-def meanaerialforce(force, begin, end, trim ):
-    """Calculate mean force signal during aerial phase of running.
+def medianaerialforce(force, begin, end, trim ):
+    """Calculate median force signal during aerial phase of running.
 
     Parameters
     ----------
@@ -65,12 +65,12 @@ def meanaerialforce(force, begin, end, trim ):
     end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`.
     trim : `number`
-        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
+        Number of frames to remove from beginning and end of aerial phase when calculating median. aerial.trim output.
 
     Returns
     -------
-    aerial_means : `ndarray`
-        Array containing means of aerial phase force signal. Excludes part of start/end of aerial phase as defined by `trim`.
+    aerial_medians : `ndarray`
+        Array containing medians of aerial phase force signal. Excludes part of start/end of aerial phase as defined by `trim`.
 
     """
     def closest_to_median(array):
@@ -84,19 +84,19 @@ def meanaerialforce(force, begin, end, trim ):
     if np.any(aerial_len < trim * 2): raise IndexError(
         'Trim amount is greater than aerial phase length. If trim selection was reasonable, adjust threshold or min_step_len in step.split.')
 
-    # calculate mean force during aerial phase (foot not on ground, should be zero)
-    # aerial_means = np.full([aerial_begin.shape[0] + 1,], np.nan)
+    # calculate median force during aerial phase (foot not on ground, should be zero)
+    # aerial_medians = np.full([aerial_begin.shape[0] + 1,], np.nan)
     if force.ndim == 1:  # one axis only
-        aerial_means = np.full([aerial_begin.shape[0], ], np.nan)
-        aerial_means_loc = np.full([aerial_begin.shape[0], ], np.nan)
+        aerial_medians = np.full([aerial_begin.shape[0], ], np.nan)
+        aerial_medians_loc = np.full([aerial_begin.shape[0], ], np.nan)
 
-        for i in range(aerial_means.shape[0]):
-            aerial_means[i,] = closest_to_median(force[aerial_begin[i] + trim:aerial_end[i] - trim])
-            aerial_means_loc[i,] = aerial_begin[i] + trim + np.argwhere(force[aerial_begin[i] + trim:aerial_end[i] - trim] == aerial_means[i,])
-        aerial_means_loc = aerial_means_loc.astype(int)
+        for i in range(aerial_medians.shape[0]):
+            aerial_medians[i,] = closest_to_median(force[aerial_begin[i] + trim:aerial_end[i] - trim])
+            aerial_medians_loc[i,] = aerial_begin[i] + trim + np.argwhere(force[aerial_begin[i] + trim:aerial_end[i] - trim] == aerial_medians[i,])
+        aerial_medians_loc = aerial_medians_loc.astype(int)
     else: raise IndexError('force.ndim != 1')
 
-    return aerial_means, aerial_means_loc
+    return aerial_medians, aerial_medians_loc
 
 
 
@@ -215,7 +215,7 @@ def trimaerial(force, begin, end):
     Returns
     -------
     trim : `integer`
-        Number of frames to trim off the beginning and end of each aerial phase when calculating mean during aerial phase.
+        Number of frames to trim off the beginning and end of each aerial phase when calculating median during aerial phase.
         Is calculated as average of user inputs.
 
     """

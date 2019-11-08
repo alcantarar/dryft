@@ -12,31 +12,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def aerial(force, aerial_means, aerial_means_loc, begin, end, trim, colormap=plt.cm.viridis):
-    """Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
+def aerial(force, aerial_medians, aerial_medians_loc, begin, end, trim, colormap=plt.cm.viridis):
+    """Plot untrimmed aerial phases, trimmed aerial phases, and the medians of the trimmed aerial phases.
 
-    Visualizes the means used to account for drift in `dryft.signal.detrend` .
+    Visualizes the medians used to account for drift in `dryft.signal.detrend` .
 
     Parameters
     ----------
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    aerial_means : `ndarray`
-        Array of mean force signal measured during each aerial phase.
+    aerial_medians : `ndarray`
+        Array of median force signal measured during each aerial phase.
     begin : `ndarray`
         Array of frame indexes for start of each aerial phase.
     end : `ndarray`
         Array of frame indexes for end of each aerial phase. Same size as `begin`.
     trim : `number`
-        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
+        Number of frames to remove from beginning and end of aerial phase when calculating median. aerial.trim output.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 
     """
 
-    if aerial_means.shape[0] == begin.shape[0]  == end.shape[0]:
-        colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
-        plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
+    if aerial_medians.shape[0] == begin.shape[0]  == end.shape[0]:
+        colors = colormap(np.linspace(0, 1, aerial_medians.shape[0]))
+        plt.fig, (untrimp, trimp, medianp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
 
         # plot of untrimmed aerial phases
         untrimp.set_title('untrimmed aerial phases')
@@ -52,18 +52,18 @@ def aerial(force, aerial_means, aerial_means_loc, begin, end, trim, colormap=plt
         for i in range(begin.shape[0]):
             trimp.plot(force[begin[i] + trim:end[i] - trim],
                        color=colors[i])
-        # plot all the means of trimmed aerial phases
-        meanp.set_title('mean of trimmed aerial phases')
-        meanp.set_xlabel('steps')
-        meanp.set_ylabel('force (N)')
-        meanp.grid()
-        meanp.plot(force)
-        for i in range(aerial_means.shape[0]):
-            meanp.plot(aerial_means_loc[i], aerial_means[i],
+        # plot all the medians of trimmed aerial phases
+        medianp.set_title('median of trimmed aerial phases')
+        medianp.set_xlabel('steps')
+        medianp.set_ylabel('force (N)')
+        medianp.grid()
+        medianp.plot(force)
+        for i in range(aerial_medians.shape[0]):
+            medianp.plot(aerial_medians_loc[i], aerial_medians[i],
                        marker='o',
                        color=colors[i])
         plt.show(block = False)
-    else: raise IndexError("Number of aerial_means isn't number of steps - 1.")
+    else: raise IndexError("Number of aerial_medians isn't number of steps - 1.")
 
 
 def stance(force, begin, end, colormap=plt.cm.viridis):

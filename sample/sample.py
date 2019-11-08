@@ -32,11 +32,11 @@ print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.s
 # Determine average force signal during aerial phase
 # Must trim beginning and end of aerial phase to get true aerial phase value
 trim = signal.trimaerial(GRF_filt[:,2], step_begin, step_end)
-aerial_means, aerial_means_loc = signal.meanaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
-# plot.aerial(GRF_filt[:,2], aerial_means, aerial_means_loc, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
+aerial_medians, aerial_medians_loc = signal.medianaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_medians will be same width as GRF_filt
+# plot.aerial(GRF_filt[:,2], aerial_medians, aerial_medians_loc, aerial_begin_all, aerial_end_all, trim) #aerial_medians and GRF_filt must be (n,) arrays
 
 # Detrend signal
-force_fd = signal.detrend(GRF_filt[:,2], aerial_means, aerial_means_loc)
+force_fd = signal.detrend(GRF_filt[:,2], aerial_medians, aerial_medians_loc)
 
 
 # compare detrended signal to original
@@ -47,10 +47,10 @@ step_begin_d, step_end_d = signal.splitsteps(vGRF=force_fd,
                                              max_tc=0.4,
                                              plot=False)
 trim_d = signal.trimaerial(force_fd, step_begin_d, step_end_d)
-aerial_means_d, aerial_means_loc = signal.meanaerialforce(force_fd, step_begin_d, step_end_d, trim_d)
+aerial_medians_d, aerial_medians_loc_d = signal.medianaerialforce(force_fd, step_begin_d, step_end_d, trim_d)
 
 # plot original vs detrended signal
-plt.detrendp, (sigcomp, meancomp) = plt.subplots(2, 1, figsize=(15, 7))
+plt.detrendp, (sigcomp, mediancomp) = plt.subplots(2, 1, figsize=(15, 7))
 sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
              GRF_filt[:,2],
              color='tab:blue',
@@ -65,23 +65,23 @@ sigcomp.set_xlabel('Seconds')
 sigcomp.set_ylabel('force (N)')
 
 # plot detrend vs original aerial phases
-meancomp.set_title('mean of aerial phases')
-meancomp.set_xlabel('step')
-meancomp.set_ylabel('force (N)')
-meancomp.grid()
-for i in range(aerial_means.shape[0]):
-    meancomp.plot(i, aerial_means[i],
+mediancomp.set_title('median of aerial phases')
+mediancomp.set_xlabel('step')
+mediancomp.set_ylabel('force (N)')
+mediancomp.grid()
+for i in range(aerial_medians.shape[0]):
+    mediancomp.plot(i, aerial_medians[i],
                   marker='.',
                   color='tab:blue',
                   label='original signal')
-    meancomp.plot(i, aerial_means_d[i],
+    mediancomp.plot(i, aerial_medians_d[i],
                   marker='.',
                   color='tab:red',
                   label='detrended signal')
-    meancomp.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
+    mediancomp.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
 plt.tight_layout()
 plt.show(block=True)
 
 
 # Can be applied again to further reduce drift
-# force_fdd, aerial_means_dd = signal.detrend(force_fd, Fs, aerial_means_d, step_begin, step_end, trim, plot = True)
+# force_fdd, aerial_medians_dd = signal.detrend(force_fd, aerial_medians_d, aerial_medians_loc_d)
