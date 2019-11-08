@@ -36,14 +36,8 @@ aerial_means, aerial_means_loc = signal.meanaerialforce(GRF_filt[:,2], step_begi
 # plot.aerial(GRF_filt[:,2], aerial_means, aerial_means_loc, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
 
 # Detrend signal
-force_fd = signal.detrend(GRF_filt[:,2],
-                          Fs,
-                          aerial_means,
-                          aerial_means_loc,
-                          step_begin,
-                          step_end,
-                          trim,
-                          plot=False) #grf_filt and aerial_means must be same width
+force_fd = signal.detrend(GRF_filt[:,2], aerial_means, aerial_means_loc)
+
 
 # compare detrended signal to original
 step_begin_d, step_end_d = signal.splitsteps(vGRF=force_fd,
