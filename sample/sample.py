@@ -23,11 +23,11 @@ step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
 # plot.stance(GRF_filt[:,2], step_begin, step_end)
 
 # Determine force signal at middle of aerial phase (feet not on ground)
-aerial_medians, aerial_medians_loc = signal.aerialforce(GRF_filt[:,2], step_begin, step_end) #aerial_medians will be same width as GRF_filt
-plot.aerial(GRF_filt[:,2], aerial_medians, aerial_medians_loc, aerial_begin_all, aerial_end_all) #aerial_medians and GRF_filt must be (n,) arrays
+aerial_vals, aerial_loc = signal.aerialforce(GRF_filt[:,2], step_begin, step_end) #aerial_vals will be same width as GRF_filt
+plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, step_begin, step_end) #aerial_vals and GRF_filt must be (n,) arrays
 
 # Detrend signal
-force_fd = signal.detrend(GRF_filt[:,2], aerial_medians, aerial_medians_loc)
+force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
 
 
 # compare detrended signal to original
@@ -37,41 +37,41 @@ step_begin_d, step_end_d = signal.splitsteps(vGRF=force_fd,
                                              min_tc=0.2,
                                              max_tc=0.4,
                                              plot=False)
-aerial_medians_d, aerial_medians_loc_d = signal.aerialforce(force_fd, step_begin_d, step_end_d)
+aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, step_begin_d, step_end_d)
 
 # plot original vs detrended signal
-plt.detrendp, (sigcomp, mediancomp) = plt.subplots(2, 1, figsize=(15, 7))
-sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
              GRF_filt[:,2],
              color='tab:blue',
              alpha=0.75)  # converted to sec
-sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
              force_fd,
              color='tab:red',
              alpha=0.75)  # converted to sec
-sigcomp.grid()
-sigcomp.legend(['original signal', 'detrended signal'], loc=1)
-sigcomp.set_xlabel('Seconds')
-sigcomp.set_ylabel('force (N)')
+plt1.grid()
+plt1.legend(['original signal', 'detrended signal'], loc=1)
+plt1.set_xlabel('Seconds')
+plt1.set_ylabel('force (N)')
 
 # plot detrend vs original aerial phases
-mediancomp.set_title('median of aerial phases')
-mediancomp.set_xlabel('step')
-mediancomp.set_ylabel('force (N)')
-mediancomp.grid()
-for i in range(aerial_medians.shape[0]):
-    mediancomp.plot(i, aerial_medians[i],
+plt2.set_title('Aerial Phases')
+plt2.set_xlabel('step')
+plt2.set_ylabel('force (N)')
+plt2.grid()
+for i in range(aerial_vals.shape[0]):
+    plt2.plot(i, aerial_vals[i],
                   marker='.',
                   color='tab:blue',
                   label='original signal')
-    mediancomp.plot(i, aerial_medians_d[i],
+    plt2.plot(i, aerial_vals_d[i],
                   marker='.',
                   color='tab:red',
                   label='detrended signal')
-    mediancomp.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
+    plt2.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
 plt.tight_layout()
 plt.show(block=True)
 
 
 # Can be applied again to further reduce drift
-# force_fdd, aerial_medians_dd = signal.detrend(force_fd, aerial_medians_d, aerial_medians_loc_d)
+# force_fdd, aerial_vals_dd = signal.detrend(force_fd, aerial_vals_d, aerial_loc_d)

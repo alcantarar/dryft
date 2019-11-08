@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def aerial(force, aerial_values, aerial_loc, begin, end, colormap=plt.cm.viridis):
+def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
     """Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
     Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
@@ -22,24 +22,27 @@ def aerial(force, aerial_values, aerial_loc, begin, end, colormap=plt.cm.viridis
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
     aerial_values : `ndarray`
-        Array of force signal measured at middle of each aerial phase. Output from `aerialforce()`
+        Array of force signal measured at middle of each aerial phase. Output from `signal.aerialforce()`
     aerial_loc : `ndarray`
-        Array of frame indexes for values in aerial_values. Output from `aerialforce()`
-    begin : `ndarray`
-        Array of frame indexes for start of each aerial phase.
-    end : `ndarray`
-        Array of frame indexes for end of each aerial phase. Same size as `begin`.
+        Array of frame indexes for values in aerial_values. Output from `signal.aerialforce()`
+    stance_begin : `ndarray`
+        Array of frame indexes for start of each stance phase. Output from `signal.splitsteps()`
+    stance_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`. Output from `signal.splitsteps()`
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 
     """
+    # define beginning/end of aerial phases
+    begin = stance_end[:-1]
+    end = stance_begin[1:]
 
     if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
         colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))
         plt.fig, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 
-        # plot of untrimmed aerial phases
-        plt1.set_title('untrimmed aerial phases')
+        # plot of  aerial phases
+        plt1.set_title('Aerial phases (black dot is middle)')
         plt1.set_ylabel('force (N)')
         plt1.grid()
         for i in range(begin.shape[0]):
