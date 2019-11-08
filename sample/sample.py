@@ -22,18 +22,9 @@ step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                   plot=False)
 # plot.stance(GRF_filt[:,2], step_begin, step_end)
 
-# Identify where aerial phase occurs (feet not on ground)
-#Use aerial phase after first step to the aerial phase before the last whole step.
-# This method guarantees aerial phases per signal.splitsteps()
-aerial_begin_all = step_end[:-1]
-aerial_end_all = step_begin[1:]
-print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.shape[0])
-
-# Determine average force signal during aerial phase
-# Must trim beginning and end of aerial phase to get true aerial phase value
-trim = signal.trimaerial(GRF_filt[:,2], step_begin, step_end)
-aerial_medians, aerial_medians_loc = signal.medianaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_medians will be same width as GRF_filt
-# plot.aerial(GRF_filt[:,2], aerial_medians, aerial_medians_loc, aerial_begin_all, aerial_end_all, trim) #aerial_medians and GRF_filt must be (n,) arrays
+# Determine force signal at middle of aerial phase (feet not on ground)
+aerial_medians, aerial_medians_loc = signal.aerialforce(GRF_filt[:,2], step_begin, step_end) #aerial_medians will be same width as GRF_filt
+plot.aerial(GRF_filt[:,2], aerial_medians, aerial_medians_loc, aerial_begin_all, aerial_end_all) #aerial_medians and GRF_filt must be (n,) arrays
 
 # Detrend signal
 force_fd = signal.detrend(GRF_filt[:,2], aerial_medians, aerial_medians_loc)
@@ -46,8 +37,7 @@ step_begin_d, step_end_d = signal.splitsteps(vGRF=force_fd,
                                              min_tc=0.2,
                                              max_tc=0.4,
                                              plot=False)
-trim_d = signal.trimaerial(force_fd, step_begin_d, step_end_d)
-aerial_medians_d, aerial_medians_loc_d = signal.medianaerialforce(force_fd, step_begin_d, step_end_d, trim_d)
+aerial_medians_d, aerial_medians_loc_d = signal.aerialforce(force_fd, step_begin_d, step_end_d)
 
 # plot original vs detrended signal
 plt.detrendp, (sigcomp, mediancomp) = plt.subplots(2, 1, figsize=(15, 7))
