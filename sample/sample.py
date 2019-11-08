@@ -51,7 +51,7 @@ plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
              force_fd,
              color='tab:red',
              alpha=0.75)  # converted to sec
-plt1.grid()
+plt1.grid(zorder =0)
 plt1.legend(['original signal', 'detrended signal'], loc=1)
 plt1.set_xlabel('Seconds')
 plt1.set_ylabel('force (N)')
@@ -60,20 +60,20 @@ plt1.set_ylabel('force (N)')
 plt2.set_title('Aerial Phases')
 plt2.set_xlabel('step')
 plt2.set_ylabel('force (N)')
-plt2.grid()
-plt.plot(np.arange(aerial_vals_d.shape[0]),
+plt.scatter(np.arange(aerial_vals_d.shape[0]),
          aerial_vals_d,
-         marker='.',
+         marker='o',
          color='tab:red',
-         label='detredned signal')
-plt.plot(np.arange(aerial_vals.shape[0]), #REMOVE LINES
+         label='detredned signal', zorder = 2)
+plt.scatter(np.arange(aerial_vals.shape[0]), #REMOVE LINES
          aerial_vals,
-         marker='.',
+         marker='o',
          color='tab:blue',
-         label='original signal')
+         label='original signal', zorder = 2)
 
 plt2.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
 plt.tight_layout()
+plt2.grid(zorder = 0)
 plt.show(block=True)
 
 
