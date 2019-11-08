@@ -50,7 +50,7 @@ trim_d = signal.trimaerial(force_fd, step_begin_d, step_end_d)
 aerial_means_d, aerial_means_loc = signal.meanaerialforce(force_fd, step_begin_d, step_end_d, trim_d)
 
 # plot original vs detrended signal
-plt.detrendp, (sigcomp, meancomp) = plt.subplots(2, 1, sharex=False, figsize=(15, 7))
+plt.detrendp, (sigcomp, meancomp) = plt.subplots(2, 1, figsize=(15, 7))
 sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
              GRF_filt[:,2],
              color='tab:blue',
@@ -66,10 +66,9 @@ sigcomp.set_ylabel('force (N)')
 
 # plot detrend vs original aerial phases
 meancomp.set_title('mean of aerial phases')
-meancomp.set_xlabel('steps')
+meancomp.set_xlabel('step')
 meancomp.set_ylabel('force (N)')
 meancomp.grid()
-# np.ylim([-20,20])
 for i in range(aerial_means.shape[0]):
     meancomp.plot(i, aerial_means[i],
                   marker='.',
