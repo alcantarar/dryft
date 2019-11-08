@@ -24,7 +24,8 @@ step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
 
 # Determine force signal at middle of aerial phase (feet not on ground)
 aerial_vals, aerial_loc = signal.aerialforce(GRF_filt[:,2], step_begin, step_end) #aerial_vals will be same width as GRF_filt
-plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, step_begin, step_end) #aerial_vals and GRF_filt must be (n,) arrays
+# Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
+# plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, step_begin, step_end) #aerial_vals and GRF_filt must be (n,) arrays
 
 # Detrend signal
 force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
@@ -38,6 +39,7 @@ step_begin_d, step_end_d = signal.splitsteps(vGRF=force_fd,
                                              max_tc=0.4,
                                              plot=False)
 aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, step_begin_d, step_end_d)
+
 
 # plot original vs detrended signal
 plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
@@ -59,16 +61,18 @@ plt2.set_title('Aerial Phases')
 plt2.set_xlabel('step')
 plt2.set_ylabel('force (N)')
 plt2.grid()
-for i in range(aerial_vals.shape[0]):
-    plt2.plot(i, aerial_vals[i],
-                  marker='.',
-                  color='tab:blue',
-                  label='original signal')
-    plt2.plot(i, aerial_vals_d[i],
-                  marker='.',
-                  color='tab:red',
-                  label='detrended signal')
-    plt2.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
+plt.plot(np.arange(aerial_vals_d.shape[0]),
+         aerial_vals_d,
+         marker='.',
+         color='tab:red',
+         label='detredned signal')
+plt.plot(np.arange(aerial_vals.shape[0]), #REMOVE LINES
+         aerial_vals,
+         marker='.',
+         color='tab:blue',
+         label='original signal')
+
+plt2.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
 plt.tight_layout()
 plt.show(block=True)
 
