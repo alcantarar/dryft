@@ -75,7 +75,3 @@ plt2.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in 
 plt.tight_layout()
 plt2.grid(zorder = 0)
 plt.show(block=True)
-
-
-# Can be applied again to further reduce drift
-# force_fdd, aerial_vals_dd = signal.detrend(force_fd, aerial_vals_d, aerial_loc_d)
