@@ -89,52 +89,7 @@ def detrend(force_f, Fs, aerial_means, aerial_means_loc, step_begin, step_end, t
 
     force_fd = force_f - drift_signal
 
-    if plot:
-        # plot raw vs detrended
-        plt.detrendp, (sigcomp, meancomp) = plt.subplots(2, 1, sharex=False, figsize=(15, 7))
-        sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-                     force_f,
-                     color='tab:blue',
-                     alpha=0.75)  # converted to sec
-        sigcomp.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-                     force_fd,
-                     color='tab:red',
-                     alpha=0.75)  # converted to sec
-        sigcomp.grid()
-        sigcomp.legend(['original signal', 'detrended signal'], loc=1)
-        sigcomp.set_xlabel('Seconds')
-        sigcomp.set_ylabel('force (N)')
-
-    # calculate mean aerial for detrend data
-    step_begin_d, step_end_d = splitsteps(vGRF=force_fd[:,],
-                                             threshold=10,
-                                             Fs=300,
-                                             min_tc=0.2,
-                                             max_tc=0.4,
-                                             plot=False)
-    aerial_means_d, aerial_means_loc_d = meanaerialforce(force_fd[:,], step_begin_d, step_end_d,trim=10)
-
-    if plot:
-        # plot detrend vs old mean aerial
-        meancomp.set_title('mean of aerial phases')
-        meancomp.set_xlabel('steps')
-        meancomp.set_ylabel('force (N)')
-        meancomp.grid()
-        # np.ylim([-20,20])
-        for i in range(aerial_means.shape[0]):
-            meancomp.plot(i, aerial_means[i],
-                          marker='.',
-                          color='tab:blue',
-                          label='original signal')
-            meancomp.plot(i, aerial_means_d[i],
-                          marker='.',
-                          color='tab:red',
-                          label='detrended signal')
-            meancomp.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
-        plt.tight_layout()
-        plt.show(block=True)
-
-    return force_fd, aerial_means_d
+    return force_fd
 
 
 def meanaerialforce(force, begin, end, trim ):
