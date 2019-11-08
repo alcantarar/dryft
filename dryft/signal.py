@@ -2,7 +2,7 @@
 
 Removes non-linear ground reaction force signal drift in a stepwise manner. It is intended
 for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
-a given step are used to tare the signal instead of assuming an overall linear trend or signal offset.
+a given stance phase are used to tare the signal instead of assuming an overall linear trend or signal offset.
 
 Licensed under an MIT License (c) Ryan Alcantara 2019
 
@@ -95,11 +95,12 @@ def aerialforce(force, begin, end):
 
 
 def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
-    """Read in filtered vertical ground reaction force (vGRF) signal and split steps based on a threshold.
+    """Read in filtered vertical ground reaction force (vGRF) signal and ID stance phases based on a threshold.
 
     Designed for running, hopping, or activity where 1 foot is on the force plate at a time.
-    Split steps are compared to min/max contact time (tc) to eliminate steps that are too short/long. Update these
-    parameters and threshold if little-no steps are identified. Setting plots=True can aid in troubleshooting.
+    Identified stance phases are compared to min/max contact time (tc) to eliminate ones that are too short/long. 
+    Update these parameters and threshold if little-no stance phases are identified. Setting plots=True can aid in 
+    troubleshooting.
 
     Parameters
     ----------
@@ -111,31 +112,31 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     Fs : `number`
         Sampling frequency of signal.
     min_tc : `number`
-        Minimum contact time, in seconds, to consider as a real step. Jogging > 0.2s
+        Minimum contact time, in seconds, to consider as a real stance phase. Jogging > 0.2s
     max_tc : number
-        Maximum contact time, in seconds, to consider as a real step. Jogging > 0.4s
+        Maximum contact time, in seconds, to consider as a real stance phase. Jogging > 0.4s
     plot : `bool`
         If true, return plot showing vGRF signal with initial and final contact points identified. Helpful for
         determining appropriate threshold, min_tc, and max_tc values.
 
     Returns
     -------
-    step_begin : `ndarray`
+    stance_begin : `ndarray`
         Array of frame indexes for start of stance phase.
-    step_end : `ndarray`
+    stance_end : `ndarray`
         Array of frame indexes for end of stance phase.
 
     Examples
     --------
         from dryft import signal
-        step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+        stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                              threshold=110,
                                              Fs=300,
                                              min_tc=0.2,
                                              max_tc=0.4,
                                              plot=False)
-        step_begin
-        step_end
+        stance_begin
+        stance_end
 
     array([102, 215, 325])
     array([171, 285, 397])
@@ -143,36 +144,30 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     """
 
     if min_tc < max_tc:
-        # step Identification Forces over step_threshold register as step (foot on ground).
+        # Identification. Forces over threshold register as stance phase (foot on ground).
         compare = (vGRF > threshold).astype(int)
 
         events = np.diff(compare)
         print(sum((compare)))
-        step_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
-        step_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
+        stance_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
+        stance_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
 
         if plot:
             plt.plot(vGRF)
             plt.plot(events*500)
             plt.show(block = False)
 
-        # if trial starts with end of step, ignore
-        step_end_all = step_end_all[step_end_all > step_begin_all[0]]
-        # trim end of step_begin_all to match step_end_all.
-        step_begin_all = step_begin_all[0:step_end_all.shape[0]]
+        # if trial starts with end of stance phase, ignore
+        stance_end_all = stance_end_all[stance_end_all > stance_begin_all[0]]
+        # trim end of stance_begin_all to match stance_end_all.
+        stance_begin_all = stance_begin_all[0:stance_end_all.shape[0]]
 
-        # initialize
-        # stance_len = np.full(step_begin_all.shape, np.nan)  # step begin and end should be same length...
-        # step_begin = np.full(step_begin_all.shape, np.nan)
-        # step_end = np.full(step_end_all.shape, np.nan)
-        # calculate step length and compare to min/max step lengths
+        stance_len = stance_end_all - stance_begin_all
+        good_stance = np.logical_and(stance_len >= min_tc*Fs, stance_len <= max_tc*Fs)
 
-        stance_len = step_end_all - step_begin_all
-        good_step = np.logical_and(stance_len >= min_tc*Fs, stance_len <= max_tc*Fs)
-
-        step_begin = step_begin_all[good_step]
-        step_end = step_end_all[good_step]
-        # ID suspicious steps (too long or short)
+        stance_begin = stance_begin_all[good_stance]
+        stance_end = stance_end_all[good_stance]
+        # ID suspicious stance phases (too long or short)
         if np.any(stance_len < min_tc*Fs):
             print('Out of', stance_len.shape[0], 'stance phases,', sum(stance_len < min_tc*Fs), ' < ',
                   min_tc, 'seconds.')
@@ -180,9 +175,9 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
             print('Out of', stance_len.shape[0], 'stance_phases,', sum(stance_len > max_tc*Fs), ' > ',
                   max_tc, 'seconds.')
         # print sizes
-        print('Number of contact time begin/end:', step_begin.shape[0], step_end.shape[0])
+        print('Number of contact time begin/end:', stance_begin.shape[0], stance_end.shape[0])
 
-        return step_begin, step_end
+        return stance_begin, stance_end
 
     else:
-        raise IndexError('Did not separate steps. min_tc > max_tc.')
+        raise IndexError('Did not ID stance phases: min_tc > max_tc.')
