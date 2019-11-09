@@ -56,11 +56,11 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stan
             # plot of aerial phases
         # plot all the aerial phase values separate
         plt2.set_title('Force measured at middle of aerial phases')
-        plt2.set_xlabel('Step #')
+        plt2.set_xlabel('Frame')
         plt2.set_ylabel('force (N)')
         plt2.grid()
-        for i in range(aerial_values.shape[0]):
-            plt2.plot(i, aerial_values[i],
+        for i, n in enumerate(aerial_loc):
+            plt2.plot(n, aerial_values[i],
                        marker='o',
                        color=colors[i])
         plt.show(block = False)

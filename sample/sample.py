@@ -13,7 +13,7 @@ GRF = pd.read_csv('../MATLAB/custom_drift_S001runT25.csv', header = None)
 
 # Apply Butterworth Filter
 Fs = 300
-Fc = 60
+Fc = 50
 Fn = (Fs / 2)
 b,a = butter(2, Fc/Fn)
 GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
@@ -23,7 +23,7 @@ GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th or
 stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
                                                           threshold=140,
                                                           Fs=300,
-                                                          min_tc=0.2,
+                                                          min_tc=0.21,
                                                           max_tc=0.4,
                                                           plot=True)
 stance_begin = stance_begin_all[good_stances]
@@ -42,9 +42,9 @@ force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
 
 # Compare corrected signal to original
 stance_begin_all_d, stance_end_all_d, good_stances_d = signal.splitsteps(vGRF=force_fd,
-                                                          threshold=20,
+                                                          threshold=25,
                                                           Fs=300,
-                                                          min_tc=0.2,
+                                                          min_tc=0.15,
                                                           max_tc=0.4,
                                                           plot=False)
 stance_begin_d = stance_begin_all_d[good_stances_d]
@@ -73,12 +73,12 @@ plt1.set_ylabel('Force (N)')
 plt2.set_title('Aerial Phases')
 plt2.set_xlabel('Step')
 plt2.set_ylabel('Force (N)')
-plt.scatter(np.arange(aerial_vals.shape[0]),
+plt.scatter(aerial_loc,
             aerial_vals,
             marker='o',
             color='tab:blue',
             label='Original Signal', zorder = 2)
-plt.scatter(np.arange(aerial_vals_d.shape[0]),
+plt.scatter(aerial_loc_d,
             aerial_vals_d,
             marker='o',
             color='tab:orange',
