@@ -3,14 +3,15 @@ library(ggthemes)
 library(viridis)
 
 data.raw = read.csv('detrend_plots_data.csv') #exported from sample.py [force_fd] and [GRF_filt]
-head(data.raw)
 
 data.raw$t = rep(seq(0.003333333,30, 1/300),2)
+
+head(data.raw)
 
 ggplot(data = data.raw[data.raw$frame <1782 & data.raw$frame > 1520,]) +
   geom_abline(intercept = 0, slope = 0, lwd = 1, alpha = 1)+
   geom_line((aes(x = t, y = force, color = signal)), alpha = 1, lwd = 1)+
-  scale_color_tableau(palette = 'Classic 10')+
+  scale_color_tableau(label = c('Corrected','Original'),palette = 'Classic 10')+
   scale_y_continuous('Vertical Ground Reaction Force [N]', breaks = seq(0,2000,300))+
   scale_x_continuous('Time [s]', breaks = seq(5,6,.2))+
   theme_classic()+
@@ -27,15 +28,15 @@ ggplot(data = data.raw[data.raw$frame <1782 & data.raw$frame > 1520,]) +
 
 # ggsave('waveform.png',height = 4, width = 8, units = 'in')
 
-data.mean = read.csv('means_plots_data.csv') #exported from sample.py [aerial_means_d]
-head(data.mean)
+data.aerial = read.csv('aerial_plots_data.csv') #exported from sample.py [aerial_means_d]
+head(data.aerial)
 
-ggplot(data = data.mean) +
+ggplot(data = data.aerial) +
   geom_abline(intercept = 0, slope = 0, lwd = 1, alpha = 1, color = 'black')+
   geom_point((aes(y = force, x = step, color = signal)), size = 2, alpha = 1)+
-  scale_y_continuous('Mean Aerial Phase Force [N]', breaks = seq(-100,100,20))+
-  scale_x_continuous('Step #')+
-  scale_color_tableau(palette = 'Classic 10')+
+  scale_y_continuous('Aerial Phase Force [N]', breaks = seq(-100,100,20))+
+  scale_x_continuous('Step Number')+
+  scale_color_tableau(label = c('Corrected','Original'),palette = 'Classic 10')+
   theme_classic()+
   theme(axis.line = element_line(size =1, color = 'black'),
         axis.ticks = element_line(size = 1, color = 'black'),
