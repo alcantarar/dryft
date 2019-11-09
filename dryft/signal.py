@@ -55,6 +55,42 @@ def detrend(force_f, aerial, aerial_loc):
     return force_fd
 
 
+def findgoodaerial(stance_begin, stance_end, good_stances):
+    """Locate good aerial phases when bad stance phases are present.
+
+        Parameters
+        ----------
+        stance_begin : `ndarray`
+            Array of frame indexes for start of each stance phase.
+        stance_end : `ndarray`
+            Array of frame indexes for end of each stance phase. Same size as `begin`.
+        good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc & max_tc requirements.
+
+        Returns
+        -------
+        aerial : `ndarray`
+            Array containing force measured at middle of aerial phase force signal.
+        aerial_loc : `ndarray`
+            Array of frame indexes for values in aerial. output from `aerialforce()`
+
+        """
+    bs = np.where(good_stances == False)
+    aerial_start = np.ones((len(good_stances),), dtype=bool)
+    aerial_end = np.ones((len(good_stances),), dtype=bool)
+
+    aerial_end[bs[0]] = False
+    aerial_end[bs[0] + 1] = False
+
+    aerial_start[bs[0]] = False
+    aerial_start[bs[0] - 1] = False
+
+    good_aerial_begin = stance_end[aerial_start][:-1]
+    good_aerial_end = stance_begin[aerial_end][1:]
+
+    return good_aerial_begin, good_aerial_end
+
+
 def aerialforce(force, begin, end, good_stances):
     """Calculate force signal at middle of aerial phase of running.
 
@@ -66,6 +102,8 @@ def aerialforce(force, begin, end, good_stances):
         Array of frame indexes for start of each stance phase.
     end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc & max_tc requirements.
 
     Returns
     -------
@@ -76,18 +114,7 @@ def aerialforce(force, begin, end, good_stances):
 
     """
     if False in good_stances:
-        bs = np.where(good_stances == False)
-        good_aerial_start = np.ones((len(good_stances),), dtype=bool)
-        good_aerial_end = np.ones((len(good_stances),), dtype=bool)
-
-        good_aerial_end[bs[0]] = False
-        good_aerial_end[bs[0]+1] = False
-
-        good_aerial_start[bs[0]] = False
-        good_aerial_start[bs[0]-1] = False
-
-        aerial_begin = end[good_aerial_start][:-1]
-        aerial_end = begin[good_aerial_end][1:]
+        aerial_begin, aerial_end = findgoodaerial(begin, end, good_stances)
     else:
         aerial_begin = end[good_stances][:-1]
         aerial_end = begin[good_stances][1:]

@@ -10,6 +10,7 @@ Distributed here: https://github.com/alcantarar/dryft
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from dryft import signal
 
 
 def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stances, colormap=plt.cm.viridis):
@@ -35,18 +36,7 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stan
     """
     # define beginning/end of aerial phases
     if False in good_stances:
-        bs = np.where(good_stances == False)
-        good_aerial_start = np.ones((len(good_stances),), dtype=bool)
-        good_aerial_end = np.ones((len(good_stances),), dtype=bool)
-
-        good_aerial_end[bs[0]] = False
-        good_aerial_end[bs[0]+1] = False
-
-        good_aerial_start[bs[0]] = False
-        good_aerial_start[bs[0]-1] = False
-
-        begin = stance_end[good_aerial_start][:-1]
-        end = stance_begin[good_aerial_end][1:]
+        begin, end = signal.findgoodaerial(stance_begin, stance_end, good_stances)
     else:
         begin = stance_end[good_stances][:-1]
         end = stance_begin[good_stances][1:]
