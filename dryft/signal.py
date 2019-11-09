@@ -40,7 +40,9 @@ def detrend(force_f, aerial, aerial_loc):
 
     """
 
+    force_f = force_f.flatten()
     # Create NaN array with aerial values at respective frame locations
+
     drift_signal = np.full(force_f.shape, np.nan)
     drift_signal[aerial_loc] = aerial
     # Use 3rd order spline to fill NaNs, creating the underlying drift of the signal.
@@ -78,16 +80,20 @@ def aerialforce(force, begin, end):
     aerial_end = begin[1:]
 
     # calculate force at middle of aerial phase (foot not on ground, should be zero)
-    if force.ndim == 1:  # one axis only
+    if force.ndim == 2:  # one axis only
+        force = force.flatten()
         aerial = np.full([aerial_begin.shape[0], ], np.nan)
         aerial_middle = np.full([aerial_begin.shape[0], ], np.nan)
+    elif force.ndim == 1:
+        aerial = np.full([aerial_begin.shape[0], ], np.nan)
+        aerial_middle = np.full([aerial_begin.shape[0], ], np.nan)
+    else: raise IndexError('Can only handle shape (n,) or (n,1)')
 
-        for i in range(aerial.shape[0]):
-            aerial_len = aerial_end-aerial_begin
-            aerial_middle[i,] = round(aerial_len[i]/2)
-            aerial[i,] = force[aerial_begin[i]+aerial_middle.astype(int)[i]]
-        aerial_loc = aerial_begin + aerial_middle.astype(int)
-    else: raise IndexError('force.ndim != 1')
+    for i in range(aerial.shape[0]):
+        aerial_len = aerial_end-aerial_begin
+        aerial_middle[i,] = round(aerial_len[i]/2)
+        aerial[i,] = force[aerial_begin[i]+aerial_middle.astype(int)[i]]
+    aerial_loc = aerial_begin + aerial_middle.astype(int)
 
     return aerial, aerial_loc
 
@@ -143,10 +149,9 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     if min_tc < max_tc:
         # Identification. Forces over threshold register as stance phase (foot on ground).
-        compare = (vGRF > threshold).astype(int)
+        compare = (vGRF.flatten() > threshold).astype(int)
 
         events = np.diff(compare)
-        print(sum((compare)))
         stance_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
         stance_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
 

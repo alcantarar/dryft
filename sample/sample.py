@@ -5,33 +5,38 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read in data from force plate
-GRF = pd.read_csv('drifting_forces.txt', header=None)
+# GRF = pd.read_csv('drifting_forces.txt', header=None)
+GRF = pd.read_csv('../MATLAB/custom_drift.csv', header = None)
+
+# slice_bad = np.asarray(GRF_bad)[:,]
+# slice_try = slice_bad.flatten()
 
 # Apply Butterworth Filter
 Fs = 300
-Fc = 60
+Fc = 30
 Fn = (Fs / 2)
 b,a = butter(2, Fc/Fn)
 GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
+# GRF_filt = GRF_filt[:,2] # just vertical for 'drifting_forces.txt'
 
 # Identify where stance phase occurs (foot on ground)
-stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
-                                  threshold=110,
+stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt,
+                                  threshold=140,
                                   Fs=300,
-                                  min_tc=0.2,
+                                  min_tc=0.15,
                                   max_tc=0.4,
-                                  plot=False)
-# plot.stance(GRF_filt[:,2], stance_begin, stance_end)
+                                  plot=True)
+plot.stance(GRF_filt, stance_begin, stance_end)
 # *stance_begin and stance_end can be used to detrend other columns of GRF_filt as well*
 
 # Determine force signal at middle of aerial phase (feet not on ground)
-aerial_vals, aerial_loc = signal.aerialforce(GRF_filt[:,2], stance_begin, stance_end)
+aerial_vals, aerial_loc = signal.aerialforce(GRF_filt, stance_begin, stance_end)
 
 # Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
-# plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, stance_begin, stance_end)
+plot.aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin, stance_end)
 
 # Detrend signal
-force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
+force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
 
 # Compare corrected signal to original
 stance_begin_d, stance_end_d = signal.splitsteps(vGRF=force_fd,
@@ -45,7 +50,7 @@ aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_d, stanc
 # Plot waveforms (original vs corrected)
 plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-          GRF_filt[:,2],
+          GRF_filt,
           color='tab:blue',
           alpha=0.75,
           label='Original Signal')  # converted to sec
@@ -63,12 +68,12 @@ plt1.set_ylabel('Force (N)')
 plt2.set_title('Aerial Phases')
 plt2.set_xlabel('Step')
 plt2.set_ylabel('Force (N)')
-plt.scatter(np.arange(aerial_vals_d.shape[0]),
+plt.scatter(np.arange(aerial_vals.shape[0]),
             aerial_vals,
             marker='o',
             color='tab:blue',
             label='Original Signal', zorder = 2)
-plt.scatter(np.arange(aerial_vals.shape[0]),
+plt.scatter(np.arange(aerial_vals_d.shape[0]),
             aerial_vals_d,
             marker='o',
             color='tab:orange',
