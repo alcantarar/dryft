@@ -41,59 +41,58 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
-    &#34;&#34;&#34;Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
+def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
+    &#34;&#34;&#34;Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
-    Visualizes the means used to account for drift in `dryft.signal.detrend` .
+    Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
 
     Parameters
     ----------
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    aerial_means : `ndarray`
-        Array of mean force signal measured during each aerial phase.
-    begin : `ndarray`
-        Array of frame indexes for start of each aerial phase.
-    end : `ndarray`
-        Array of frame indexes for end of each aerial phase. Same size as `begin`.
-    trim : `number`
-        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
+    aerial_values : `ndarray`
+        Array of force signal measured at middle of each aerial phase. Output from `signal.aerialforce()`
+    aerial_loc : `ndarray`
+        Array of frame indexes for values in aerial_values. Output from `signal.aerialforce()`
+    stance_begin : `ndarray`
+        Array of frame indexes for start of each stance phase. Output from `signal.splitsteps()`
+    stance_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`. Output from `signal.splitsteps()`
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 
     &#34;&#34;&#34;
+    # define beginning/end of aerial phases
+    begin = stance_end[:-1]
+    end = stance_begin[1:]
 
-    if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
-        colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
-        plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
+    if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
+        colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))
+        plt.fig, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 
-        # plot of untrimmed aerial phases
-        untrimp.set_title(&#39;untrimmed aerial phases&#39;)
-        untrimp.set_ylabel(&#39;force (N)&#39;)
-        untrimp.grid()
+        # plot of  aerial phases
+        plt1.set_title(&#39;Aerial phases (black dot is middle)&#39;)
+        plt1.set_ylabel(&#39;force (N)&#39;)
+        plt1.grid()
         for i in range(begin.shape[0]):
-            untrimp.plot(force[begin[i]:end[i]],
+            plt1.plot(force[begin[i]:end[i]],
                          color=colors[i])
-            # plot of trimmed aerial phases
-        trimp.set_title(&#39;trimmed aerial phases&#39;)
-        trimp.set_ylabel(&#39;force (N)&#39;)
-        trimp.grid()
-        for i in range(begin.shape[0]):
-            trimp.plot(force[begin[i] + trim:end[i] - trim],
-                       color=colors[i])
-        # plot all the means of trimmed aerial phases
-        meanp.set_title(&#39;mean of trimmed aerial phases&#39;)
-        meanp.set_xlabel(&#39;steps&#39;)
-        meanp.set_ylabel(&#39;force (N)&#39;)
-        meanp.grid()
-        for i in range(aerial_means.shape[0]):
-            meanp.plot(i, aerial_means[i],
+            plt1.plot(aerial_loc[i]-begin[i], aerial_values[i],&#39;k.&#39;)
+            # plot of aerial phases
+        # plot all the aerial phase values separate
+        plt2.set_title(&#39;Force measured at middle of aerial phases&#39;)
+        plt2.set_xlabel(&#39;Step #&#39;)
+        plt2.set_ylabel(&#39;force (N)&#39;)
+        plt2.grid()
+        for i in range(aerial_values.shape[0]):
+            plt2.plot(i, aerial_values[i],
                        marker=&#39;o&#39;,
                        color=colors[i])
         plt.show(block = False)
+    else: raise IndexError(&#34;Number of aerial_values isn&#39;t number of steps - 1.&#34;)
 
 
-def stance(force, begin, end):
+def stance(force, begin, end, colormap=plt.cm.viridis):
     &#34;&#34;&#34;Plots separated steps on top of each other.
 
     Requires an `ndarray` of beginning/end of stance phase indexes and 1d force data. Use to confirm `step.split`.
@@ -106,6 +105,9 @@ def stance(force, begin, end):
         Array of frame indexes for start of each stance phase.
     end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`.
+    colormap : `colormap`
+        Default is `matplotlib.plt.cm.viridis`
+
 
     Returns
     -------
@@ -117,7 +119,7 @@ def stance(force, begin, end):
         plot.stance(GRF_filt[:,2], step_begin, step_end)
 
     &#34;&#34;&#34;
-    colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
+    colors = colormap(np.linspace(0,1,begin.shape[0]))
 
     fig, ax = plt.subplots()
     ax.set_title(&#39;All separated steps&#39;)
@@ -138,23 +140,23 @@ def stance(force, begin, end):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="dryft.plot.aerial"><code class="name flex">
-<span>def <span class="ident">aerial</span></span>(<span>force, aerial_means, begin, end, trim, colormap=&lt;matplotlib.colors.ListedColormap object&gt;)</span>
+<span>def <span class="ident">aerial</span></span>(<span>force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=&lt;matplotlib.colors.ListedColormap object&gt;)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.</p>
-<p>Visualizes the means used to account for drift in <a title="dryft.signal.detrend" href="signal.html#dryft.signal.detrend"><code>detrend()</code></a> .</p>
+<section class="desc"><p>Plot aerial phase waveforms with middle identified and separated aerial phase values.</p>
+<p>Visualizes the aerial phase values used to correct for drift in <a title="dryft.signal.detrend" href="signal.html#dryft.signal.detrend"><code>detrend()</code></a> .</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>force</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.</dd>
-<dt><strong><code>aerial_means</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of mean force signal measured during each aerial phase.</dd>
-<dt><strong><code>begin</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for start of each aerial phase.</dd>
-<dt><strong><code>end</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for end of each aerial phase. Same size as <code>begin</code>.</dd>
-<dt><strong><code>trim</code></strong> :&ensp;<code>number</code></dt>
-<dd>Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.</dd>
+<dt><strong><code>aerial_values</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of force signal measured at middle of each aerial phase. Output from <code>signal.aerialforce()</code></dd>
+<dt><strong><code>aerial_loc</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for values in aerial_values. Output from <code>signal.aerialforce()</code></dd>
+<dt><strong><code>stance_begin</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for start of each stance phase. Output from <code>signal.splitsteps()</code></dd>
+<dt><strong><code>stance_end</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>. Output from <code>signal.splitsteps()</code></dd>
 <dt><strong><code>colormap</code></strong> :&ensp;<code>colormap</code></dt>
 <dd>Default is <code>matplotlib.plt.cm.viridis</code></dd>
 </dl></section>
@@ -162,60 +164,59 @@ def stance(force, begin, end):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def aerial(force, aerial_means, begin, end, trim, colormap=plt.cm.viridis):
-    &#34;&#34;&#34;Plot untrimmed aerial phases, trimmed aerial phases, and the means of the trimmed aerial phases.
+<pre><code class="python">def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
+    &#34;&#34;&#34;Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
-    Visualizes the means used to account for drift in `dryft.signal.detrend` .
+    Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
 
     Parameters
     ----------
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    aerial_means : `ndarray`
-        Array of mean force signal measured during each aerial phase.
-    begin : `ndarray`
-        Array of frame indexes for start of each aerial phase.
-    end : `ndarray`
-        Array of frame indexes for end of each aerial phase. Same size as `begin`.
-    trim : `number`
-        Number of frames to remove from beginning and end of aerial phase when calculating mean. aerial.trim output.
+    aerial_values : `ndarray`
+        Array of force signal measured at middle of each aerial phase. Output from `signal.aerialforce()`
+    aerial_loc : `ndarray`
+        Array of frame indexes for values in aerial_values. Output from `signal.aerialforce()`
+    stance_begin : `ndarray`
+        Array of frame indexes for start of each stance phase. Output from `signal.splitsteps()`
+    stance_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `begin`. Output from `signal.splitsteps()`
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 
     &#34;&#34;&#34;
+    # define beginning/end of aerial phases
+    begin = stance_end[:-1]
+    end = stance_begin[1:]
 
-    if aerial_means.shape[0] == begin.shape[0] + 1 == end.shape[0] + 1:
-        colors = colormap(np.linspace(0, 1, aerial_means.shape[0]))
-        plt.fig, (untrimp, trimp, meanp) = plt.subplots(3, 1, sharex=False, figsize=(15, 7))
+    if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
+        colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))
+        plt.fig, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 
-        # plot of untrimmed aerial phases
-        untrimp.set_title(&#39;untrimmed aerial phases&#39;)
-        untrimp.set_ylabel(&#39;force (N)&#39;)
-        untrimp.grid()
+        # plot of  aerial phases
+        plt1.set_title(&#39;Aerial phases (black dot is middle)&#39;)
+        plt1.set_ylabel(&#39;force (N)&#39;)
+        plt1.grid()
         for i in range(begin.shape[0]):
-            untrimp.plot(force[begin[i]:end[i]],
+            plt1.plot(force[begin[i]:end[i]],
                          color=colors[i])
-            # plot of trimmed aerial phases
-        trimp.set_title(&#39;trimmed aerial phases&#39;)
-        trimp.set_ylabel(&#39;force (N)&#39;)
-        trimp.grid()
-        for i in range(begin.shape[0]):
-            trimp.plot(force[begin[i] + trim:end[i] - trim],
-                       color=colors[i])
-        # plot all the means of trimmed aerial phases
-        meanp.set_title(&#39;mean of trimmed aerial phases&#39;)
-        meanp.set_xlabel(&#39;steps&#39;)
-        meanp.set_ylabel(&#39;force (N)&#39;)
-        meanp.grid()
-        for i in range(aerial_means.shape[0]):
-            meanp.plot(i, aerial_means[i],
+            plt1.plot(aerial_loc[i]-begin[i], aerial_values[i],&#39;k.&#39;)
+            # plot of aerial phases
+        # plot all the aerial phase values separate
+        plt2.set_title(&#39;Force measured at middle of aerial phases&#39;)
+        plt2.set_xlabel(&#39;Step #&#39;)
+        plt2.set_ylabel(&#39;force (N)&#39;)
+        plt2.grid()
+        for i in range(aerial_values.shape[0]):
+            plt2.plot(i, aerial_values[i],
                        marker=&#39;o&#39;,
                        color=colors[i])
-        plt.show(block = False)</code></pre>
+        plt.show(block = False)
+    else: raise IndexError(&#34;Number of aerial_values isn&#39;t number of steps - 1.&#34;)</code></pre>
 </details>
 </dd>
 <dt id="dryft.plot.stance"><code class="name flex">
-<span>def <span class="ident">stance</span></span>(<span>force, begin, end)</span>
+<span>def <span class="ident">stance</span></span>(<span>force, begin, end, colormap=&lt;matplotlib.colors.ListedColormap object&gt;)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Plots separated steps on top of each other.</p>
@@ -228,6 +229,8 @@ def stance(force, begin, end):
 <dd>Array of frame indexes for start of each stance phase.</dd>
 <dt><strong><code>end</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>.</dd>
+<dt><strong><code>colormap</code></strong> :&ensp;<code>colormap</code></dt>
+<dd>Default is <code>matplotlib.plt.cm.viridis</code></dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p><code>matplotlib.pyplot</code> figure of each step overlayed.</p>
@@ -239,7 +242,7 @@ plot.stance(GRF_filt[:,2], step_begin, step_end)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def stance(force, begin, end):
+<pre><code class="python">def stance(force, begin, end, colormap=plt.cm.viridis):
     &#34;&#34;&#34;Plots separated steps on top of each other.
 
     Requires an `ndarray` of beginning/end of stance phase indexes and 1d force data. Use to confirm `step.split`.
@@ -252,6 +255,9 @@ plot.stance(GRF_filt[:,2], step_begin, step_end)
         Array of frame indexes for start of each stance phase.
     end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`.
+    colormap : `colormap`
+        Default is `matplotlib.plt.cm.viridis`
+
 
     Returns
     -------
@@ -263,7 +269,7 @@ plot.stance(GRF_filt[:,2], step_begin, step_end)
         plot.stance(GRF_filt[:,2], step_begin, step_end)
 
     &#34;&#34;&#34;
-    colors = plt.cm.viridis(np.linspace(0,1,begin.shape[0]))
+    colors = colormap(np.linspace(0,1,begin.shape[0]))
 
     fig, ax = plt.subplots()
     ax.set_title(&#39;All separated steps&#39;)
