@@ -57,7 +57,7 @@ a continuous running trial. Then these aerial phase values are interpolated to t
 spline fill. Lastly, the interpolated values, which represents the signal drift over time, are subtracted from the original 
 trial. This effectively corrects for signal drift. A similar method is 
 described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), but `dryft` does not assume a 
-constant drift for a given step, instead interpolating between aerial phases. The `dryft` package differs from currently 
+constant drift for a given step, instead spline interpolating between aerial phases. The `dryft` package differs from currently 
 available signal correction methods, which can only 
 account for [linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) 
 or a constant [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
