@@ -42,10 +42,43 @@ GRF_filt = filtfilt(b, a, GRF);
 plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end)
 
 %% Subtract aerial phase to remove drift
-[vGRF_detrend, aerial_means_detrend] = detrend(GRF_filt(:,3),... %nx1 force array
-    Fs,... %force sampling frequency
-    aerial_vals,... %mean force during aerial phase
-    stance_begin,... %tc_begin
-    stance_end,... %tc_end
-    trim,... %trim off beginning and end of aerial phase
-    1); %(d)isplay plots = True
+vGRF_detrend = detrend(GRF_filt(:,3), aerial_vals, aerial_loc);
+
+%% Plot results
+% 
+% if d
+%     figure
+%     subplot(2,1,1)
+%     hold on
+%     plot(linspace(0,length(force_fd)/Fs, length(force_fd)), force_f,'b')
+%     plot(linspace(0,length(force_fd)/Fs, length(force_fd)), force_fd,'r')
+%     grid on
+%     legend({'original signal', 'detrended signal'})
+%     xlabel('time')
+%     ylabel('force')
+% end    
+% 
+% %calculate mean aerial phase for detrend data
+% aerial_means_d = mean_aerial_force(force_fd, stance_begin, stance_end, trim);
+% 
+% % i = 1;
+% % while i < min([length(step_begin), length(step_end)])
+% %     aerial_mean_d(i,t_num) = mean(force_fd(aerial_begin(i)+trim:aerial_end(i)-trim,t_num));
+% %     i = i+1;
+% % end
+% % aerial_mean_d(i,t_num) = mean(force_fd(aerial_begin(i-1)+trim:aerial_end(i-1)-trim,t_num)); %repeat last one
+% 
+% if d
+%     subplot(2,1,2)
+%     hold on
+%     for i = 1:length(aerial_means)
+%         plot(i, aerial_means(i), 'b.')
+%         plot(i, aerial_means_d(i), 'r.')
+%     end
+%     legend({'original signal', 'detrended signal'})
+%     grid on
+%     title('mean of aerial phase')
+%     xlabel('steps')
+%     ylabel('force')
+% end
+% 
