@@ -29,7 +29,7 @@ Fn = (Fs/2);
 GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
-[step_begin,step_end] = split_steps(GRF_filt(:,3),... %vertical GRF
+[stance_begin,stance_end] = split_steps(GRF_filt(:,3),... %vertical GRF
     110,... %threshold
     Fs,... %Sampling Frequency
     0.2,... %min_tc
@@ -37,20 +37,15 @@ GRF_filt = filtfilt(b, a, GRF);
     0); %(d)isplay plots = True
 
 %% Identify where aerial phase occurs (feet not on ground)                                
-aerial_begin =  step_end(1:end-1);
-aerial_end = step_begin(2:end);
-
-% Determine average force signal during aerial phase.
-% Must trim beginning and end of aerial phase to get true aerial phase
-% value. Filtering smooths out rapid transitions at start/end.
-[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), step_begin, step_end);
-plot_aerial(GRF_filt(:,3), aerial_vals, aerial_begin, aerial_end)
+% Determine force signal during middle of aerial phase.
+[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin, stance_end);
+plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end)
 
 %% Subtract aerial phase to remove drift
 [vGRF_detrend, aerial_means_detrend] = detrend(GRF_filt(:,3),... %nx1 force array
     Fs,... %force sampling frequency
     aerial_vals,... %mean force during aerial phase
-    step_begin,... %tc_begin
-    step_end,... %tc_end
+    stance_begin,... %tc_begin
+    stance_end,... %tc_end
     trim,... %trim off beginning and end of aerial phase
     1); %(d)isplay plots = True
