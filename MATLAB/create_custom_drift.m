@@ -5,14 +5,22 @@ dt = 1/Fs;
 StopTime = 30;
 t = (0:dt:StopTime-dt)';
 Fc = 1/30;
-sine_drift = sin(2*pi*Fc*t)*100;
+sine_drift = sin(2*pi*Fc*t)*1000;
 exp_drift = exp(t/8);
 plot(t,exp_drift)
 vGRF = RBDS001runT25forces;
 drift_vGRF = vGRF + sine_drift;
 
 plot(drift_vGRF)
+%%
+temp = drift_vGRF(110:546)
 
+Fs = 300; % From Fukuchi et al. (2017) dataset
+Fc = 60;
+Fn = (Fs/2);
+[b, a] = butter(2, Fc/Fn);
+
+temp_f = filtfilt(b, a, temp);
 
 %% create custom drift
 x = linspace(0,30,15);
