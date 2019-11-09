@@ -13,7 +13,7 @@ drift_vGRF = vGRF + sine_drift;
 
 plot(drift_vGRF)
 %%
-temp = drift_vGRF(110:546)
+temp = drift_vGRF(110:546);
 
 Fs = 300; % From Fukuchi et al. (2017) dataset
 Fc = 60;
@@ -21,7 +21,25 @@ Fn = (Fs/2);
 [b, a] = butter(2, Fc/Fn);
 
 temp_f = filtfilt(b, a, temp);
+trueGRF = vGRF(100:546);
+trueGRF_f = filtfilt(b,a,trueGRF);
 
+aerial_vals = [75, 146, 227, 302];
+aerial_locs = [0,102,220,332];
+hold on
+plot(temp_f)
+plot(aerial_locs, aerial_vals,'k*')
+drift =[repmat(aerial_vals(1),aerial_locs(2)-aerial_locs(1),1); ...
+    repmat(aerial_vals(2),aerial_locs(3)-aerial_locs(2),1); ...
+    repmat(aerial_vals(3),aerial_locs(4)-aerial_locs(3),1); ...
+    repmat(aerial_vals(4),length(temp_f)-aerial_locs(4),1)];
+plot(drift)
+
+figure
+hold on
+wrong = temp_f-drift;
+plot(wrong,'k')
+plot(trueGRF_f,'r--')
 %% create custom drift
 x = linspace(0,30,15);
 y = [0,2,6,12,20,25,30, 33, 34, 35, 35.5, 36, 36.5, 37, 37.5]; %fake drift

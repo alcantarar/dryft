@@ -59,7 +59,8 @@ head(data.ex)
 
 ggplot(data = data.ex) +
   geom_abline(intercept = 0, slope = 0, lwd = 1, alpha = 1)+
-  geom_line((aes(x = time, y = force)), alpha = 1, lwd = 1)+
+  geom_line((aes(x = time, y = wrong)), alpha = 1, lwd = 1)+
+  geom_line((aes(x = time, y = right)), alpha = 1, lwd = 1, color = 'red')+
   scale_color_tableau(label = c('Corrected','Original'),palette = 'Classic 10')+
   scale_y_continuous('Vertical Ground Reaction Force [N]', breaks = seq(0,2000,300))+
   scale_x_continuous('Time [s]', breaks = seq(5,6,.2))+
@@ -75,4 +76,4 @@ ggplot(data = data.ex) +
         legend.background = element_rect(fill = alpha('white',0.8), size = 1, linetype = 'solid', color = 'black'),
         plot.margin = unit(c(10,10,10,10),'points'))
 
-# ggsave('example.eps',height = 8, width = 8, units = 'in')
+# ggsave('example2.eps',height = 8, width = 8, units = 'in')
