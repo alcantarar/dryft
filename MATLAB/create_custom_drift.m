@@ -8,7 +8,7 @@ Fc = 1/30;
 sine_drift = sin(2*pi*Fc*t)*100;
 exp_drift = exp(t/8);
 plot(t,exp_drift)
-vGRF = s001_35(:,2);
+vGRF = RBDS001runT25forces;
 drift_vGRF = vGRF + sine_drift;
 
 plot(drift_vGRF)
@@ -34,4 +34,4 @@ plot(vGRF)
 hold on
 plot(vGRF+y1')
 custom_drift_vGRF = vGRF + y1';
-csvwrite('custom_drift.csv',custom_drift_vGRF)
+csvwrite('custom_drift_S001runT25.csv',custom_drift_vGRF)
