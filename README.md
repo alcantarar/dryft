@@ -49,32 +49,38 @@ python setup.py install
 Running is generally characterized by two phases: a stance and aerial phase. Only one foot is on the ground at a time during 
 stance phase and both feet are off the ground during aerial phase. The force exerted by the body on the ground during 
 aerial phase is zero and during stance phase it is greater than zero. If drift is present in the force signal, values 
-during the aerial phase will no longer be zero. `dryft` uses the aerial phase before and after a given step to tare the 
-force signal during that step. Specifically, it subtracts the mean between the two aerial phases from the step contained
- between the aerial phases. This effectively corrects for signal drift in a step-wise manner. A similar method is 
- described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), but no details on the software
- routine is provided. The `dryft` package differs from currently available signal correction methods, which can only 
- account for [linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) 
-or an [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
+during the aerial phase will no longer be zero. First, `dryft` calculates the force occurring during each aerial phase of
+a continuous running trial. Then these aerial phase values are interpolated to the length of the trial using a 3rd order
+spline fill. Lastly, the interpolated values, which represents the signal drift over time, are subtracted from the original 
+trial. This effectively corrects for signal drift. A similar method is 
+described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), but `dryft` does not assume a 
+constant drift for a given step, instead interpolating between aerial phases. The `dryft` package differs from currently 
+available signal correction methods, which can only 
+account for [linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) 
+or a constant [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
 
 
 ## Using `dryft`
 ### Documentation
-Please refer to the [API Documentation](https://alcantarar.github.io/dryft/index.html)
+Please refer to the [documentation page](https://alcantarar.github.io/dryft/index.html)
 ### Example
-The following tutorial and its supporting documents is found in `setup.py`located in [sample](sample)
+The following tutorial and its supporting documents are found in `setup.py`, located in [sample](sample)
 #### Read force signal data
-The three-dimensional force data modified from [Fukuchi *et al* (2017)](https://peerj.com/articles/3298/). There is a sine wave
-with an amplitude of 100 Newtons and wavelength equal to trial length added to the force signal. 
+The three-dimensional force data modified from [Fukuchi *et al* (2017)](https://peerj.com/articles/3298/). 
+There is a sine wave with an amplitude of 100 Newtons and wavelength equal to trial length added to the force signal to 
+simulate a variety of drift slopes. 
 ```
 from dryft import signal, plot
 import pandas as pd
 from scipy.signal import butter, filtfilt
+import matplotlib.pyplot as plt
+import numpy as np
 
+# Read in data from force plate
 GRF = pd.read_csv('drifting_forces.txt', header=None)
 ```
 #### Filter signal
-Filtering data will improve step identification methods. Here I apply a zero-lag 4th order butterworth
+Filtering data will improve step identification methods. Here I apply a zero-lag 4th order low pass butterworth
 filter with a 60Hz cutoff.
 ```
 # Apply Butterworth Filter
@@ -86,51 +92,89 @@ GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th or
 ```
 
 #### Identify where stance and aerial phases occur
-Note the unusually high force threshold to define a step. This will depend upon the amount of
-drift present in your signal. `GRF_filt[:,2]` is the vertical component of the ground reaction
- force signal (vGRF) and has an artificial drift of 100 Newtons, so a threshold of 110 Newtons 
- will suffice for separating steps.
+Note the unusually high force threshold to define a stance phase (ideally <20 N). This will depend upon the amount of 
+drift present in your signal. `GRF_filt[:,2]` is the vertical component of the ground reaction 
+force signal (vGRF) and has an artificial drift of 100 Newtons, so a threshold of 110 Newtons 
+will suffice for identifying stance phases. 
+
+**After signal drift is corrected, be sure to run `signal.splitsteps()` on the detrended signal with a lower threshold!**
 
 ```
-# stance phase
-step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+# Stance phase
+stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                   threshold=110,
                                   Fs=300,
                                   min_tc=0.2,
                                   max_tc=0.4,
                                   plot=False)
-# plot stance phases
-plot.stance(GRF_filt[:,2], step_begin, step_end)
-
-# aerial phase
-aerial_begin_all = step_end[:-1]
-aerial_end_all = step_begin[1:]
-print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.shape[0])
+# Plot stance phases
+plot.stance(GRF_filt[:,2], stance_begin, stance_end)
 ```
-#### Determine average force signal during aerial phase
-To calculate the force measured during aerial phase, the beginning and end of each 
-aerial phase must be ignored. This provides a better sense of what the true force value
-is during aerial phase.
+#### Determine force signal during aerial phase
+To calculate the force measured during aerial phase, `signal.aerialforce()` extracts the value that lies at the middle of 
+the aerial phase. This ensures that no trailing values from the neighboring stance phases are included. 
 ```
-# trim beginning/end of aerial phase prior to calculation of mean
-trim = signal.trimaerial(GRF_filt[:,2], step_begin, step_end)
-aerial_means = signal.meanaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
+# Determine force signal at middle of aerial phase (feet not on ground)
+aerial_vals, aerial_loc = signal.aerialforce(GRF_filt[:,2], stance_begin, stance_end)
 
-# plot aerial phases
-plot.aerial(GRF_filt[:,2], aerial_means, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
+# Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
+plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, stance_begin, stance_end)
 ```
 #### Remove force signal drift
-This is performed on a per-step basis.
+`signal.detrend()` first interpolates the aerial phase values to the length of the trial, and then subtracts it from the 
+signal.
 ```
-force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
-                                          Fs,
-                                          aerial_means,
-                                          step_begin,
-                                          step_end,
-                                          trim,
-                                          plot=True) #grf_filt and aerial_means must be same width
- 
+force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
 ```
+#### Plot results of `dryft`
+```
+# Compare detrended signal to original
+stance_begin_d, stance_end_d = signal.splitsteps(vGRF=force_fd,
+                                             threshold=10,
+                                             Fs=300,
+                                             min_tc=0.2,
+                                             max_tc=0.4,
+                                             plot=False)
+aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_d, stance_end_d)
+
+# Plot waveforms (original vs detrended)
+plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+             GRF_filt[:,2],
+             color='tab:blue',
+             alpha=0.75)  
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+             force_fd,
+             color='tab:red',
+             alpha=0.75)  
+plt1.grid(zorder =0)
+plt1.legend(['original signal', 'detrended signal'], loc=1)
+plt1.set_xlabel('Seconds')
+plt1.set_ylabel('force (N)')
+
+# Plot aerial phases (original vs detrended)
+plt2.set_title('Aerial Phases')
+plt2.set_xlabel('Step')
+plt2.set_ylabel('force (N)')
+plt.scatter(np.arange(aerial_vals_d.shape[0]),
+         aerial_vals_d,
+         marker='o',
+         color='tab:red',
+         label='detredned signal', zorder = 2)
+plt.scatter(np.arange(aerial_vals.shape[0]), 
+         aerial_vals,
+         marker='o',
+         color='tab:blue',
+         label='original signal', zorder = 2)
+
+plt2.legend(['original signal', 'detrended signal'], loc=1)
+plt.tight_layout()
+plt2.grid(zorder = 0)
+plt.show()
+```
+produces the following plot:
+![README_image](sample/output.pdf)
+
 ## Contributing
 
 To report an problem with `dryft`, please create a new [issue](https://github.com/alcantarar/dryft/issues).

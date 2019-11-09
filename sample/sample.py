@@ -66,13 +66,13 @@ plt.scatter(np.arange(aerial_vals_d.shape[0]),
          marker='o',
          color='tab:red',
          label='detredned signal', zorder = 2)
-plt.scatter(np.arange(aerial_vals.shape[0]), #REMOVE LINES
+plt.scatter(np.arange(aerial_vals.shape[0]),
          aerial_vals,
          marker='o',
          color='tab:blue',
          label='original signal', zorder = 2)
 
-plt2.legend(['original signal', 'detrended signal'], loc=1)  # don't want it in loop, but it needs it?
+plt2.legend(['original signal', 'detrended signal'], loc=1)
 plt.tight_layout()
 plt2.grid(zorder = 0)
 plt.show(block=True)
