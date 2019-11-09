@@ -4,7 +4,7 @@
 %   Calls on the following functions: 
 %   split_steps.m
 %   trim_aerial.m
-%   mean_aerial_force.m
+%   aerial_force.m
 %   plot_aerial.m (optional)
 %   detrend.m
 %
@@ -34,7 +34,7 @@ GRF_filt = filtfilt(b, a, GRF);
     Fs,... %Sampling Frequency
     0.2,... %min_tc
     0.4,... %max_tc
-    1); %(d)isplay plots = True
+    0); %(d)isplay plots = True
 
 %% Identify where aerial phase occurs (feet not on ground)                                
 aerial_begin =  step_end(1:end-1);
@@ -43,14 +43,13 @@ aerial_end = step_begin(2:end);
 % Determine average force signal during aerial phase.
 % Must trim beginning and end of aerial phase to get true aerial phase
 % value. Filtering smooths out rapid transitions at start/end.
-trim = trim_aerial(GRF_filt(:,3), step_begin, step_end);                         
-aerial_means = mean_aerial_force(GRF_filt(:,3), step_begin, step_end, trim);
-plot_aerial(GRF_filt(:,3), aerial_means, aerial_begin, aerial_end, trim)
+[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), step_begin, step_end);
+plot_aerial(GRF_filt(:,3), aerial_vals, aerial_begin, aerial_end)
 
 %% Subtract aerial phase to remove drift
 [vGRF_detrend, aerial_means_detrend] = detrend(GRF_filt(:,3),... %nx1 force array
     Fs,... %force sampling frequency
-    aerial_means,... %mean force during aerial phase
+    aerial_vals,... %mean force during aerial phase
     step_begin,... %tc_begin
     step_end,... %tc_end
     trim,... %trim off beginning and end of aerial phase
