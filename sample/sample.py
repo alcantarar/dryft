@@ -2,6 +2,8 @@ from dryft import signal, plot
 import pandas as pd
 from scipy.signal import butter, filtfilt
 import matplotlib.pyplot as plt
+import numpy as np
+
 # Read in data from force plate
 GRF = pd.read_csv('drifting_forces.txt', header=None)
 
@@ -13,35 +15,66 @@ b,a = butter(2, Fc/Fn)
 GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
 
 # Identify where stance phase occurs (foot on ground)
-step_begin, step_end = signal.splitsteps(vGRF=GRF_filt[:,2],
+stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
                                   threshold=110,
                                   Fs=300,
                                   min_tc=0.2,
                                   max_tc=0.4,
-                                  plot=True)
-# plot.stance(GRF_filt[:,2], step_begin, step_end)
+                                  plot=False)
+# plot.stance(GRF_filt[:,2], stance_begin, stance_end)
+# *stance_begin and stance_end can be used to detrend other columns of GRF_filt as well*
 
-# Identify where aerial phase occurs (feet not on ground)
-#Use aerial phase after first step to the aerial phase before the last whole step.
-# This method guarantees aerial phases per signal.splitsteps()
-aerial_begin_all = step_end[:-1]
-aerial_end_all = step_begin[1:]
-print('Number of aerial begin/end:', aerial_begin_all.shape[0], aerial_end_all.shape[0])
+# Determine force signal at middle of aerial phase (feet not on ground)
+aerial_vals, aerial_loc = signal.aerialforce(GRF_filt[:,2], stance_begin, stance_end)
 
-# Determine average force signal during aerial phase
-# Must trim beginning and end of aerial phase to get true aerial phase value
-trim = signal.trimaerial(GRF_filt[:,2], step_begin, step_end)
-aerial_means = signal.meanaerialforce(GRF_filt[:,2], step_begin, step_end, trim ) #aerial_means will be same width as GRF_filt
-plot.aerial(GRF_filt[:,2], aerial_means, aerial_begin_all, aerial_end_all, trim) #aerial_means and GRF_filt must be (n,) arrays
+# Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
+# plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, stance_begin, stance_end)
 
 # Detrend signal
-force_fd, aerial_means_d = signal.detrend(GRF_filt[:,2],
-                                          Fs,
-                                          aerial_means,
-                                          step_begin,
-                                          step_end,
-                                          trim,
-                                          plot=True) #grf_filt and aerial_means must be same width
+force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
 
-# Can be applied again to further reduce drift
-# force_fdd, aerial_means_dd = signal.detrend(force_fd, Fs, aerial_means_d, step_begin, step_end, trim, plot = True)
+# Compare detrended signal to original
+stance_begin_d, stance_end_d = signal.splitsteps(vGRF=force_fd,
+                                             threshold=10,
+                                             Fs=300,
+                                             min_tc=0.2,
+                                             max_tc=0.4,
+                                             plot=False)
+aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_d, stance_end_d)
+
+# Plot waveforms (original vs detrended)
+plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+          GRF_filt[:,2],
+          color='tab:blue',
+          alpha=0.75,
+          label='original signal')  # converted to sec
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+          force_fd,
+          color='tab:orange',
+          alpha=0.75,
+          label='detrended signal')  # converted to sec
+plt1.grid(zorder =0)
+plt1.legend(loc=1)
+plt1.set_xlabel('Seconds')
+plt1.set_ylabel('force (N)')
+
+# Plot aerial phases (original vs detrended)
+plt2.set_title('Aerial Phases')
+plt2.set_xlabel('Step')
+plt2.set_ylabel('force (N)')
+plt.scatter(np.arange(aerial_vals_d.shape[0]),
+            aerial_vals,
+            marker='o',
+            color='tab:blue',
+            label='original signal', zorder = 2)
+plt.scatter(np.arange(aerial_vals.shape[0]),
+            aerial_vals_d,
+            marker='o',
+            color='tab:orange',
+            label='detrended signal', zorder = 2)
+
+plt2.legend(loc=1)
+plt.tight_layout()
+plt2.grid(zorder = 0)
+plt.show(block=True)
