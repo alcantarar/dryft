@@ -1,4 +1,5 @@
 # `dryft`
+![output_image](sample/output.png)
 #### Created by [Ryan Alcantara](https://alcantarar.github.io)
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
@@ -173,7 +174,7 @@ plt2.grid(zorder = 0)
 plt.show()
 ```
 produces the following plot:
-![README_image](sample/output.pdf)
+![README_image](sample/output.png)
 
 ## Contributing
 
