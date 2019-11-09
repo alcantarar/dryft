@@ -92,8 +92,6 @@ def aerialforce(force, begin, end):
     return aerial, aerial_loc
 
 
-
-
 def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     """Read in filtered vertical ground reaction force (vGRF) signal and ID stance phases based on a threshold.
 
