@@ -40,7 +40,8 @@ if max_tc < min_tc
 end
 
 compare = force_f > threshold; %every data point that is over the threshold
-events = diff(compare); % either x2-x1 = 0-1 = -1 (end of step) or x2-x1 = 1-0 = 1 (beginning of step)
+events = diff(compare); % either x2-x1 = 0-1 = -1 (end of stance phase) or...
+% x2-x1 = 1-0 = 1 (beginning of stance phase)
 stance_begin.all = find(events == 1); %index of stance phase begin
 stance_end.all = find(events == -1); %index of stance phase end
 
@@ -60,18 +61,18 @@ stance_end.keep = stance_end.all(stance_end.all > stance_begin.all(1));
 stance_begin.keep = stance_begin.all(1:length(stance_end.keep));
 %above compare indexes from begin #1 to every stance phase end index, keep if end > begin is true
 
-%remove stance phases that are too short (not full step @ end of trial
+%remove stance phases that are too short (not full stance phase @ end of trial
 min_tc = min_tc*Fs_force;
 max_tc = max_tc*Fs_force;
 
-%calculate stance phase duration (frames) and compare to min step length
-step_len = stance_end.keep - stance_begin.keep;
-good_step1 = step_len >= min_tc; %which stance phases meet minimum length req
-good_step2 = step_len <= max_tc; %which stance phases meet max length req
-good_step = (good_step1 + good_step2 == 2);
+%calculate stance phase duration (frames) and compare to min stance phase length
+stance_len = stance_end.keep - stance_begin.keep;
+good_stance1 = stance_len >= min_tc; %which stance phases meet minimum length req
+good_stance2 = stance_len <= max_tc; %which stance phases meet max length req
+good_stance = (good_stance1 + good_stance2 == 2);
 
-stance_begin = stance_begin.keep(good_step); %take those stance phases' beginnings
-stance_end = stance_end.keep(good_step); %take those stance phases' ends
+stance_begin = stance_begin.keep(good_stance); %take those stance phases' beginnings
+stance_end = stance_end.keep(good_stance); %take those stance phases' ends
 
 disp(['Number of stance phase begin/ends: ', num2str(length(stance_begin)), '/', num2str(length(stance_end))])
 

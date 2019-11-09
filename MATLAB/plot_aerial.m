@@ -5,8 +5,7 @@ function plot_aerial(force, aerial_vals, aerial_loc, stance_begin, stance_end)
 %   INPUTS
 %   ------
 %   force: Nx1 array of force signal
-%   aerial_vals: force signal from middle of each aerial phase. Output from
-%       [trim_aerial.m].
+%   aerial_vals: force signal from middle of each aerial phase.
 %   aerial_loc: array of frame indexes for values in [aerial_vals] in trial.
 %   stance_begin: array of frames where initial conact occurs.
 %   stance_end: array of frames where toe-off occurs.
@@ -24,7 +23,7 @@ aerial_end = stance_begin(2:end);
 
 colors = winter(length(aerial_begin));
 
-%plot all untrimmed aerial phases
+%plot all aerial phases
 figure
 p1 = subplot(2,1,1);
 title('Aerial phases (black dot is middle)','fontsize',16)

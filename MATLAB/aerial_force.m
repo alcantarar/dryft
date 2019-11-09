@@ -1,6 +1,5 @@
 function [aerial, aerial_loc] = aerial_force(force, stance_begin, stance_end)
-%AERIAL_FORCE Calculates mean force signal during aerial phase of
-%running.
+%AERIAL_FORCE Calculates force signal at middle of aerial phase of running.
 %   INPUTS
 %   ------
 %   force: nx1 array of force signal to be detrended

@@ -34,7 +34,7 @@ GRF_filt = filtfilt(b, a, GRF);
     Fs,... %Sampling Frequency
     0.2,... %min_tc
     0.4,... %max_tc
-    0); %(d)isplay plots = True
+    1); %(d)isplay plots = True
 
 %% Identify where aerial phase occurs (feet not on ground)
 % Determine force signal during middle of aerial phase.
@@ -70,7 +70,7 @@ plot(1:length(aerial_vals), aerial_vals, 'b.')
 plot(1:length(aerial_vals_d), aerial_vals_d, 'r.')
 legend({'original signal', 'detrended signal'})
 grid on
-title('Aerial phase')
+title('Aerial phases')
 xlabel('Step')
 ylabel('Force [N]')
 
