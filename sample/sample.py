@@ -28,7 +28,7 @@ stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
 aerial_vals, aerial_loc = signal.aerialforce(GRF_filt[:,2], stance_begin, stance_end)
 
 # Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
-plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, stance_begin, stance_end)
+# plot.aerial(GRF_filt[:,2], aerial_vals, aerial_loc, stance_begin, stance_end)
 
 # Detrend signal
 force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
@@ -45,15 +45,17 @@ aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_d, stanc
 # Plot waveforms (original vs detrended)
 plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-             GRF_filt[:,2],
-             color='tab:blue',
-             alpha=0.75)  # converted to sec
+          GRF_filt[:,2],
+          color='tab:blue',
+          alpha=0.75,
+          label='original signal')  # converted to sec
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-             force_fd,
-             color='tab:red',
-             alpha=0.75)  # converted to sec
+          force_fd,
+          color='tab:orange',
+          alpha=0.75,
+          label='detrended signal')  # converted to sec
 plt1.grid(zorder =0)
-plt1.legend(['original signal', 'detrended signal'], loc=1)
+plt1.legend(loc=1)
 plt1.set_xlabel('Seconds')
 plt1.set_ylabel('force (N)')
 
@@ -62,17 +64,17 @@ plt2.set_title('Aerial Phases')
 plt2.set_xlabel('Step')
 plt2.set_ylabel('force (N)')
 plt.scatter(np.arange(aerial_vals_d.shape[0]),
-         aerial_vals_d,
-         marker='o',
-         color='tab:red',
-         label='detredned signal', zorder = 2)
+            aerial_vals,
+            marker='o',
+            color='tab:blue',
+            label='original signal', zorder = 2)
 plt.scatter(np.arange(aerial_vals.shape[0]),
-         aerial_vals,
-         marker='o',
-         color='tab:blue',
-         label='original signal', zorder = 2)
+            aerial_vals_d,
+            marker='o',
+            color='tab:orange',
+            label='detrended signal', zorder = 2)
 
-plt2.legend(['original signal', 'detrended signal'], loc=1)
+plt2.legend(loc=1)
 plt.tight_layout()
 plt2.grid(zorder = 0)
 plt.show(block=True)
