@@ -20,12 +20,14 @@ GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th or
 # GRF_filt = GRF_filt[:,2] # just vertical for 'drifting_forces.txt'
 
 # Identify where stance phase occurs (foot on ground)
-stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt,
-                                  threshold=140,
-                                  Fs=300,
-                                  min_tc=0.15,
-                                  max_tc=0.4,
-                                  plot=True)
+stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
+                                                          threshold=140,
+                                                          Fs=300,
+                                                          min_tc=0.2,
+                                                          max_tc=0.4,
+                                                          plot=True)
+stance_begin = stance_begin_all[good_stances]
+stance_end = stance_end_all[good_stances]
 plot.stance(GRF_filt, stance_begin, stance_end)
 # *stance_begin and stance_end can be used to detrend other columns of GRF_filt as well*
 

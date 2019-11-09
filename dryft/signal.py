@@ -125,10 +125,14 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Returns
     -------
-    stance_begin : `ndarray`
-        Array of frame indexes for start of stance phase.
-    stance_end : `ndarray`
-        Array of frame indexes for end of stance phase.
+    stance_begin_all : `ndarray`
+        Array of frame indexes for every start of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    stance_end_all : `ndarray`
+        Array of frame indexes for every end of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc & max_tc requirements.
 
     Examples
     --------
@@ -166,10 +170,8 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         stance_begin_all = stance_begin_all[0:stance_end_all.shape[0]]
 
         stance_len = stance_end_all - stance_begin_all
-        good_stance = np.logical_and(stance_len >= min_tc*Fs, stance_len <= max_tc*Fs)
+        good_stances = np.logical_and(stance_len >= min_tc*Fs, stance_len <= max_tc*Fs)
 
-        stance_begin = stance_begin_all[good_stance]
-        stance_end = stance_end_all[good_stance]
         # ID suspicious stance phases (too long or short)
         if np.any(stance_len < min_tc*Fs):
             print('Out of', stance_len.shape[0], 'stance phases,', sum(stance_len < min_tc*Fs), ' < ',
@@ -178,9 +180,9 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
             print('Out of', stance_len.shape[0], 'stance_phases,', sum(stance_len > max_tc*Fs), ' > ',
                   max_tc, 'seconds.')
         # print sizes
-        print('Number of contact time begin/end:', stance_begin.shape[0], stance_end.shape[0])
+        print('Total number of contact time begin/end:', stance_begin_all.shape[0], stance_end_all.shape[0])
 
-        return stance_begin, stance_end
+        return stance_begin_all, stance_end_all, good_stances
 
     else:
         raise IndexError('Did not ID stance phases: min_tc > max_tc.')

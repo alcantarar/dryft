@@ -99,5 +99,4 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
     ax.set_ylabel('force (N)')
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
-    plt.pause(.5)
     plt.show(block = False)
