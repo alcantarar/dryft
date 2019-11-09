@@ -1,6 +1,6 @@
 function force_fd = detrend(force_f, aerial_vals, aerial_loc)
-%DETREND Removes linear or non-linear drift from running ground reaction
-%force data in a stepwise manner.
+%DETREND Removes drift from running ground reaction force signal according
+%to the aerial phase values.
 %   INPUT
 %   -----
 %   force_f: nx1 array containing force signal to be detrended

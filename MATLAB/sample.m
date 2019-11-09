@@ -1,7 +1,7 @@
-%Script corrects force signal drift in a step-specific manner. Subtracts 
+%Script corrects force signal drift in a step-specific manner. Subtracts
 %mean of aerial phase before and after each step for whole trial.
 %
-%   Calls on the following functions: 
+%   Calls on the following functions:
 %   split_steps.m
 %   trim_aerial.m
 %   aerial_force.m
@@ -36,7 +36,7 @@ GRF_filt = filtfilt(b, a, GRF);
     0.4,... %max_tc
     0); %(d)isplay plots = True
 
-%% Identify where aerial phase occurs (feet not on ground)                                
+%% Identify where aerial phase occurs (feet not on ground)
 % Determine force signal during middle of aerial phase.
 [aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin, stance_end);
 plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end)
@@ -44,41 +44,33 @@ plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end)
 %% Subtract aerial phase to remove drift
 vGRF_detrend = detrend(GRF_filt(:,3), aerial_vals, aerial_loc);
 
-%% Plot results
-% 
-% if d
-%     figure
-%     subplot(2,1,1)
-%     hold on
-%     plot(linspace(0,length(force_fd)/Fs, length(force_fd)), force_f,'b')
-%     plot(linspace(0,length(force_fd)/Fs, length(force_fd)), force_fd,'r')
-%     grid on
-%     legend({'original signal', 'detrended signal'})
-%     xlabel('time')
-%     ylabel('force')
-% end    
-% 
-% %calculate mean aerial phase for detrend data
-% aerial_means_d = mean_aerial_force(force_fd, stance_begin, stance_end, trim);
-% 
-% % i = 1;
-% % while i < min([length(step_begin), length(step_end)])
-% %     aerial_mean_d(i,t_num) = mean(force_fd(aerial_begin(i)+trim:aerial_end(i)-trim,t_num));
-% %     i = i+1;
-% % end
-% % aerial_mean_d(i,t_num) = mean(force_fd(aerial_begin(i-1)+trim:aerial_end(i-1)-trim,t_num)); %repeat last one
-% 
-% if d
-%     subplot(2,1,2)
-%     hold on
-%     for i = 1:length(aerial_means)
-%         plot(i, aerial_means(i), 'b.')
-%         plot(i, aerial_means_d(i), 'r.')
-%     end
-%     legend({'original signal', 'detrended signal'})
-%     grid on
-%     title('mean of aerial phase')
-%     xlabel('steps')
-%     ylabel('force')
-% end
-% 
+%% Compare original to detrended signal
+
+% Split steps BUT WITH A LOWER STEP THRESHOLD. GO AS LOW AS YOU CAN.
+[stance_begin_d,stance_end_d] = split_steps(vGRF_detrend, 10, Fs, 0.2, 0.4, 0);
+%calculate force at middle of aerial phase
+[aerial_vals_d, aerial_loc_d] = aerial_force(vGRF_detrend, stance_begin_d, stance_end_d);
+
+% Plot original vs detrended signal
+figure
+% plot waveforms
+subplot(2,1,1)
+hold on
+plot(linspace(0,length(GRF_filt)/Fs, length(GRF_filt)), GRF_filt(:,3),'b')
+plot(linspace(0,length(vGRF_detrend)/Fs, length(vGRF_detrend)), vGRF_detrend,'r')
+grid on
+legend({'original signal', 'detrended signal'})
+title('Entire Trial')
+xlabel('Time [s]')
+ylabel('Force [N]')
+% plot aerial phases
+subplot(2,1,2)
+hold on
+plot(1:length(aerial_vals), aerial_vals, 'b.')
+plot(1:length(aerial_vals_d), aerial_vals_d, 'r.')
+legend({'original signal', 'detrended signal'})
+grid on
+title('Aerial phase')
+xlabel('Step')
+ylabel('Force [N]')
+
