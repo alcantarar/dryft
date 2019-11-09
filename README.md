@@ -100,7 +100,7 @@ drift present in your signal. `GRF_filt[:,2]` is the vertical component of the g
 force signal (vGRF) and has an artificial drift of 100 Newtons, so a threshold of 110 Newtons 
 will suffice for identifying stance phases. 
 
-**After signal drift is corrected, be sure to run `signal.splitsteps()` on the detrended signal with a lower threshold!**
+**After signal drift is corrected, be sure to run `signal.splitsteps()` on the corrected signal with a lower threshold!**
 
 ```
 # Stance phase
@@ -131,7 +131,7 @@ force_fd = signal.detrend(GRF_filt[:,2], aerial_vals, aerial_loc)
 ```
 #### Plot results of `dryft`
 ```
-# Compare detrended signal to original
+# Compare corrected signal to original
 stance_begin_d, stance_end_d = signal.splitsteps(vGRF=force_fd,
                                              threshold=10,
                                              Fs=300,
@@ -140,36 +140,37 @@ stance_begin_d, stance_end_d = signal.splitsteps(vGRF=force_fd,
                                              plot=False)
 aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_d, stance_end_d)
 
-# Plot waveforms (original vs detrended)plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
+# Plot waveforms (original vs corrected)
+plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
           GRF_filt[:,2],
           color='tab:blue',
           alpha=0.75,
-          label='original signal')  # converted to sec
+          label='Original Signal')  # converted to sec
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
           force_fd,
           color='tab:orange',
           alpha=0.75,
-          label='detrended signal')  # converted to sec
+          label='Corrected Signal')  # converted to sec
 plt1.grid(zorder =0)
 plt1.legend(loc=1)
 plt1.set_xlabel('Seconds')
-plt1.set_ylabel('force (N)')
+plt1.set_ylabel('Force (N)')
 
-# Plot aerial phases (original vs detrended)
+# Plot aerial phases (original vs corrected)
 plt2.set_title('Aerial Phases')
 plt2.set_xlabel('Step')
-plt2.set_ylabel('force (N)')
+plt2.set_ylabel('Force (N)')
 plt.scatter(np.arange(aerial_vals_d.shape[0]),
             aerial_vals,
             marker='o',
             color='tab:blue',
-            label='original signal', zorder = 2)
+            label='Original Signal', zorder = 2)
 plt.scatter(np.arange(aerial_vals.shape[0]),
             aerial_vals_d,
             marker='o',
             color='tab:orange',
-            label='detrended signal', zorder = 2)
+            label='Corrected Signal', zorder = 2)
 
 plt2.legend(loc=1)
 plt.tight_layout()
