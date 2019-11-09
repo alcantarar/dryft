@@ -1,6 +1,6 @@
 # `dryft`
 #### Created by [Ryan Alcantara](https://alcantarar.github.io)
-<img src="https://github.com/alcantarar/dryft/documentation/JOSS_submission/waveform.png" width="400">
+<img src="https://raw.githubusercontent.com/alcantarar/dryft/aerial-means-interp/documentation/JOSS_submission/waveform.png" width="500">
 *Illustrated effect of using `dryft` to correct signal drift in vertical ground reaction force running data*
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
