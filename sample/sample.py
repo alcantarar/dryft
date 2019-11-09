@@ -32,10 +32,10 @@ plot.stance(GRF_filt, stance_begin, stance_end)
 # *stance_begin and stance_end can be used to detrend other columns of GRF_filt as well*
 
 # Determine force signal at middle of aerial phase (feet not on ground)
-aerial_vals, aerial_loc = signal.aerialforce(GRF_filt, stance_begin, stance_end)
+aerial_vals, aerial_loc = signal.aerialforce(GRF_filt, stance_begin_all, stance_end_all, good_stances)
 
 # Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
-plot.aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin, stance_end)
+plot.aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin_all, stance_end_all, good_stances)
 
 # Detrend signal
 force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)

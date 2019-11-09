@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
+def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stances, colormap=plt.cm.viridis):
     """Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
     Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
@@ -34,8 +34,22 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=
 
     """
     # define beginning/end of aerial phases
-    begin = stance_end[:-1]
-    end = stance_begin[1:]
+    if False in good_stances:
+        bs = np.where(good_stances == False)
+        good_aerial_start = np.ones((len(good_stances),), dtype=bool)
+        good_aerial_end = np.ones((len(good_stances),), dtype=bool)
+
+        good_aerial_end[bs[0]] = False
+        good_aerial_end[bs[0]+1] = False
+
+        good_aerial_start[bs[0]] = False
+        good_aerial_start[bs[0]-1] = False
+
+        begin = stance_end[good_aerial_start][:-1]
+        end = stance_begin[good_aerial_end][1:]
+    else:
+        begin = stance_end[good_stances][:-1]
+        end = stance_begin[good_stances][1:]
 
     if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
         colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))

@@ -55,7 +55,7 @@ def detrend(force_f, aerial, aerial_loc):
     return force_fd
 
 
-def aerialforce(force, begin, end):
+def aerialforce(force, begin, end, good_stances):
     """Calculate force signal at middle of aerial phase of running.
 
     Parameters
@@ -75,9 +75,22 @@ def aerialforce(force, begin, end):
         Array of frame indexes for values in aerial. output from `aerialforce()`
 
     """
+    if False in good_stances:
+        bs = np.where(good_stances == False)
+        good_aerial_start = np.ones((len(good_stances),), dtype=bool)
+        good_aerial_end = np.ones((len(good_stances),), dtype=bool)
 
-    aerial_begin = end[:-1]
-    aerial_end = begin[1:]
+        good_aerial_end[bs[0]] = False
+        good_aerial_end[bs[0]+1] = False
+
+        good_aerial_start[bs[0]] = False
+        good_aerial_start[bs[0]-1] = False
+
+        aerial_begin = end[good_aerial_start][:-1]
+        aerial_end = begin[good_aerial_end][1:]
+    else:
+        aerial_begin = end[good_stances][:-1]
+        aerial_end = begin[good_stances][1:]
 
     # calculate force at middle of aerial phase (foot not on ground, should be zero)
     if force.ndim == 2:  # one axis only
