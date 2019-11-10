@@ -56,12 +56,12 @@ aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_all_d, s
 plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
           GRF_filt,
-          color='tab:blue',
+          color='tab:red',
           alpha=0.75,
           label='Original Signal')  # converted to sec
 plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
           force_fd,
-          color='tab:orange',
+          color='tab:blue',
           alpha=0.75,
           label='Corrected Signal')  # converted to sec
 plt1.grid(zorder =0)
@@ -71,17 +71,17 @@ plt1.set_ylabel('Force (N)')
 
 # Plot aerial phases (original vs corrected)
 plt2.set_title('Aerial Phases')
-plt2.set_xlabel('Step')
+plt2.set_xlabel('Frames')
 plt2.set_ylabel('Force (N)')
 plt.scatter(aerial_loc,
             aerial_vals,
             marker='o',
-            color='tab:blue',
+            color='tab:red',
             label='Original Signal', zorder = 2)
 plt.scatter(aerial_loc_d,
             aerial_vals_d,
             marker='o',
-            color='tab:orange',
+            color='tab:blue',
             label='Corrected Signal', zorder = 2)
 
 plt2.legend(loc=2)
