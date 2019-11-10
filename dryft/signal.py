@@ -69,10 +69,10 @@ def findgoodaerial(stance_begin, stance_end, good_stances):
 
         Returns
         -------
-        aerial : `ndarray`
-            Array containing force measured at middle of aerial phase force signal.
-        aerial_loc : `ndarray`
-            Array of frame indexes for values in aerial. output from `aerialforce()`
+        good_aerial_begin : `ndarray`
+            Array of frame indexes for aerial phase beginnings not connected to bad steps (per min/max_tc requirements).
+        good_aerial_end : `ndarray`
+            Array of frame indexes for aerial phase ends not connected to bad steps (per min/max_tc requirements).
 
         """
     bs = np.where(good_stances == False)
