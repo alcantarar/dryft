@@ -1,5 +1,5 @@
 ---
-title: 'Dryft: A Python and MATLAB package to correct drifting ground reaction force signals during running'
+title: "`Dryft`: A Python and MATLAB package to correct drifting ground reaction force signals during running"
 tags:
   - biomechanics
   - signal processing
