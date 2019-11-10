@@ -28,7 +28,7 @@ time is defined as the time the foot is in contact with the ground and is often 
 threshold. Signal drift causes an increasing (or decreasing) amount of the vertical GRF signal to fall below the
 threshold, affecting time-dependent biomechanical variables.
 
-![Figure 1. Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
+![Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
 After aerial phases have been identified using a force threshold, aerial phase values are interpolated and subtracted
 from the original signal. ](example_JOSS.png)
  
@@ -60,7 +60,7 @@ represent the underlying drift in the GRF signal and are subtracted, producing t
 (Figure 1). Once aerial phases have been identified using the vertical GRF signal, this process can be applied to
 horizontal GRF signals.
 
-![Figure 2: Force measured during each aerial phase before (red) and after (blue) using Dryft to correct the drifting vertical
+![Force measured during each aerial phase before (red) and after (blue) using Dryft to correct the drifting vertical
 ground reaction force signal. Each dot represents the force measured by the treadmill at the middle of an aerial phase.](steps2.png)
 
 To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
