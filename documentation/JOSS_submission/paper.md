@@ -29,6 +29,7 @@ threshold. Signal drift causes an increasing (or decreasing) amount of the verti
 threshold, affecting time-dependent biomechanical variables.
 
 ![Figure 1](example_JOSS.png)
+
 *Figure 1. Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
 After aerial phases have been identified using a force threshold, aerial phase values are interpolated and subtracted
 from the original signal. *
