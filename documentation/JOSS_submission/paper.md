@@ -9,10 +9,10 @@ tags:
 authors:
   - name: Ryan S. Alcantara
     orcid: 0000-0002-8539-711X
-    affiliation: "1"
+    affiliation: 
 affiliations:
  - name: Department of Integrative Physiology, University of Colorado Boulder, Boulder CO, USA 
-   index: 1
+   index: 
 date: 31 October 2019 #spooktober
 bibliography: paper.bib
 
