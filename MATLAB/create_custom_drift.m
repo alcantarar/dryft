@@ -21,11 +21,12 @@ Fn = (Fs/2);
 [b, a] = butter(2, Fc/Fn);
 
 temp_f = filtfilt(b, a, temp);
-trueGRF = vGRF(100:546);
+plot(temp_f)
+trueGRF = vGRF(110:546);
 trueGRF_f = filtfilt(b,a,trueGRF);
 
 aerial_vals = [75, 146, 227, 302];
-aerial_locs = [0,102,220,332];
+aerial_locs = [0,92,208,321];
 hold on
 plot(temp_f)
 plot(aerial_locs, aerial_vals,'k*')
