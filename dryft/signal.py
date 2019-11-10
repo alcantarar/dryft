@@ -55,7 +55,43 @@ def detrend(force_f, aerial, aerial_loc):
     return force_fd
 
 
-def aerialforce(force, begin, end):
+def findgoodaerial(stance_begin, stance_end, good_stances):
+    """Locate good aerial phases when bad stance phases are present.
+
+        Parameters
+        ----------
+        stance_begin : `ndarray`
+            Array of frame indexes for start of each stance phase.
+        stance_end : `ndarray`
+            Array of frame indexes for end of each stance phase. Same size as `begin`.
+        good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc & max_tc requirements.
+
+        Returns
+        -------
+        aerial : `ndarray`
+            Array containing force measured at middle of aerial phase force signal.
+        aerial_loc : `ndarray`
+            Array of frame indexes for values in aerial. output from `aerialforce()`
+
+        """
+    bs = np.where(good_stances == False)
+    aerial_start = np.ones((len(good_stances),), dtype=bool)
+    aerial_end = np.ones((len(good_stances),), dtype=bool)
+
+    aerial_end[bs[0]] = False
+    aerial_end[bs[0] + 1] = False
+
+    aerial_start[bs[0]] = False
+    aerial_start[bs[0] - 1] = False
+
+    good_aerial_begin = stance_end[aerial_start][:-1]
+    good_aerial_end = stance_begin[aerial_end][1:]
+
+    return good_aerial_begin, good_aerial_end
+
+
+def aerialforce(force, begin, end, good_stances):
     """Calculate force signal at middle of aerial phase of running.
 
     Parameters
@@ -66,6 +102,8 @@ def aerialforce(force, begin, end):
         Array of frame indexes for start of each stance phase.
     end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc & max_tc requirements.
 
     Returns
     -------
@@ -75,9 +113,11 @@ def aerialforce(force, begin, end):
         Array of frame indexes for values in aerial. output from `aerialforce()`
 
     """
-
-    aerial_begin = end[:-1]
-    aerial_end = begin[1:]
+    if False in good_stances:
+        aerial_begin, aerial_end = findgoodaerial(begin, end, good_stances)
+    else:
+        aerial_begin = end[good_stances][:-1]
+        aerial_end = begin[good_stances][1:]
 
     # calculate force at middle of aerial phase (foot not on ground, should be zero)
     if force.ndim == 2:  # one axis only
@@ -125,10 +165,14 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Returns
     -------
-    stance_begin : `ndarray`
-        Array of frame indexes for start of stance phase.
-    stance_end : `ndarray`
-        Array of frame indexes for end of stance phase.
+    stance_begin_all : `ndarray`
+        Array of frame indexes for every start of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    stance_end_all : `ndarray`
+        Array of frame indexes for every end of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc & max_tc requirements.
 
     Examples
     --------
@@ -166,10 +210,8 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         stance_begin_all = stance_begin_all[0:stance_end_all.shape[0]]
 
         stance_len = stance_end_all - stance_begin_all
-        good_stance = np.logical_and(stance_len >= min_tc*Fs, stance_len <= max_tc*Fs)
+        good_stances = np.logical_and(stance_len >= min_tc*Fs, stance_len <= max_tc*Fs)
 
-        stance_begin = stance_begin_all[good_stance]
-        stance_end = stance_end_all[good_stance]
         # ID suspicious stance phases (too long or short)
         if np.any(stance_len < min_tc*Fs):
             print('Out of', stance_len.shape[0], 'stance phases,', sum(stance_len < min_tc*Fs), ' < ',
@@ -178,9 +220,9 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
             print('Out of', stance_len.shape[0], 'stance_phases,', sum(stance_len > max_tc*Fs), ' > ',
                   max_tc, 'seconds.')
         # print sizes
-        print('Number of contact time begin/end:', stance_begin.shape[0], stance_end.shape[0])
+        print('Total number of contact time begin/end:', stance_begin_all.shape[0], stance_end_all.shape[0])
 
-        return stance_begin, stance_end
+        return stance_begin_all, stance_end_all, good_stances
 
     else:
         raise IndexError('Did not ID stance phases: min_tc > max_tc.')

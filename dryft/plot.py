@@ -10,9 +10,10 @@ Distributed here: https://github.com/alcantarar/dryft
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from dryft import signal
 
 
-def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
+def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stances, colormap=plt.cm.viridis):
     """Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
     Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
@@ -34,8 +35,11 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=
 
     """
     # define beginning/end of aerial phases
-    begin = stance_end[:-1]
-    end = stance_begin[1:]
+    if False in good_stances:
+        begin, end = signal.findgoodaerial(stance_begin, stance_end, good_stances)
+    else:
+        begin = stance_end[good_stances][:-1]
+        end = stance_begin[good_stances][1:]
 
     if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
         colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))
@@ -52,11 +56,11 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=
             # plot of aerial phases
         # plot all the aerial phase values separate
         plt2.set_title('Force measured at middle of aerial phases')
-        plt2.set_xlabel('Step #')
+        plt2.set_xlabel('Frame')
         plt2.set_ylabel('force (N)')
         plt2.grid()
-        for i in range(aerial_values.shape[0]):
-            plt2.plot(i, aerial_values[i],
+        for i, n in enumerate(aerial_loc):
+            plt2.plot(n, aerial_values[i],
                        marker='o',
                        color=colors[i])
         plt.show(block = False)
@@ -99,5 +103,4 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
     ax.set_ylabel('force (N)')
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
-    plt.pause(.5)
     plt.show(block = False)

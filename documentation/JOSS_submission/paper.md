@@ -1,10 +1,11 @@
 ---
-title: 'Dryft: A Python and MATLAB package to correct drifting ground reaction force signals during running'
+title: "`Dryft`: A Python and MATLAB package to correct drifting ground reaction force signals during running"
 tags:
   - biomechanics
   - signal processing
   - detrend
   - GRF
+  - walking
 authors:
   - name: Ryan S. Alcantara
     orcid: 0000-0002-8539-711X
@@ -18,73 +19,68 @@ bibliography: paper.bib
 ---
 
 # Background
-Ground reaction forces (GRFs) are exerted by the body on the ground during running and are used to calculate a variety of
-clinical and performance-related biomechanical variables.
-GRFs can be measured by platforms and treadmills instrumented with three-dimensional force transducers.
-However, force transducer signals can be affected by changes in temperature or signal amplifiers, causing the signal to 
-drift.
-If ignored, signal drift causes inaccuracies in data and potentially data loss if the signal exceeds the range of the 
-force transducer.
-For example, contact time is defined as the time the foot is in contact with the ground and is often calculated as the 
-duration when the vertical GRF signal is above a set threshold.  
-Signal drift can cause an increasing (or decreasing) amount of the vertical GRF signal to fall below the threshold, 
-artificially increasing the variability in contact time values or other time-dependent biomechanical variables (Figure 1).
+Ground reaction forces (GRFs) are exerted by the body on the ground during running, measured by treadmills instrumented
+with force transducers, and are used to calculate a variety of clinical and performance-related biomechanical variables
+[Kram et al 1998]. However, force transducer signals can be affected by changes in temperature or signal amplification
+[Sloot et al. 2015, v3d documentation], causing the signal to drift. If ignored, signal drift causes inaccuracies in
+data and potentially data loss if the signal exceeds the range of the force transducer. For example, ground contact
+time is defined as the time the foot is in contact with the ground and is often calculated using a vertical GRF
+threshold. Signal drift causes an increasing (or decreasing) amount of the vertical GRF signal to fall below the
+threshold, affecting time-dependent biomechanical variables.
 
-![Figure 1](Figure_1.png)
-*Figure 1. Vertical ground reaction force signal where signal drifts positively 100 Newtons. 
-Contact time increases by ~0.04s, or ~17%.* 
+![Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
+After aerial phases have been identified using a force threshold, aerial phase values are interpolated and subtracted
+from the original signal. ](example_JOSS.png)
  
-To counteract signal drift, it is best practice to tare (“zero”) the force transducer signal between trials during data 
-collection. 
-This must be done when no force is being applied to the force transducers to ensure accurate signals.
-However, zeroing force transducers may not be feasible for protocols requiring extended periods of continuous running on an 
-instrumented treadmill, allowing GRF signals to drift over time.
-There are signal processing methods available to remove offsets [v3d] and linear drift [scipy/matlab detrend] in GRF 
-signals, but their effectiveness is limited as signal drift is not guaranteed to be linear over long durations. 
-Here, I introduce `dryft`, a Python and MATLAB package that takes a stepwise approach to removing drift in 
-a GRF signal produced during treadmill running.
-
+To prospectively counteract signal drift, it is best practice to zero (tare) the force transducers between trials
+during data collection. This must be done when no force is being applied to the force transducers. However, zeroing
+force transducers may not be feasible for protocols requiring extended periods of continuous running on an instrumented
+treadmill, which could result in GRF signals drifting over time. There are signal processing methods available to
+remove a constant offset [v3d documentation] or linear drift [detrend function documentation] in GRF signals, but their
+effectiveness is limited because signal drift may not be linear over long durations. Prior work investigating the use
+of instrumented split-belt treadmills has suggested using the aerial phase of running to tare force transducers for
+each step [Paolini et al 2007, Sloot et al. 2015], but this approach has not been thoroughly explained nor the software
+distributed to my knowledge. Here I introduce `dryft`, an open source Python and MATLAB package that takes a simple
+approach to identifying and correcting drift in GRF signals produced during treadmill running.
 
 # Summary
-During the aerial phase of running, the body exerts no force on the ground. 
-I assume any substantial forces measured by the instrumented treadmill during an aerial phase are due to signal drift.
-`dryft` implements a stepwise approach that zeros each step separately by subtracting the mean of the aerial phases 
-before and after a step, represented by:
+During the aerial phase of running, the body exerts no force on the ground. `dryft` assumes that any ground
+reaction force measured during an aerial phase is due to signal drift. Prior work has corrected signal drift by
+subtracting the force measured during a given aerial phase from each step (consecutive aerial and stance phases)
+[Sloot2015, Paolini2007]. This approach assumes that there is no change in drift within a step because only one value
+is being subtracted from the entire step. Instead, `dryft` interpolates the force measured during each aerial phase and
+subtracts this from the entire trial (Figure 1).
 
-$$S_n = D_n - \frac{A_n + A_{n+1}}{2}$$
+To accomplish this, `dryft` uses a force threshold (user-defined) to approximate the start and end of each stance phase
+and identify aerial and stance phases in a filtered vertical GRF signal. Then the GRF measured by the instrumented
+treadmill during the middle of each aerial phase is extracted. Only the middle value of each aerial phase is extracted
+to avoid the possibility that part of the adjacent stance phases are included in the drift estimation process. These
+aerial phase values are then cubic spline interpolated to the full length of the GRF signal. These interpolated values
+represent the underlying drift in the GRF signal and are subtracted, producing the corrected vertical GRF signal
+(Figure 1). Once aerial phases have been identified using the vertical GRF signal, this process can be applied to
+horizontal GRF signals.
 
-Where $n$ is a given step, $A$ is the mean vertical GRF during the aerial phase, $D$ is the drifting signal, and $S$ 
-is the returned signal with drift removed. 
-This process is repeated for all steps present in a trial, with drift of the first and last step in a trial estimated from 
-only one adjacent aerial phase.
+![Force measured during each aerial phase before (red) and after (blue) using `dryft` to correct the drifting vertical
+ground reaction force signal. Each dot represents the force measured by the treadmill at the middle of an aerial phase.](steps2.png)
 
-I generated a drifting signal by adding a sine wave (amplitude: 100 N, wavelength: 30 s) to a 
-30-second vGRF signal collected by an instrumented signal (available from Fukuchi et al. (2017)).
-Figure 2 and 3 illustrate improvements in mean aerial phase values and vertical GRF signal when using `dryft` to 
-correct drift.
-`dryft` can be repeatedly implemented to further reduce signal drift, although substantial improvements are
-observed with a single use.
-
-![Figure 2](steps.png)
-*Figure 2. Mean aerial phase values before (orange) and after 
-(blue) using `dryft` to correct for signal drift of +/- 100 Newtons over 30 seconds of running.* 
-
-![Figure3](waveform.png)
-*Figure 3. Representative vertical ground reaction force signal before (orange) and after
-(blue) using `dryft` to correct for drift. 
-Data and code to produce this result are located in `sample` folder.*
- 
-
-The primary application of the `dryft` package is to remove signal drift in GRF signals produced during treadmill running, 
-but one of its supporting functions, `signal.splitsteps()` may also be useful to biomechanical researchers.
-`signal.splitsteps()` provides a fast and robust method for identifying initial contact and toe-off within a 
-vertical GRF signal. 
-Once identified, these events can used to calculate commonly investigated stride kinematic variables like contact time, 
-leg swing time, step time, step length, or step frequency.
+To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
+treadmill during running (Fukuchi et al 2017). Using `dryft` to reduce this signal’s drift produced favorable results, as
+the average force measured during across aerial phases was 0.01 N for the corrected signal (Figure 2). While `dryft` was
+intended to be used with running GRF signals, it could also be applied to split-belt walking GRF signals as well, as typically
+only one foot is on a belt at a time. However, extra care should be taken to the identify crossover steps
+prior to correcting drift, as they may influence the accuracy of the force values measured during the swing phase.
 
 # Acknowledgements
 
-The author would like to thank MRP for their support as well as GB and 
-[/r/learnpython](https://reddit.com/r/learnpython) for their feedback during package development. 
+The author would like to thank MRP for their continued support and GB, the ABL, and
+[/r/learnpython](https://reddit.com/r/learnpython) for their feedback on this package and manuscript.
 
 # References
+1. Kram, Griffin, Donelan, and Chang (1998) Force treadmill for measuring vertical and horizontal ground reaction forces.
+2. Fukuchi, Fukuchi, & Duarte (2017) A public dataset of running biomechanics and the effects of running speed on lower
+extremity kinematics and kinetics.
+3. Scipy.signal.detrend: [https://docs.scipy.org/doc/scipy-1.1.0/reference/generated/scipy.signal.detrend.html](https://docs.scipy.org/doc/scipy-1.1.0/reference/generated/scipy.signal.detrend.html).
+4. Visual3D FP_ZERO: [https://www.c-motion.com/v3dwiki/index.php/FP_ZERO](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
+5. Paolini, Della Croce, Riley, Newton, Kerrigan (2007) Testing of a tri-instrumented-treadmill unit for kinetic analysis
+of locomotion tasks in static and dynamic loading conditions.
+6. Sloot, Houdijk, Harlaar (2015) A comprehensive protocol to test instrumented treadmills.
