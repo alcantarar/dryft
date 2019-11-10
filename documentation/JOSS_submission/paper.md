@@ -28,11 +28,9 @@ time is defined as the time the foot is in contact with the ground and is often 
 threshold. Signal drift causes an increasing (or decreasing) amount of the vertical GRF signal to fall below the
 threshold, affecting time-dependent biomechanical variables.
 
-![Figure 1](example_JOSS.png)
-
-*Figure 1. Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
+![Figure 1. Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
 After aerial phases have been identified using a force threshold, aerial phase values are interpolated and subtracted
-from the original signal. *
+from the original signal. ](example_JOSS.png)
  
 To prospectively counteract signal drift, it is best practice to zero (tare) the force transducers between trials
 during data collection. This must be done when no force is being applied to the force transducers. However, zeroing
@@ -62,9 +60,8 @@ represent the underlying drift in the GRF signal and are subtracted, producing t
 (Figure 1). Once aerial phases have been identified using the vertical GRF signal, this process can be applied to
 horizontal GRF signals.
 
-![Figure 2](steps2.png)
-*Force measured during each aerial phase before (red) and after (blue) using Dryft to correct the drifting vertical
-ground reaction force signal. Each dot represents the force measured by the treadmill at the middle of an aerial phase.*
+![Figure 2: Force measured during each aerial phase before (red) and after (blue) using Dryft to correct the drifting vertical
+ground reaction force signal. Each dot represents the force measured by the treadmill at the middle of an aerial phase.](steps2.png)
 
 To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
 treadmill during running (Fukuchi et al 2017). Using Dryft to reduce this signal’s drift produced favorable results, as
