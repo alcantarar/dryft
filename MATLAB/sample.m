@@ -29,20 +29,17 @@ Fn = (Fs/2);
 GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
-[stance_begin_all,stance_end_all, good_stances] = split_steps(GRF_filt(:,3),... %vertical GRF
+[stance_begin,stance_end, good_stances] = split_steps(GRF_filt(:,3),... %vertical GRF
     110,... %threshold
     Fs,... %Sampling Frequency
     0.2,... %min_tc
     0.4,... %max_tc
     0); %(d)isplay plots = True
 
-% stance_begin = stance_begin(good_stances);
-% stance_end = stance_end(good_stances);
-
 %% Identify where aerial phase occurs (feet not on ground)
 % Determine force signal during middle of aerial phase.
-[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin_all, stance_end_all, good_stances);
-plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin_all, stance_end_all, good_stances)
+[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin, stance_end, good_stances);
+plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end, good_stances)
 
 %% Subtract aerial phase to remove drift
 vGRF_detrend = detrend(GRF_filt(:,3), aerial_vals, aerial_loc);
@@ -50,9 +47,9 @@ vGRF_detrend = detrend(GRF_filt(:,3), aerial_vals, aerial_loc);
 %% Compare original to detrended signal
 
 % Split steps BUT WITH A LOWER STEP THRESHOLD. GO AS LOW AS YOU CAN.
-[stance_begin_d,stance_end_d] = split_steps(vGRF_detrend, 10, Fs, 0.2, 0.4, 0);
+[stance_begin_d,stance_end_d, good_stances_d] = split_steps(vGRF_detrend, 15, Fs, 0.2, 0.4, 0);
 %calculate force at middle of aerial phase
-[aerial_vals_d, aerial_loc_d] = aerial_force(vGRF_detrend, stance_begin_d, stance_end_d);
+[aerial_vals_d, aerial_loc_d] = aerial_force(vGRF_detrend, stance_begin_d, stance_end_d, good_stances_d);
 
 % Plot original vs detrended signal
 figure
@@ -69,8 +66,8 @@ ylabel('Force [N]')
 % plot aerial phases
 subplot(2,1,2)
 hold on
-plot(1:length(aerial_vals), aerial_vals, 'b.')
-plot(1:length(aerial_vals_d), aerial_vals_d, 'r.')
+plot(aerial_loc, aerial_vals, 'b.')
+plot(aerial_loc_d, aerial_vals_d, 'r.')
 legend({'original signal', 'detrended signal'})
 grid on
 title('Aerial phases')
