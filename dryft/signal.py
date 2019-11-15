@@ -36,8 +36,7 @@ def detrend(force_f, aerial, aerial_loc):
     --------
         from dryft import signal
 
-        force_fd = signal.detrend(force_f, aerial, aerial_loc)
-
+        force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
     """
 
     force_f = force_f.flatten()
@@ -73,7 +72,6 @@ def findgoodaerial(stance_begin, stance_end, good_stances):
             Array of frame indexes for aerial phase beginnings not connected to bad steps (per min/max_tc requirements).
         good_aerial_end : `ndarray`
             Array of frame indexes for aerial phase ends not connected to bad steps (per min/max_tc requirements).
-
         """
     bs = np.where(good_stances == False)
     aerial_start = np.ones((len(good_stances),), dtype=bool)
@@ -91,17 +89,17 @@ def findgoodaerial(stance_begin, stance_end, good_stances):
     return good_aerial_begin, good_aerial_end
 
 
-def aerialforce(force, begin, end, good_stances):
+def aerialforce(force, stance_begin, stance_end, good_stances):
     """Calculate force signal at middle of aerial phase of running.
 
     Parameters
     ----------
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    begin : `ndarray`
+    stance_begin : `ndarray`
         Array of frame indexes for start of each stance phase.
-    end : `ndarray`
-        Array of frame indexes for end of each stance phase. Same size as `begin`.
+    stance_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `stance_begin`.
     good_stances : `ndarray`
         Boolean array of which stance phases meet min_tc & max_tc requirements.
 
@@ -114,10 +112,10 @@ def aerialforce(force, begin, end, good_stances):
 
     """
     if False in good_stances:
-        aerial_begin, aerial_end = findgoodaerial(begin, end, good_stances)
+        aerial_begin, aerial_end = findgoodaerial(stance_begin, stance_end, good_stances)
     else:
-        aerial_begin = end[good_stances][:-1]
-        aerial_end = begin[good_stances][1:]
+        aerial_begin = stance_end[good_stances][:-1]
+        aerial_end = stance_begin[good_stances][1:]
 
     # calculate force at middle of aerial phase (foot not on ground, should be zero)
     if force.ndim == 2:  # one axis only
@@ -177,18 +175,13 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
     Examples
     --------
         from dryft import signal
-        stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
-                                             threshold=110,
-                                             Fs=300,
-                                             min_tc=0.2,
-                                             max_tc=0.4,
-                                             plot=False)
-        stance_begin
-        stance_end
 
-    array([102, 215, 325])
-    array([171, 285, 397])
-
+        stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
+                                                                           threshold=140,
+                                                                           Fs=300,
+                                                                           min_tc=0.2,
+                                                                           max_tc=0.4,
+                                                                           plot=True)
     """
 
     if min_tc < max_tc:

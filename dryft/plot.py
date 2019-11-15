@@ -84,17 +84,6 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
         Array of frame indexes for end of each stance phase. Same size as `begin`.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
-
-
-    Returns
-    -------
-    `matplotlib.pyplot` figure of each step overlayed.
-
-    Examples
-    --------
-        from dryft import plot
-        plot.stance(GRF_filt[:,2], step_begin, step_end)
-
     """
     colors = colormap(np.linspace(0,1,begin.shape[0]))
 

@@ -105,11 +105,11 @@ will suffice for identifying stance phases.
 ```
 # Identify where stance phase occurs (foot on ground)
 stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
-                                                          threshold=140,
-                                                          Fs=300,
-                                                          min_tc=0.2,
-                                                          max_tc=0.4,
-                                                          plot=True)
+                                                                   threshold=140,
+                                                                   Fs=300,
+                                                                   min_tc=0.2,
+                                                                   max_tc=0.4,
+                                                                   plot=True)
 stance_begin = stance_begin_all[good_stances]
 stance_end = stance_end_all[good_stances]
 plot.stance(GRF_filt, stance_begin, stance_end)
@@ -134,11 +134,11 @@ force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
 ```
 # Compare corrected signal to original
 stance_begin_all_d, stance_end_all_d, good_stances_d = signal.splitsteps(vGRF=force_fd,
-                                                          threshold=25,
-                                                          Fs=300,
-                                                          min_tc=0.2,
-                                                          max_tc=0.4,
-                                                          plot=False)
+                                                                         threshold=25,
+                                                                         Fs=300,
+                                                                         min_tc=0.2,
+                                                                         max_tc=0.4,
+                                                                         plot=False)
 stance_begin_d = stance_begin_all_d[good_stances_d]
 stance_end_d = stance_end_all_d[good_stances_d]
 
