@@ -22,23 +22,26 @@ GRF = dlmread('drifting_forces.txt');
 
 %% Apply Butterworth filter
 Fs = 300; % From Fukuchi et al. (2017) dataset
-Fc = 60;
+Fc = 50;
 Fn = (Fs/2);
 [b, a] = butter(2, Fc/Fn);
 
 GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
-[stance_begin,stance_end, good_stances] = split_steps(GRF_filt(:,3),... %vertical GRF
+[stance_begin_all,stance_end_all, good_stances] = split_steps(GRF_filt(:,3),... %vertical GRF
     110,... %threshold
     Fs,... %Sampling Frequency
     0.2,... %min_tc
     0.4,... %max_tc
     1); %(d)isplay plots = True
 
+% stance_begin = stance_begin(good_stances);
+% stance_end = stance_end(good_stances);
+
 %% Identify where aerial phase occurs (feet not on ground)
 % Determine force signal during middle of aerial phase.
-[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin, stance_end);
+[aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin_all, stance_end_all, good_stances);
 plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end)
 
 %% Subtract aerial phase to remove drift

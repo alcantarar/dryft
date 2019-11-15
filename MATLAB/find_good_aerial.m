@@ -21,6 +21,20 @@ function [good_aerial_begin, good_aerial_end] = find_good_aerial(stance_begin, s
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 bs = find(good_stances == False);
+aerial_start = true(length(good_stances),1);
+aerial_end = true(length(good_stances),1);
+
+aerial_end(bs) = false;
+aerial_end(bs+1) = false;
+
+aerial_start(bs) = false;
+aerial_start(bs-1) = false;
+
+good_aerial_begin = stance_end(aerial_start);
+good_aerial_end = stance_begin(aerial_end);
+
+good_aerial_begin = good_aerial_begin(1:end-1);
+good_aerial_end = good_aerial_end(2:end);
 
 end
 
