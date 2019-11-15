@@ -53,7 +53,7 @@ vertical GRF signal, this process can be applied to horizontal GRF signals as we
 
 ![Vertical ground reaction force (GRF) measured during each aerial phase before (red) and after (blue) using `dryft` to correct
 the drifting vertical GRF signal. Each point represents the force measured by the treadmill at the middle
-of an aerial phase. `dryft` was used to successfully tare the drifting vertical GRF signal](steps2.png)
+of an aerial phase. `dryft` was used to successfully tare the drifting vertical GRF signal](steps.png)
 
 To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
 treadmill during running (Fukuchi et al 2017). Using `dryft` to reduce this vertical GRF signal’s drift produced favorable results, as
