@@ -182,7 +182,7 @@ plt2.grid(zorder = 0)
 plt.show()
 ```
 produces the following plot:
-![README_image](sample/output.png)
+![README_image](documentation/README_output.png)
 
 ## Contributing
 
