@@ -1,5 +1,5 @@
 ---
-title: "`Dryft`: A Python and MATLAB package to correct drifting ground reaction force signals during running"
+title: "Dryft: A Python and MATLAB package to correct drifting ground reaction force signals during running"
 tags:
   - biomechanics
   - signal processing
@@ -21,54 +21,54 @@ bibliography: paper.bib
 # Background
 Ground reaction forces (GRFs) are exerted by the body on the ground during running, measured by treadmills instrumented
 with force transducers, and are used to calculate a variety of clinical and performance-related biomechanical variables
-[Kram et al 1998]. However, force transducer signals can be affected by changes in temperature or signal amplification
-[Sloot et al. 2015, v3d documentation], causing the signal to drift. If ignored, signal drift causes inaccuracies in
-data and potentially data loss if the signal exceeds the range of the force transducer. For example, ground contact
-time is defined as the time the foot is in contact with the ground and is often calculated using a vertical GRF
-threshold. Signal drift causes an increasing (or decreasing) amount of the vertical GRF signal to fall below the
-threshold, affecting time-dependent biomechanical variables.
+[Kram et al 1998]. However, force transducer signals can be affected by changes in temperature during warm up or over long periods
+[Sloot et al. 2015], causing the signal to drift. If ignored, signal drift causes inaccuracies in the calculation of
+biomechanical variables. For example, ground contact time is defined as the time the foot is in contact with the ground and is often
+calculated as the time a vertical GRF exceeds a threshold. Drift changes the amount of the vertical GRF
+signal to fall below the threshold, affecting the calculation of time-dependent GRF metrics. Drift can also potentially lead
+to data loss if the signal exceeds the range of the force transducer.
 
 ![Process of correcting drift from a vertical ground reaction force signal collected during treadmill running.
 After aerial phases have been identified using a force threshold, aerial phase values are interpolated and subtracted
 from the original signal. ](example_JOSS.png)
  
 To prospectively counteract signal drift, it is best practice to zero (tare) the force transducers between trials
-during data collection. This must be done when no force is being applied to the force transducers. However, zeroing
-force transducers may not be feasible for protocols requiring extended periods of continuous running on an instrumented
-treadmill, which could result in GRF signals drifting over time. There are signal processing methods available to
-remove a constant offset [v3d documentation] or linear drift [detrend function documentation] in GRF signals, but their
-effectiveness is limited because signal drift may not be linear over long durations. Prior work investigating the use
-of instrumented split-belt treadmills has suggested using the aerial phase of running to tare force transducers for
-each step [Paolini et al 2007, Sloot et al. 2015], but this approach has not been thoroughly explained nor the software
-distributed to my knowledge. Here I introduce `dryft`, an open source Python and MATLAB package that takes a simple
-approach to identifying and correcting drift in GRF signals produced during treadmill running.
+during data collection. However, zeroing force transducers may not be feasible for protocols requiring extended periods
+of continuous running on an instrumented treadmill, which could result in GRF signals drifting over time. There are
+signal processing methods available to remove a constant offset [v3d documentation] or linear drift [detrend function
+documentation] in GRF signals, but their effectiveness is limited because signal drift may not be linear over the
+duration of the trial. Here I introduce `dryft`, an open source Python and MATLAB package that takes a simple
+approach to identifying and correcting non-linear drift in GRF signals produced during treadmill running.
 
 # Summary
 During the aerial phase of running, the body exerts no force on the ground. `dryft` assumes that any ground
-reaction force measured during an aerial phase is due to signal drift. Prior work has corrected signal drift by
-subtracting the force measured during a given aerial phase from each step (consecutive aerial and stance phases)
-[Sloot2015, Paolini2007]. This approach assumes that there is no change in drift within a step because only one value
-is being subtracted from the entire step. Instead, `dryft` interpolates the force measured during each aerial phase and
-subtracts this from the entire trial (Figure 1).
-
-To accomplish this, `dryft` uses a force threshold (user-defined) to approximate the start and end of each stance phase
-and identify aerial and stance phases in a filtered vertical GRF signal. Then the GRF measured by the instrumented
-treadmill during the middle of each aerial phase is extracted. Only the middle value of each aerial phase is extracted
-to avoid the possibility that part of the adjacent stance phases are included in the drift estimation process. These
-aerial phase values are then cubic spline interpolated to the full length of the GRF signal. These interpolated values
-represent the underlying drift in the GRF signal and are subtracted, producing the corrected vertical GRF signal
-(Figure 1). Once aerial phases have been identified using the vertical GRF signal, this process can be applied to
-horizontal GRF signals.
+reaction force measured during an aerial phase is due to noise or signal drift. `dryft` uses a force threshold
+(user-defined) to approximate the start and end of each stance phase and identify aerial and stance phases in a
+filtered vertical GRF signal (Figure 1). Then the force measured by the instrumented treadmill during the middle of each aerial
+phase is identified. The middle value of each aerial phase is identified to avoid the possibility that part of the
+adjacent stance phases are included in the drift estimation process. These aerial phase values are then cubic spline
+interpolated to the full length of the GRF signal. These interpolated values represent the underlying drift in the GRF
+signal and are subtracted, producing the corrected vertical GRF signal (Figure 1). Once aerial phases have been
+identified using the vertical GRF signal, this process can be applied to horizontal GRF signals as well.
 
 ![Force measured during each aerial phase before (red) and after (blue) using `dryft` to correct the drifting vertical
 ground reaction force signal. Each dot represents the force measured by the treadmill at the middle of an aerial phase.](steps2.png)
 
 To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
 treadmill during running (Fukuchi et al 2017). Using `dryft` to reduce this signal’s drift produced favorable results, as
-the average force measured during across aerial phases was 0.01 N for the corrected signal (Figure 2). While `dryft` was
-intended to be used with running GRF signals, it could also be applied to split-belt walking GRF signals as well, as typically
-only one foot is on a belt at a time. However, extra care should be taken to the identify crossover steps
-prior to correcting drift, as they may influence the accuracy of the force values measured during the swing phase.
+the average force measured across aerial phases was 0.01 N for the corrected signal (Figure 2). While `dryft` was
+intended to be used with GRF signals measured during treadmill running, it could also be applied to split-belt walking
+GRF signals as well, as typically only one foot is on a belt at a time. However, extra care should be taken to identify crossover steps
+prior to correcting drift, as they will influence the accuracy of the force values measured during the swing phase.
+
+# Conclusion
+Prior work corrects non-linear drift in GRF signals by subtracting the mean force measured during a given
+aerial phase from the following stance phase [Sloot2015, Paolini2007]. The success of this method heavily relies on how
+accurately stance and aerial phases are identified and assumes that there is no change in drift within a given step
+(consecutive aerial and stance phases). Instead, `dryft` interpolates the force measured at the middle of each aerial
+phase and subtracts this from the entire trial. This package can be used to identify stance phases and correct
+non-linear drift in ground reaction force signals produced during treadmill running or split-belt walking.
+
 
 # Acknowledgements
 
