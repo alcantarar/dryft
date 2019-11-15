@@ -68,11 +68,12 @@ def detrend(force_f, aerial, aerial_loc):
     --------
         from dryft import signal
 
-        force_fd = signal.detrend(force_f, aerial, aerial_loc)
-
+        force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
     &#34;&#34;&#34;
 
+    force_f = force_f.flatten()
     # Create NaN array with aerial values at respective frame locations
+
     drift_signal = np.full(force_f.shape, np.nan)
     drift_signal[aerial_loc] = aerial
     # Use 3rd order spline to fill NaNs, creating the underlying drift of the signal.
@@ -85,17 +86,54 @@ def detrend(force_f, aerial, aerial_loc):
     return force_fd
 
 
-def aerialforce(force, begin, end):
+def findgoodaerial(stance_begin, stance_end, good_stances):
+    &#34;&#34;&#34;Locate good aerial phases when bad stance phases are present.
+
+        Parameters
+        ----------
+        stance_begin : `ndarray`
+            Array of frame indexes for start of each stance phase.
+        stance_end : `ndarray`
+            Array of frame indexes for end of each stance phase. Same size as `begin`.
+        good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
+
+        Returns
+        -------
+        good_aerial_begin : `ndarray`
+            Array of frame indexes for aerial phase beginnings not connected to bad steps (per min/max_tc requirements).
+        good_aerial_end : `ndarray`
+            Array of frame indexes for aerial phase ends not connected to bad steps (per min/max_tc requirements).
+        &#34;&#34;&#34;
+    bs = np.where(good_stances == False)
+    aerial_start = np.ones((len(good_stances),), dtype=bool)
+    aerial_end = np.ones((len(good_stances),), dtype=bool)
+
+    aerial_end[bs[0]] = False
+    aerial_end[bs[0] + 1] = False
+
+    aerial_start[bs[0]] = False
+    aerial_start[bs[0] - 1] = False
+
+    good_aerial_begin = stance_end[aerial_start][:-1]
+    good_aerial_end = stance_begin[aerial_end][1:]
+
+    return good_aerial_begin, good_aerial_end
+
+
+def aerialforce(force, stance_begin, stance_end, good_stances):
     &#34;&#34;&#34;Calculate force signal at middle of aerial phase of running.
 
     Parameters
     ----------
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    begin : `ndarray`
+    stance_begin : `ndarray`
         Array of frame indexes for start of each stance phase.
-    end : `ndarray`
-        Array of frame indexes for end of each stance phase. Same size as `begin`.
+    stance_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `stance_begin`.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
 
     Returns
     -------
@@ -105,25 +143,29 @@ def aerialforce(force, begin, end):
         Array of frame indexes for values in aerial. output from `aerialforce()`
 
     &#34;&#34;&#34;
-
-    aerial_begin = end[:-1]
-    aerial_end = begin[1:]
+    if False in good_stances:
+        aerial_begin, aerial_end = findgoodaerial(stance_begin, stance_end, good_stances)
+    else:
+        aerial_begin = stance_end[good_stances][:-1]
+        aerial_end = stance_begin[good_stances][1:]
 
     # calculate force at middle of aerial phase (foot not on ground, should be zero)
-    if force.ndim == 1:  # one axis only
+    if force.ndim == 2:  # one axis only
+        force = force.flatten()
         aerial = np.full([aerial_begin.shape[0], ], np.nan)
         aerial_middle = np.full([aerial_begin.shape[0], ], np.nan)
+    elif force.ndim == 1:
+        aerial = np.full([aerial_begin.shape[0], ], np.nan)
+        aerial_middle = np.full([aerial_begin.shape[0], ], np.nan)
+    else: raise IndexError(&#39;Can only handle shape (n,) or (n,1)&#39;)
 
-        for i in range(aerial.shape[0]):
-            aerial_len = aerial_end-aerial_begin
-            aerial_middle[i,] = round(aerial_len[i]/2)
-            aerial[i,] = force[aerial_begin[i]+aerial_middle.astype(int)[i]]
-        aerial_loc = aerial_begin + aerial_middle.astype(int)
-    else: raise IndexError(&#39;force.ndim != 1&#39;)
+    for i in range(aerial.shape[0]):
+        aerial_len = aerial_end-aerial_begin
+        aerial_middle[i,] = round(aerial_len[i]/2)
+        aerial[i,] = force[aerial_begin[i]+aerial_middle.astype(int)[i]]
+    aerial_loc = aerial_begin + aerial_middle.astype(int)
 
     return aerial, aerial_loc
-
-
 
 
 def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
@@ -153,34 +195,32 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
     Returns
     -------
-    stance_begin : `ndarray`
-        Array of frame indexes for start of stance phase.
-    stance_end : `ndarray`
-        Array of frame indexes for end of stance phase.
+    stance_begin_all : `ndarray`
+        Array of frame indexes for every start of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    stance_end_all : `ndarray`
+        Array of frame indexes for every end of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
 
     Examples
     --------
         from dryft import signal
-        stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
-                                             threshold=110,
-                                             Fs=300,
-                                             min_tc=0.2,
-                                             max_tc=0.4,
-                                             plot=False)
-        stance_begin
-        stance_end
 
-    array([102, 215, 325])
-    array([171, 285, 397])
-
+        stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
+                                                                           threshold=140,
+                                                                           Fs=300,
+                                                                           min_tc=0.2,
+                                                                           max_tc=0.4,
+                                                                           plot=True)
     &#34;&#34;&#34;
 
     if min_tc &lt; max_tc:
         # Identification. Forces over threshold register as stance phase (foot on ground).
-        compare = (vGRF &gt; threshold).astype(int)
+        compare = (vGRF.flatten() &gt; threshold).astype(int)
 
         events = np.diff(compare)
-        print(sum((compare)))
         stance_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
         stance_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
 
@@ -195,10 +235,8 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         stance_begin_all = stance_begin_all[0:stance_end_all.shape[0]]
 
         stance_len = stance_end_all - stance_begin_all
-        good_stance = np.logical_and(stance_len &gt;= min_tc*Fs, stance_len &lt;= max_tc*Fs)
+        good_stances = np.logical_and(stance_len &gt;= min_tc*Fs, stance_len &lt;= max_tc*Fs)
 
-        stance_begin = stance_begin_all[good_stance]
-        stance_end = stance_end_all[good_stance]
         # ID suspicious stance phases (too long or short)
         if np.any(stance_len &lt; min_tc*Fs):
             print(&#39;Out of&#39;, stance_len.shape[0], &#39;stance phases,&#39;, sum(stance_len &lt; min_tc*Fs), &#39; &lt; &#39;,
@@ -207,9 +245,9 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
             print(&#39;Out of&#39;, stance_len.shape[0], &#39;stance_phases,&#39;, sum(stance_len &gt; max_tc*Fs), &#39; &gt; &#39;,
                   max_tc, &#39;seconds.&#39;)
         # print sizes
-        print(&#39;Number of contact time begin/end:&#39;, stance_begin.shape[0], stance_end.shape[0])
+        print(&#39;Total number of contact time begin/end:&#39;, stance_begin_all.shape[0], stance_end_all.shape[0])
 
-        return stance_begin, stance_end
+        return stance_begin_all, stance_end_all, good_stances
 
     else:
         raise IndexError(&#39;Did not ID stance phases: min_tc &gt; max_tc.&#39;)</code></pre>
@@ -223,7 +261,7 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="dryft.signal.aerialforce"><code class="name flex">
-<span>def <span class="ident">aerialforce</span></span>(<span>force, begin, end)</span>
+<span>def <span class="ident">aerialforce</span></span>(<span>force, stance_begin, stance_end, good_stances)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Calculate force signal at middle of aerial phase of running.</p>
@@ -231,10 +269,12 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 <dl>
 <dt><strong><code>force</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.</dd>
-<dt><strong><code>begin</code></strong> :&ensp;<code>ndarray</code></dt>
+<dt><strong><code>stance_begin</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Array of frame indexes for start of each stance phase.</dd>
-<dt><strong><code>end</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>.</dd>
+<dt><strong><code>stance_end</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for end of each stance phase. Same size as <code>stance_begin</code>.</dd>
+<dt><strong><code>good_stances</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Boolean array of which stance phases meet min_tc &amp; max_tc requirements.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -247,17 +287,19 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def aerialforce(force, begin, end):
+<pre><code class="python">def aerialforce(force, stance_begin, stance_end, good_stances):
     &#34;&#34;&#34;Calculate force signal at middle of aerial phase of running.
 
     Parameters
     ----------
     force : `ndarray`
         Filtered vertical ground reaction force (vGRF) signal [n,]. Using unfiltered signal will cause unreliable results.
-    begin : `ndarray`
+    stance_begin : `ndarray`
         Array of frame indexes for start of each stance phase.
-    end : `ndarray`
-        Array of frame indexes for end of each stance phase. Same size as `begin`.
+    stance_end : `ndarray`
+        Array of frame indexes for end of each stance phase. Same size as `stance_begin`.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
 
     Returns
     -------
@@ -267,21 +309,27 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
         Array of frame indexes for values in aerial. output from `aerialforce()`
 
     &#34;&#34;&#34;
-
-    aerial_begin = end[:-1]
-    aerial_end = begin[1:]
+    if False in good_stances:
+        aerial_begin, aerial_end = findgoodaerial(stance_begin, stance_end, good_stances)
+    else:
+        aerial_begin = stance_end[good_stances][:-1]
+        aerial_end = stance_begin[good_stances][1:]
 
     # calculate force at middle of aerial phase (foot not on ground, should be zero)
-    if force.ndim == 1:  # one axis only
+    if force.ndim == 2:  # one axis only
+        force = force.flatten()
         aerial = np.full([aerial_begin.shape[0], ], np.nan)
         aerial_middle = np.full([aerial_begin.shape[0], ], np.nan)
+    elif force.ndim == 1:
+        aerial = np.full([aerial_begin.shape[0], ], np.nan)
+        aerial_middle = np.full([aerial_begin.shape[0], ], np.nan)
+    else: raise IndexError(&#39;Can only handle shape (n,) or (n,1)&#39;)
 
-        for i in range(aerial.shape[0]):
-            aerial_len = aerial_end-aerial_begin
-            aerial_middle[i,] = round(aerial_len[i]/2)
-            aerial[i,] = force[aerial_begin[i]+aerial_middle.astype(int)[i]]
-        aerial_loc = aerial_begin + aerial_middle.astype(int)
-    else: raise IndexError(&#39;force.ndim != 1&#39;)
+    for i in range(aerial.shape[0]):
+        aerial_len = aerial_end-aerial_begin
+        aerial_middle[i,] = round(aerial_len[i]/2)
+        aerial[i,] = force[aerial_begin[i]+aerial_middle.astype(int)[i]]
+    aerial_loc = aerial_begin + aerial_middle.astype(int)
 
     return aerial, aerial_loc</code></pre>
 </details>
@@ -308,7 +356,7 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 <h2 id="examples">Examples</h2>
 <pre><code>from dryft import signal
 
-force_fd = signal.detrend(force_f, aerial, aerial_loc)
+force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
 </code></pre></section>
 <details class="source">
 <summary>
@@ -335,11 +383,12 @@ force_fd = signal.detrend(force_f, aerial, aerial_loc)
     --------
         from dryft import signal
 
-        force_fd = signal.detrend(force_f, aerial, aerial_loc)
-
+        force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
     &#34;&#34;&#34;
 
+    force_f = force_f.flatten()
     # Create NaN array with aerial values at respective frame locations
+
     drift_signal = np.full(force_f.shape, np.nan)
     drift_signal[aerial_loc] = aerial
     # Use 3rd order spline to fill NaNs, creating the underlying drift of the signal.
@@ -350,6 +399,66 @@ force_fd = signal.detrend(force_f, aerial, aerial_loc)
     force_fd = force_f - drift_signal
 
     return force_fd</code></pre>
+</details>
+</dd>
+<dt id="dryft.signal.findgoodaerial"><code class="name flex">
+<span>def <span class="ident">findgoodaerial</span></span>(<span>stance_begin, stance_end, good_stances)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Locate good aerial phases when bad stance phases are present.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>stance_begin</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for start of each stance phase.</dd>
+<dt><strong><code>stance_end</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>.</dd>
+<dt><strong><code>good_stances</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Boolean array of which stance phases meet min_tc &amp; max_tc requirements.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>good_aerial_begin</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for aerial phase beginnings not connected to bad steps (per min/max_tc requirements).</dd>
+<dt><strong><code>good_aerial_end</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for aerial phase ends not connected to bad steps (per min/max_tc requirements).</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def findgoodaerial(stance_begin, stance_end, good_stances):
+    &#34;&#34;&#34;Locate good aerial phases when bad stance phases are present.
+
+        Parameters
+        ----------
+        stance_begin : `ndarray`
+            Array of frame indexes for start of each stance phase.
+        stance_end : `ndarray`
+            Array of frame indexes for end of each stance phase. Same size as `begin`.
+        good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
+
+        Returns
+        -------
+        good_aerial_begin : `ndarray`
+            Array of frame indexes for aerial phase beginnings not connected to bad steps (per min/max_tc requirements).
+        good_aerial_end : `ndarray`
+            Array of frame indexes for aerial phase ends not connected to bad steps (per min/max_tc requirements).
+        &#34;&#34;&#34;
+    bs = np.where(good_stances == False)
+    aerial_start = np.ones((len(good_stances),), dtype=bool)
+    aerial_end = np.ones((len(good_stances),), dtype=bool)
+
+    aerial_end[bs[0]] = False
+    aerial_end[bs[0] + 1] = False
+
+    aerial_start[bs[0]] = False
+    aerial_start[bs[0] - 1] = False
+
+    good_aerial_begin = stance_end[aerial_start][:-1]
+    good_aerial_end = stance_begin[aerial_end][1:]
+
+    return good_aerial_begin, good_aerial_end</code></pre>
 </details>
 </dd>
 <dt id="dryft.signal.splitsteps"><code class="name flex">
@@ -380,24 +489,25 @@ determining appropriate threshold, min_tc, and max_tc values.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>stance_begin</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for start of stance phase.</dd>
-<dt><strong><code>stance_end</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Array of frame indexes for end of stance phase.</dd>
+<dt><strong><code>stance_begin_all</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for every start of stance phase found in trial. Use <code>good_stances</code> to index which ones
+pass the min/max_tc requirements.</dd>
+<dt><strong><code>stance_end_all</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Array of frame indexes for every end of stance phase found in trial. Use <code>good_stances</code> to index which ones
+pass the min/max_tc requirements.</dd>
+<dt><strong><code>good_stances</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Boolean array of which stance phases meet min_tc &amp; max_tc requirements.</dd>
 </dl>
 <h2 id="examples">Examples</h2>
 <pre><code>from dryft import signal
-stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
-                                     threshold=110,
-                                     Fs=300,
-                                     min_tc=0.2,
-                                     max_tc=0.4,
-                                     plot=False)
-stance_begin
-stance_end
-</code></pre>
-<p>array([102, 215, 325])
-array([171, 285, 397])</p></section>
+
+stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
+                                                                   threshold=140,
+                                                                   Fs=300,
+                                                                   min_tc=0.2,
+                                                                   max_tc=0.4,
+                                                                   plot=True)
+</code></pre></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -429,34 +539,32 @@ array([171, 285, 397])</p></section>
 
     Returns
     -------
-    stance_begin : `ndarray`
-        Array of frame indexes for start of stance phase.
-    stance_end : `ndarray`
-        Array of frame indexes for end of stance phase.
+    stance_begin_all : `ndarray`
+        Array of frame indexes for every start of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    stance_end_all : `ndarray`
+        Array of frame indexes for every end of stance phase found in trial. Use `good_stances` to index which ones
+        pass the min/max_tc requirements.
+    good_stances : `ndarray`
+        Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
 
     Examples
     --------
         from dryft import signal
-        stance_begin, stance_end = signal.splitsteps(vGRF=GRF_filt[:,2],
-                                             threshold=110,
-                                             Fs=300,
-                                             min_tc=0.2,
-                                             max_tc=0.4,
-                                             plot=False)
-        stance_begin
-        stance_end
 
-    array([102, 215, 325])
-    array([171, 285, 397])
-
+        stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
+                                                                           threshold=140,
+                                                                           Fs=300,
+                                                                           min_tc=0.2,
+                                                                           max_tc=0.4,
+                                                                           plot=True)
     &#34;&#34;&#34;
 
     if min_tc &lt; max_tc:
         # Identification. Forces over threshold register as stance phase (foot on ground).
-        compare = (vGRF &gt; threshold).astype(int)
+        compare = (vGRF.flatten() &gt; threshold).astype(int)
 
         events = np.diff(compare)
-        print(sum((compare)))
         stance_begin_all = np.squeeze(np.asarray(np.nonzero(events == 1)).transpose())
         stance_end_all = np.squeeze(np.asarray(np.nonzero(events == -1)).transpose())
 
@@ -471,10 +579,8 @@ array([171, 285, 397])</p></section>
         stance_begin_all = stance_begin_all[0:stance_end_all.shape[0]]
 
         stance_len = stance_end_all - stance_begin_all
-        good_stance = np.logical_and(stance_len &gt;= min_tc*Fs, stance_len &lt;= max_tc*Fs)
+        good_stances = np.logical_and(stance_len &gt;= min_tc*Fs, stance_len &lt;= max_tc*Fs)
 
-        stance_begin = stance_begin_all[good_stance]
-        stance_end = stance_end_all[good_stance]
         # ID suspicious stance phases (too long or short)
         if np.any(stance_len &lt; min_tc*Fs):
             print(&#39;Out of&#39;, stance_len.shape[0], &#39;stance phases,&#39;, sum(stance_len &lt; min_tc*Fs), &#39; &lt; &#39;,
@@ -483,9 +589,9 @@ array([171, 285, 397])</p></section>
             print(&#39;Out of&#39;, stance_len.shape[0], &#39;stance_phases,&#39;, sum(stance_len &gt; max_tc*Fs), &#39; &gt; &#39;,
                   max_tc, &#39;seconds.&#39;)
         # print sizes
-        print(&#39;Number of contact time begin/end:&#39;, stance_begin.shape[0], stance_end.shape[0])
+        print(&#39;Total number of contact time begin/end:&#39;, stance_begin_all.shape[0], stance_end_all.shape[0])
 
-        return stance_begin, stance_end
+        return stance_begin_all, stance_end_all, good_stances
 
     else:
         raise IndexError(&#39;Did not ID stance phases: min_tc &gt; max_tc.&#39;)</code></pre>
@@ -511,6 +617,7 @@ array([171, 285, 397])</p></section>
 <ul class="">
 <li><code><a title="dryft.signal.aerialforce" href="#dryft.signal.aerialforce">aerialforce</a></code></li>
 <li><code><a title="dryft.signal.detrend" href="#dryft.signal.detrend">detrend</a></code></li>
+<li><code><a title="dryft.signal.findgoodaerial" href="#dryft.signal.findgoodaerial">findgoodaerial</a></code></li>
 <li><code><a title="dryft.signal.splitsteps" href="#dryft.signal.splitsteps">splitsteps</a></code></li>
 </ul>
 </li>

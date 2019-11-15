@@ -39,9 +39,10 @@ Distributed here: https://github.com/alcantarar/dryft
 &#34;&#34;&#34;
 import numpy as np
 import matplotlib.pyplot as plt
+from dryft import signal
 
 
-def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
+def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stances, colormap=plt.cm.viridis):
     &#34;&#34;&#34;Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
     Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
@@ -58,13 +59,18 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=
         Array of frame indexes for start of each stance phase. Output from `signal.splitsteps()`
     stance_end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`. Output from `signal.splitsteps()`
+    good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 
     &#34;&#34;&#34;
     # define beginning/end of aerial phases
-    begin = stance_end[:-1]
-    end = stance_begin[1:]
+    if False in good_stances:
+        begin, end = signal.findgoodaerial(stance_begin, stance_end, good_stances)
+    else:
+        begin = stance_end[good_stances][:-1]
+        end = stance_begin[good_stances][1:]
 
     if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
         colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))
@@ -81,11 +87,11 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=
             # plot of aerial phases
         # plot all the aerial phase values separate
         plt2.set_title(&#39;Force measured at middle of aerial phases&#39;)
-        plt2.set_xlabel(&#39;Step #&#39;)
+        plt2.set_xlabel(&#39;Frame&#39;)
         plt2.set_ylabel(&#39;force (N)&#39;)
         plt2.grid()
-        for i in range(aerial_values.shape[0]):
-            plt2.plot(i, aerial_values[i],
+        for i, n in enumerate(aerial_loc):
+            plt2.plot(n, aerial_values[i],
                        marker=&#39;o&#39;,
                        color=colors[i])
         plt.show(block = False)
@@ -107,17 +113,6 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
         Array of frame indexes for end of each stance phase. Same size as `begin`.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
-
-
-    Returns
-    -------
-    `matplotlib.pyplot` figure of each step overlayed.
-
-    Examples
-    --------
-        from dryft import plot
-        plot.stance(GRF_filt[:,2], step_begin, step_end)
-
     &#34;&#34;&#34;
     colors = colormap(np.linspace(0,1,begin.shape[0]))
 
@@ -128,7 +123,6 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
     ax.set_ylabel(&#39;force (N)&#39;)
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
-    plt.pause(.5)
     plt.show(block = False)</code></pre>
 </details>
 </section>
@@ -140,7 +134,7 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="dryft.plot.aerial"><code class="name flex">
-<span>def <span class="ident">aerial</span></span>(<span>force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=&lt;matplotlib.colors.ListedColormap object&gt;)</span>
+<span>def <span class="ident">aerial</span></span>(<span>force, aerial_values, aerial_loc, stance_begin, stance_end, good_stances, colormap=&lt;matplotlib.colors.ListedColormap object&gt;)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Plot aerial phase waveforms with middle identified and separated aerial phase values.</p>
@@ -157,6 +151,8 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
 <dd>Array of frame indexes for start of each stance phase. Output from <code>signal.splitsteps()</code></dd>
 <dt><strong><code>stance_end</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>. Output from <code>signal.splitsteps()</code></dd>
+<dt><strong><code>good_stances</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Boolean array of which stance phases meet min_tc &amp; max_tc requirements.</dd>
 <dt><strong><code>colormap</code></strong> :&ensp;<code>colormap</code></dt>
 <dd>Default is <code>matplotlib.plt.cm.viridis</code></dd>
 </dl></section>
@@ -164,7 +160,7 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, colormap=plt.cm.viridis):
+<pre><code class="python">def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stances, colormap=plt.cm.viridis):
     &#34;&#34;&#34;Plot aerial phase waveforms with middle identified and separated aerial phase values.
 
     Visualizes the aerial phase values used to correct for drift in `dryft.signal.detrend` .
@@ -181,13 +177,18 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
         Array of frame indexes for start of each stance phase. Output from `signal.splitsteps()`
     stance_end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`. Output from `signal.splitsteps()`
+    good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc &amp; max_tc requirements.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 
     &#34;&#34;&#34;
     # define beginning/end of aerial phases
-    begin = stance_end[:-1]
-    end = stance_begin[1:]
+    if False in good_stances:
+        begin, end = signal.findgoodaerial(stance_begin, stance_end, good_stances)
+    else:
+        begin = stance_end[good_stances][:-1]
+        end = stance_begin[good_stances][1:]
 
     if aerial_values.shape[0] == begin.shape[0]  == end.shape[0]:
         colors = colormap(np.linspace(0, 1, aerial_values.shape[0]))
@@ -204,11 +205,11 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
             # plot of aerial phases
         # plot all the aerial phase values separate
         plt2.set_title(&#39;Force measured at middle of aerial phases&#39;)
-        plt2.set_xlabel(&#39;Step #&#39;)
+        plt2.set_xlabel(&#39;Frame&#39;)
         plt2.set_ylabel(&#39;force (N)&#39;)
         plt2.grid()
-        for i in range(aerial_values.shape[0]):
-            plt2.plot(i, aerial_values[i],
+        for i, n in enumerate(aerial_loc):
+            plt2.plot(n, aerial_values[i],
                        marker=&#39;o&#39;,
                        color=colors[i])
         plt.show(block = False)
@@ -231,13 +232,7 @@ def stance(force, begin, end, colormap=plt.cm.viridis):
 <dd>Array of frame indexes for end of each stance phase. Same size as <code>begin</code>.</dd>
 <dt><strong><code>colormap</code></strong> :&ensp;<code>colormap</code></dt>
 <dd>Default is <code>matplotlib.plt.cm.viridis</code></dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p><code>matplotlib.pyplot</code> figure of each step overlayed.</p>
-<h2 id="examples">Examples</h2>
-<pre><code>from dryft import plot
-plot.stance(GRF_filt[:,2], step_begin, step_end)
-</code></pre></section>
+</dl></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -257,17 +252,6 @@ plot.stance(GRF_filt[:,2], step_begin, step_end)
         Array of frame indexes for end of each stance phase. Same size as `begin`.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
-
-
-    Returns
-    -------
-    `matplotlib.pyplot` figure of each step overlayed.
-
-    Examples
-    --------
-        from dryft import plot
-        plot.stance(GRF_filt[:,2], step_begin, step_end)
-
     &#34;&#34;&#34;
     colors = colormap(np.linspace(0,1,begin.shape[0]))
 
@@ -278,7 +262,6 @@ plot.stance(GRF_filt[:,2], step_begin, step_end)
     ax.set_ylabel(&#39;force (N)&#39;)
     for i,n in enumerate(end): plt.plot(force[begin[i]:end[i]], color = colors[i])
     plt.tight_layout()
-    plt.pause(.5)
     plt.show(block = False)</code></pre>
 </details>
 </dd>
