@@ -24,7 +24,6 @@ stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt
 stance_begin = stance_begin_all[good_stances]
 stance_end = stance_end_all[good_stances]
 # plot.stance(GRF_filt, stance_begin, stance_end)
-# *stance_begin and stance_end can be used to detrend other columns of GRF_filt as well*
 
 # Determine force signal at middle of aerial phase (feet not on ground)
 aerial_vals, aerial_loc = signal.aerialforce(GRF_filt, stance_begin_all, stance_end_all, good_stances)
