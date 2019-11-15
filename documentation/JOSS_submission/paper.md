@@ -47,9 +47,9 @@ reaction force measured during an aerial phase is due to noise or signal drift. 
 filtered vertical GRF signal (Figure 1). Then the force measured by the instrumented treadmill during the middle of each aerial
 phase is identified. The middle value of each aerial phase is identified to avoid the possibility that part of the
 adjacent stance phases are included in the drift estimation process. These aerial phase values are then cubic spline
-interpolated to the full length of the GRF signal. These interpolated values represent the underlying drift in the GRF
-signal and are subtracted, producing the corrected vertical GRF signal (Figure 1). Once aerial phases have been
-identified using the vertical GRF signal, this process can be applied to horizontal GRF signals as well.
+interpolated to the full length of the GRF signal to estimate the underlying drift in the GRF signal. Lastly, the
+estimated drift is subtracted from the GRF signal (Figure 1). Once aerial phases have been identified using the
+vertical GRF signal, this process can be applied to horizontal GRF signals as well.
 
 ![Force measured during each aerial phase before (red) and after (blue) using `dryft` to correct the drifting vertical
 ground reaction force signal. Each dot represents the force measured by the treadmill at the middle of an aerial phase.](steps2.png)
