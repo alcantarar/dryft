@@ -30,6 +30,8 @@ def aerial(force, aerial_values, aerial_loc, stance_begin, stance_end, good_stan
         Array of frame indexes for start of each stance phase. Output from `signal.splitsteps()`
     stance_end : `ndarray`
         Array of frame indexes for end of each stance phase. Same size as `begin`. Output from `signal.splitsteps()`
+    good_stances : `ndarray`
+            Boolean array of which stance phases meet min_tc & max_tc requirements.
     colormap : `colormap`
         Default is `matplotlib.plt.cm.viridis`
 

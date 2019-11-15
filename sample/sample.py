@@ -23,7 +23,7 @@ GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th or
 stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
                                                           threshold=140,
                                                           Fs=300,
-                                                          min_tc=0.21,
+                                                          min_tc=0.2,
                                                           max_tc=0.4,
                                                           plot=True)
 stance_begin = stance_begin_all[good_stances]
