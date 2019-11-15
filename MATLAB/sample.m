@@ -71,6 +71,6 @@ plot(aerial_loc_d, aerial_vals_d, 'r.')
 legend({'original signal', 'detrended signal'})
 grid on
 title('Aerial phases')
-xlabel('Step')
+xlabel('Frame')
 ylabel('Force [N]')
 
