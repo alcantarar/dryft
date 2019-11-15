@@ -1,7 +1,7 @@
 # `dryft`
 #### Created by [Ryan Alcantara](https://alcantarar.github.io)
 <p align="center">
-<img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/waveform.png" width="700">
+<img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/example_JOSS.png" width="700">
 </p>      
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
