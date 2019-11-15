@@ -5,11 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read in data from force plate
-# GRF = pd.read_csv('drifting_forces.txt', header=None)
-GRF = pd.read_csv('../MATLAB/custom_drift_S001runT25.csv', header = None)
-
-# slice_bad = np.asarray(GRF_bad)[:,]
-# slice_try = slice_bad.flatten()
+GRF = pd.read_csv('custom_drift_S001runT25.csv', header = None)
 
 # Apply Butterworth Filter
 Fs = 300
@@ -17,7 +13,6 @@ Fc = 50
 Fn = (Fs / 2)
 b,a = butter(2, Fc/Fn)
 GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
-# GRF_filt = GRF_filt[:,2] # just vertical for 'drifting_forces.txt'
 
 # Identify where stance phase occurs (foot on ground)
 stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
@@ -44,7 +39,7 @@ force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
 stance_begin_all_d, stance_end_all_d, good_stances_d = signal.splitsteps(vGRF=force_fd,
                                                           threshold=25,
                                                           Fs=300,
-                                                          min_tc=0.15,
+                                                          min_tc=0.2,
                                                           max_tc=0.4,
                                                           plot=False)
 stance_begin_d = stance_begin_all_d[good_stances_d]

@@ -6,8 +6,8 @@
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
 signal drift. This package was developed for biomechanical researchers using force plates
-or a force-measuring treadmill to collect an individual's GRF during running. Due to the
-prevalence of MATLAB in the field of Biomechanics, I have also developed a [set of 
+or a force-measuring treadmill to collect an individual's GRF during running, but should work for split-belt treadmill
+walking as well. Due to the prevalence of MATLAB in the field of Biomechanics, I have also developed a [set of
 MATLAB functions](MATLAB) that operate like the Python package. However, this readme will 
 focus on the use of the Python package.
 
