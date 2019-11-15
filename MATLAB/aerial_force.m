@@ -17,6 +17,7 @@ function [aerial, aerial_loc] = aerial_force(force, stance_begin, stance_end)
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 %define aerial phases
+
 aerial_begin = stance_end(1:end-1);
 aerial_end = stance_begin(2:end);
 aerial_len = aerial_end - aerial_begin;

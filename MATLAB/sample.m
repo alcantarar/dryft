@@ -29,7 +29,7 @@ Fn = (Fs/2);
 GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
-[stance_begin,stance_end] = split_steps(GRF_filt(:,3),... %vertical GRF
+[stance_begin,stance_end, good_stances] = split_steps(GRF_filt(:,3),... %vertical GRF
     110,... %threshold
     Fs,... %Sampling Frequency
     0.2,... %min_tc

@@ -1,4 +1,4 @@
-function [stance_begin,stance_end] = split_steps(force_f,threshold, Fs_force, min_tc, max_tc, d)
+function [stance_begin,stance_end, good_stances] = split_steps(force_f,threshold, Fs_force, min_tc, max_tc, d)
 %SPLIT_STEPS reads in FILTERED running ground reaction force data and 
 %identifies stance phase beginning/end based on a force threshold.
 %
@@ -69,10 +69,10 @@ max_tc = max_tc*Fs_force;
 stance_len = stance_end.keep - stance_begin.keep;
 good_stance1 = stance_len >= min_tc; %which stance phases meet minimum length req
 good_stance2 = stance_len <= max_tc; %which stance phases meet max length req
-good_stance = (good_stance1 + good_stance2 == 2);
+good_stances = (good_stance1 + good_stance2 == 2);
 
-stance_begin = stance_begin.keep(good_stance); %take those stance phases' beginnings
-stance_end = stance_end.keep(good_stance); %take those stance phases' ends
+stance_begin = stance_begin.keep; %take those stance phases' beginnings
+stance_end = stance_end.keep; %take those stance phases' ends
 
 disp(['Number of stance phase begin/ends: ', num2str(length(stance_begin)), '/', num2str(length(stance_end))])
 
