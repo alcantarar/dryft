@@ -34,7 +34,7 @@ GRF_filt = filtfilt(b, a, GRF);
     Fs,... %Sampling Frequency
     0.2,... %min_tc
     0.4,... %max_tc
-    1); %(d)isplay plots = True
+    0); %(d)isplay plots = True
 
 % stance_begin = stance_begin(good_stances);
 % stance_end = stance_end(good_stances);
@@ -42,7 +42,7 @@ GRF_filt = filtfilt(b, a, GRF);
 %% Identify where aerial phase occurs (feet not on ground)
 % Determine force signal during middle of aerial phase.
 [aerial_vals, aerial_loc] = aerial_force(GRF_filt(:,3), stance_begin_all, stance_end_all, good_stances);
-plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin, stance_end)
+plot_aerial(GRF_filt(:,3), aerial_vals, aerial_loc, stance_begin_all, stance_end_all, good_stances)
 
 %% Subtract aerial phase to remove drift
 vGRF_detrend = detrend(GRF_filt(:,3), aerial_vals, aerial_loc);
