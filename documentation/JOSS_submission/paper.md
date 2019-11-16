@@ -15,7 +15,7 @@ affiliations:
    index: 1
 date: 31 October 2019 #spooktober
 bibliography: paper.bib
-biblio-style: "apalike"
+biblio-style: acm
 link-citations: true
 ---
 
