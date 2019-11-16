@@ -15,7 +15,6 @@ affiliations:
    index: 1
 date: 31 October 2019 #spooktober
 bibliography: paper.bib
-biblio-style: plain
 ---
 
 # Background
