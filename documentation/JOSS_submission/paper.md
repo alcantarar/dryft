@@ -21,7 +21,7 @@ bibliography: paper.bib
 # Background
 Ground reaction forces (GRFs) are exerted by the body on the ground during running, measured by treadmills instrumented
 with force transducers, and are used to calculate a variety of clinical and performance-related biomechanical variables
-[kram1998force]. However, force transducer signals can be affected by changes in temperature during warm up or over long periods
+[kram:1998]. However, force transducer signals can be affected by changes in temperature during warm up or over long periods
 [sloot2015comprehensive], causing the signal to drift. If ignored, signal drift can lead to the inaccurate calculation of
 biomechanical variables. For example, ground contact time is defined as the time the foot is in contact with the ground and is often
 calculated as the time a vertical GRF exceeds a threshold. Signal drift can cause more (or less) of the vertical GRF
