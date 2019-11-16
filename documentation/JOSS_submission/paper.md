@@ -15,7 +15,6 @@ affiliations:
    index: 1
 date: 31 October 2019 #spooktober
 bibliography: paper.bib
-
 ---
 
 # Background
@@ -51,19 +50,19 @@ interpolated to the full length of the GRF signal to estimate the underlying dri
 estimated drift is then subtracted from the GRF signal (Figure 1). This process can also be applied to horizontal GRF signals
 once aerial phases have been identified using the vertical GRF signal.
 
-![Vertical ground reaction force (GRF) measured during each aerial phase before (red) and after (blue) using `dryft` to correct
-the drifting vertical GRF signal. Each point represents the force measured by the treadmill at the middle
-of an aerial phase. `dryft` was used to successfully tare the drifting vertical GRF signal](steps.png)
-
 To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
 treadmill during running [@fukuchi2017public]. Using `dryft` to reduce this vertical GRF signal’s drift produced favorable results, as
-the average force measured across aerial phases was 0.01 N for the corrected signal (Figure 2). While `dryft` was
+the average (± SD) force measured across the extracted aerial phases values was -0.01 N (± 0.09 N) for the corrected signal (Figure 2). While `dryft` was
 intended to be used with GRF signals measured during treadmill running, it could also be applied to GRF signals measured
 during split-belt treadmill walking, since only one foot is on a belt at a time. However, extra care should be
 taken to identify crossover steps prior to correcting drift in split-belt treadmill walking GRF data as they will
 influence the accuracy of the force values measured during the swing phase.
 
-# Conclusions
+![Vertical ground reaction force (GRF) measured during each aerial phase before (red) and after (blue) using `dryft` to correct
+the drifting vertical GRF signal. Each point represents the force measured by the treadmill at the middle
+of an aerial phase.](steps.png)
+
+# Conclusion
 Prior work has corrected drift in GRF signals by subtracting the force measured during a given
 aerial phase from the following stance phase [@sloot2015comprehensive; @paolini2007testing; @riley2008kinematics]. The
 success of this approach heavily relies on how accurately stance and aerial phases are identified and assumes that there
