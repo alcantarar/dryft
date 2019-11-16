@@ -41,15 +41,15 @@ Python and MATLAB package that takes a simple approach to identifying and correc
 produced during treadmill running.
 
 # Summary
-During the aerial phase of running, the body exerts no force on the ground. `dryft` assumes that any ground
+The body exerts no force on the ground during the aerial phase of running and `dryft` assumes that any ground
 reaction force measured during an aerial phase is due to noise or drift in the signal. `dryft` implements a user-defined
 force threshold to approximate the start and end of each stance phase and identify aerial phases in a
 filtered vertical GRF signal (Figure 1). Next, the force measured by the instrumented treadmill during the middle of each aerial
 phase is identified. The middle value of each aerial phase is identified to avoid the possibility that part of the
 adjacent stance phases are included in the drift estimation process. These aerial phase values are then cubic spline
-interpolated to the full length of the GRF signal to estimate the underlying drift in the GRF signal. Lastly, the
-estimated drift is subtracted from the GRF signal (Figure 1). Once aerial phases have been identified using the
-vertical GRF signal, this process can be applied to horizontal GRF signals as well.
+interpolated to the full length of the GRF signal to estimate the underlying drift in the GRF signal. The
+estimated drift is then subtracted from the GRF signal (Figure 1). This process can also be applied to horizontal GRF signals
+once aerial phases have been identified using the vertical GRF signal.
 
 ![Vertical ground reaction force (GRF) measured during each aerial phase before (red) and after (blue) using `dryft` to correct
 the drifting vertical GRF signal. Each point represents the force measured by the treadmill at the middle
@@ -59,8 +59,8 @@ To test the performance of this method, I added drift to a 30-second vertical GR
 treadmill during running (Fukuchi et al 2017). Using `dryft` to reduce this vertical GRF signal’s drift produced favorable results, as
 the average force measured across aerial phases was 0.01 N for the corrected signal (Figure 2). While `dryft` was
 intended to be used with GRF signals measured during treadmill running, it could also be applied to GRF signals measured
-during split-belt treadmill walking as well, since only one foot is on a belt at a time. However, extra care should be
-taken to identify crossover steps prior to correcting drift in split-belt treadmill walking GRF data, as they will
+during split-belt treadmill walking, since only one foot is on a belt at a time. However, extra care should be
+taken to identify crossover steps prior to correcting drift in split-belt treadmill walking GRF data as they will
 influence the accuracy of the force values measured during the swing phase.
 
 # Conclusions
