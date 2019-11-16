@@ -56,7 +56,7 @@ of an aerial phase. `dryft` was used to successfully tare the drifting vertical 
 
 To test the performance of this method, I added drift to a 30-second vertical GRF signal collected by an instrumented
 treadmill during running [@fukuchi2017public]. Using `dryft` to reduce this vertical GRF signal’s drift produced favorable results, as
-the average force measured across the extracted aerial phases values was 0.01 N for the corrected signal (Figure 2). While `dryft` was
+the average (± SD) force measured across the extracted aerial phases values was -0.01 N (± 0.09 N) for the corrected signal (Figure 2). While `dryft` was
 intended to be used with GRF signals measured during treadmill running, it could also be applied to GRF signals measured
 during split-belt treadmill walking, since only one foot is on a belt at a time. However, extra care should be
 taken to identify crossover steps prior to correcting drift in split-belt treadmill walking GRF data as they will
