@@ -11,7 +11,12 @@ GRF = pd.read_csv('custom_drift_S001runT25.csv', header = None)
 Fs = 300
 Fc = 50
 Fn = (Fs / 2)
-b,a = butter(2, Fc/Fn)
+n_pass = 2  # filtfilt is dual pass
+order = 2  # filtfilt doubles effective order (resulting order = 2*order)
+C = (2**(1/n_pass) - 1)**(1/(2*order))  # Correction factor per Research Methods in Biomechanics (2e) pg 288
+Wn = (np.tan(np.pi*Fc/Fs))/C  # Apply correction to adjusted cutoff freq
+Fc_corrected = np.arctan(Wn)*Fs/np.pi  # Hz
+b,a = butter(order, Fc_corrected/Fn)
 GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
 
 # Identify where stance phase occurs (foot on ground)
