@@ -24,7 +24,12 @@ GRF = dlmread('custom_drift_S001runT25.csv');
 Fs = 300; % From Fukuchi et al. (2017) dataset
 Fc = 50;
 Fn = (Fs/2);
-[b, a] = butter(2, Fc/Fn);
+n_pass = 2;
+order = 2;
+C = (2^(1/n_pass)-1)^(1/(2*order)); % Correction factor per Research Methods in Biomechanics (2e) pg 288
+Wn = (tan(pi*Fc/Fs))/C; % Apply correction factor to adjusted cutoff freq
+Fc_corrected = atan(Wn)*Fs/pi; % Hz
+[b, a] = butter(order, Fc_corrected/Fn);
 
 GRF_filt = filtfilt(b, a, GRF);
 
