@@ -84,7 +84,7 @@ GRF = pd.read_csv('custom_drift_S001runT25.csv', header = None)
 ```
 #### Filter signal
 Filtering data will improve step identification methods. Here I apply a zero-lag 4th order low pass butterworth
-filter with a 60Hz cutoff.
+filter with a 50Hz cutoff.
 ```
 # Apply Butterworth Filter
 Fs = 300
