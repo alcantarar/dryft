@@ -59,133 +59,20 @@ or a constant [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
 
 
 ## Using `dryft`
+
+### Testing
+Running the following from the command line will automatically test the installation of `dryft`:
+```
+python -m dryft.sample.test
+```
+
+### Tutorial
+A notebook of `dryft.sample.test` is available [here](https://alcantarar.github.io/dryft/test.html) as a tutorial.
+
 ### Documentation
 Please refer to the [documentation page](https://alcantarar.github.io/dryft/index.html)
-### Example
-The following tutorial and its supporting documents are found in `setup.py`, located in [sample](sample)
-#### Read force signal data
-The three-dimensional force data modified from [Fukuchi *et al* (2017)](https://peerj.com/articles/3298/). 
-There is a sine wave with an amplitude of 100 Newtons and wavelength equal to trial length added to the force signal to 
-simulate a variety of drift slopes. 
-```
-from dryft import signal, plot
-import pandas as pd
-from scipy.signal import butter, filtfilt
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Read in data from force plate
-GRF = pd.read_csv('custom_drift_S001runT25.csv', header = None)
-```
-#### Filter signal
-Filtering data will improve step identification methods. Here I apply a zero-lag 4th order low pass butterworth
-filter with a 50Hz cutoff.
-```
-# Apply Butterworth Filter
-Fs = 300
-Fc = 50
-Fn = (Fs / 2)
-n_pass = 2  # filtfilt is dual pass
-order = 2  # filtfilt doubles effective order (resulting order = 2*order)
-C = (2**(1/n_pass) - 1)**(1/(2*order))  # Correction factor per Research Methods in Biomechanics (2e) pg 288
-Wn = (np.tan(np.pi*Fc/Fs))/C  # Apply correction to adjusted cutoff freq
-Fc_corrected = np.arctan(Wn)*Fs/np.pi  # Hz
-b,a = butter(order, Fc_corrected/Fn)
-GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
-```
-
-#### Identify where stance and aerial phases occur
-Note the unusually high force threshold to define a stance phase (ideally <20 N). This will depend upon the amount of 
-drift present in your signal. `GRF_filt[:,2]` is the vertical component of the ground reaction 
-force signal (vGRF) and has an artificial drift of 100 Newtons, so a threshold of 110 Newtons 
-will suffice for identifying stance phases. 
-
-**After signal drift is corrected, be sure to run `signal.splitsteps()` on the corrected signal with a lower threshold!**
-
-```
-# Identify where stance phase occurs (foot on ground)
-stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
-                                                                   threshold=140,
-                                                                   Fs=300,
-                                                                   min_tc=0.2,
-                                                                   max_tc=0.4,
-                                                                   plot=True)
-stance_begin = stance_begin_all[good_stances]
-stance_end = stance_end_all[good_stances]
-plot.stance(GRF_filt, stance_begin, stance_end)
-```
-#### Determine force signal during aerial phase
-To calculate the force measured during aerial phase, `signal.aerialforce()` extracts the value that lies at the middle of 
-the aerial phase. This ensures that no trailing values from the neighboring stance phases are included. 
-```
-# Determine force signal at middle of aerial phase (feet not on ground)
-aerial_vals, aerial_loc = signal.aerialforce(GRF_filt, stance_begin_all, stance_end_all, good_stances)
-
-# Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
-plot.aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin_all, stance_end_all, good_stances)
-```
-#### Remove force signal drift
-`signal.detrend()` first interpolates the aerial phase values to the length of the trial, and then subtracts it from the 
-signal.
-```
-force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
-```
-#### Plot results of `dryft`
-```
-# Compare corrected signal to original
-stance_begin_all_d, stance_end_all_d, good_stances_d = signal.splitsteps(vGRF=force_fd,
-                                                                         threshold=25,
-                                                                         Fs=300,
-                                                                         min_tc=0.2,
-                                                                         max_tc=0.4,
-                                                                         plot=False)
-stance_begin_d = stance_begin_all_d[good_stances_d]
-stance_end_d = stance_end_all_d[good_stances_d]
-
-aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_all_d, stance_end_all_d, good_stances_d)
-
-# Plot waveforms (original vs corrected)
-plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
-plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-          GRF_filt,
-          color='tab:red',
-          alpha=0.75,
-          label='Original Signal')  # converted to sec
-plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-          force_fd,
-          color='tab:blue',
-          alpha=0.75,
-          label='Corrected Signal')  # converted to sec
-plt1.grid(zorder =0)
-plt1.legend(loc=2)
-plt1.set_xlabel('Seconds')
-plt1.set_ylabel('Force (N)')
-
-# Plot aerial phases (original vs corrected)
-plt2.set_title('Aerial Phases')
-plt2.set_xlabel('Frames')
-plt2.set_ylabel('Force (N)')
-plt.scatter(aerial_loc,
-            aerial_vals,
-            marker='o',
-            color='tab:red',
-            label='Original Signal', zorder = 2)
-plt.scatter(aerial_loc_d,
-            aerial_vals_d,
-            marker='o',
-            color='tab:blue',
-            label='Corrected Signal', zorder = 2)
-
-plt2.legend(loc=2)
-plt.tight_layout()
-plt2.grid(zorder = 0)
-plt.show()
-```
-produces the following plot:
-![README_image](documentation/README_output.png)
 
 ## Contributing
-
 To report an problem with `dryft`, please create a new [issue](https://github.com/alcantarar/dryft/issues).
 
 Contact [alcantarar](https://github.com/alcantarar) with any support or general questions about `dryft`. I also welcome

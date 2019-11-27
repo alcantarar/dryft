@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read in data from force plate
-GRF = pd.read_csv('custom_drift_S001runT25.csv', header = None)
+GRF = pd.read_csv('dryft\sample\custom_drift_S001runT25.csv', header = None)
 
 # Apply Butterworth Filter
 Fs = 300
