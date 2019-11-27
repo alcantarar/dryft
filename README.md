@@ -25,7 +25,7 @@ Other python 3.X versions may be supported, provided dependency compatibilities 
 
 The package requires the following dependencies: 
 * numpy
-* pandas
+* pandas *(0.24.0 or newer)*
 * matplotlib
 * scipy
 
