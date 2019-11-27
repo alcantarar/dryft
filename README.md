@@ -67,7 +67,7 @@ python -m dryft.sample.test
 ```
 
 ### Tutorial
-A notebook of `dryft.sample.test` is available [here](dryft/sample/test.html) as a tutorial.
+A notebook of `dryft.sample.test` is available [here](https://alcantarar.github.io/dryft/test.html) as a tutorial.
 
 ### Documentation
 Please refer to the [documentation page](https://alcantarar.github.io/dryft/index.html)
