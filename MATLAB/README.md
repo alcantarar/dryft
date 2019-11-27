@@ -6,24 +6,33 @@ if there are problems or better yet, contribute code via a [pull requests](https
 to improve this MATLAB version! 
 
 ## Using the MATLAB version of `dryft`
-#### Download functions
-First, you need to clone/download the following files located in the MATLAB folder:
-* `aerial_force.m`
-* `detrend.m`
-* `find_good_aerial.m`
-* `plot_aerial.m`
-* `sample.m`
-* `split_steps.m`
+#### Download package
+Download zipped repository or clone with git:
+```
+git clone https://github.com/alcantarar/dryft.git
+cd dryft/MATLAB
+```
+#### Add `dryft` to MATLAB path
+The `dryft/MATLAB/` directory contains the MATLAB version of the `dryft` package in `/+dryft`, a `README.md`, and the following 
+supporting files:
+* `sample.m` (example script calling functions in the `dryft` package)
 * `custom_drift_S001runT25.csv` (force data from [Fukuchi et al. (2017)](https://peerj.com/articles/3298/) that was
 modified to have drift)
 
-#### Add functions to MATLAB path
-Open up `sample.m` and make sure the functions are located in your MATLAB path. If you're not sure how to do
-this, consult the [MATLAB documentation](https://www.mathworks.com/help/matlab/ref/addpath.html). To confirm that the `dryft`
-functions are in your path, run `help detrend` in the MATLAB command window. It should return the help page if the
-function was successfully added to your MATLAB path. 
+Next, open up `sample.m` and add `dryft` to your MATLAB path by updating `path/to/dryft/MALTAB/` in MATLAB:
+```
+%% Add [dryft] package to MATLAB path
+addpath("path/to/dryft/MATLAB/"); % change to your directory
+savepath(); % optional, saves path/to/dryft/MATLAB/ to your MATLABPATH permanently
+```
 
-####  Using MATLAB version of `dryft`
+Consult the [MATLAB documentation](https://www.mathworks.com/help/matlab/ref/addpath.html) for 
+more information on adding directories to your MATLAB path. To confirm that the `dryft`
+package is in your path, run `help detrend` in the MATLAB command window. If it returns `dryft not found.`,
+then it was not successfully added to your MATLAB path. Make sure the location of `dryft/MATLAB` is listed 
+correctly when you run `path` in the MATLAB command window.
+
+####  Example of `dryft` use
 The `sample.m` script serves as a tutorial, using the `custom_drift_S001runT25.csv` as an example vertical ground reaction force trial.
 
 ## Licensing

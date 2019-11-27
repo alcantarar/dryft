@@ -25,7 +25,7 @@ Other python 3.X versions may be supported, provided dependency compatibilities 
 
 The package requires the following dependencies: 
 * numpy
-* pandas
+* pandas *(0.24.0 or newer)*
 * matplotlib
 * scipy
 
@@ -33,18 +33,13 @@ The package requires the following dependencies:
 
 I recommend using the [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
 environment to use this package. If you wish to setup a new environment, an Anaconda [environment](environment.yml) 
-file is included to automatically install most dependencies. To setup a new environment for `dryft`, type the following 
-command into Anaconda Prompt:
+file is included to automatically install most dependencies. 
+You can create/activate an anaconda environment and download dependencies using the Anaconda Prompt: 
 ```
+git clone https://github.com/alcantarar/dryft.git
+cd dryft
 conda env create -f path\to\environment.yml
-```
-This will create a new environment named `dryft-env`, which can be actived by typing:
-```
 conda activate dryft-env
-```
-Once the environment is setup and activated, `dryft` can be installed by cloning/downloading
-this repository and then running:
-```
 python setup.py install
 ```
 
