@@ -74,7 +74,7 @@ split-belt treadmill walking.
 
 # Acknowledgements
 
-The author would like to thank MRP for their continued support and GB, the ABL, and
-[/r/learnpython](https://reddit.com/r/learnpython) for their feedback on this package and manuscript.
+The author would like to thank Maggie Peterson for their continued support and Gary Bruening, the Applied Biomechanics 
+Lab, and [/r/learnpython](https://reddit.com/r/learnpython) for their feedback on this package and manuscript.
 
 # References
