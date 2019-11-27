@@ -19,10 +19,11 @@ supporting files:
 * `custom_drift_S001runT25.csv` (force data from [Fukuchi et al. (2017)](https://peerj.com/articles/3298/) that was
 modified to have drift)
 
-Next, open up `sample.m` and add `dryft` to your MATLAB path by updating `path/to/dryft/MALTAB/`:
+Next, open up `sample.m` and add `dryft` to your MATLAB path by updating `path/to/dryft/MALTAB/` in MATLAB:
 ```
-addpath("path/to/dryft/MATLAB/");
-savepath(); %optional, saves path/to/dryft/MATLAB/ to your MATLABPATH permanently
+%% Add [dryft] package to MATLAB path
+addpath("path/to/dryft/MATLAB/"); % change to your directory
+savepath(); % optional, saves path/to/dryft/MATLAB/ to your MATLABPATH permanently
 ```
 
 Consult the [MATLAB documentation](https://www.mathworks.com/help/matlab/ref/addpath.html) for 
