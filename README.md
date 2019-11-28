@@ -45,7 +45,7 @@ pip install virtualenv
 python -m venv dryft-env
 source dryft-env/bin/activate
 ```
-Then install `dryft` dependencies:
+Then install `dryft` dependencies using pip:
 ```
 cd dryft
 pip install -r requirements.txt
