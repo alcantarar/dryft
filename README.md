@@ -29,9 +29,30 @@ The package requires the following dependencies:
 * matplotlib
 * scipy
 
-## Recommended Installation
+## Installation
+### Using pip/virtualenv
+On Windows:
+```
+git clone https://github.com/alcantarar/dryft.git
+pip install virtualenv
+python -m venv dryft-env
+.\dryft-env\Scripts\activate
+```
+On macOS or Linux:
+```
+git clone https://github.com/alcantarar/dryft.git
+pip install virtualenv
+python -m venv dryft-env
+source dryft-env/bin/activate
+```
+Then install `dryft` dependencies:
+```
+cd dryft
+pip install -r requirements.txt
+```
 
-I recommend using the [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
+### Using Anaconda
+You can use [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
 environment to use this package. If you wish to setup a new environment, an Anaconda [environment](environment.yml) 
 file is included to automatically install most dependencies. 
 You can create/activate an anaconda environment and download dependencies using the Anaconda Prompt: 
