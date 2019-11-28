@@ -87,3 +87,5 @@ plt2.legend(loc=2)
 plt.tight_layout()
 plt2.grid(zorder = 0)
 plt.show(block=True)
+
+print('dryft test complete')
