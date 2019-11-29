@@ -85,4 +85,3 @@ grid on
 title('Aerial phases')
 xlabel('Frame')
 ylabel('Force [N]')
-
