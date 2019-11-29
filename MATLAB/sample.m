@@ -22,6 +22,9 @@
 addpath("path/to/dryft/MATLAB/");
 savepath(); %optional, saves path/to/dryft/MATALAB/ to your MTALABPATH permanently 
 
+%% test dryft to make sure install was successfull
+test_result = runtests('dryft.test')
+
 %% Read in data from force plate
 clear
 close
