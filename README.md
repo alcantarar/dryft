@@ -27,13 +27,15 @@ The package requires the following dependencies:
 * scipy
 
 ## Installation
-### Using pip/virtualenv
+### Using virtualenv
 On Windows:
 ```
 git clone https://github.com/alcantarar/dryft.git
 pip install virtualenv
 python -m venv dryft-env
 .\dryft-env\Scripts\activate
+cd dryft
+python setup.py install
 ```
 On macOS or Linux:
 ```
@@ -41,13 +43,15 @@ git clone https://github.com/alcantarar/dryft.git
 pip install virtualenv
 python -m venv dryft-env
 source dryft-env/bin/activate
+cd dryft
+python setup.py install
 ```
-Then install `dryft` dependencies using pip:
+### Using pip:
 ```
+git clone https://github.com/alcantarar/dryft.git
 cd dryft
 pip install -r requirements.txt
 ```
-
 ### Using Anaconda
 You can use [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
 environment to use this package. If you wish to setup a new environment, an Anaconda [environment](environment.yml) 
@@ -61,7 +65,7 @@ conda activate dryft-env
 python setup.py install
 ```
 
-## How `dryft` works
+## How `dryft` Works
 <p align="center">
 <img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/example_JOSS.png" width="700">
 </p>  
