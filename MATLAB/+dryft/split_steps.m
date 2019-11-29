@@ -19,6 +19,7 @@ function [stance_begin,stance_end, good_stances] = split_steps(force_f,threshold
 %   -------------
 %   stance_begin :  Array of frame indexes for beginning of stance phase
 %   stance_end :    Array of frame indexes for end of stance phase
+%   good_stances :  Logical array of which stance phases meet min_tc & max_tc requirements.
 %
 %   EXAMPLE
 %   -------------

@@ -1,3 +1,10 @@
+"""
+Test script for `dryft` package.
+
+Licensed under an MIT License (c) Ryan Alcantara 2019
+
+Distributed here: https://github.com/alcantarar/dryft
+"""
 from dryft import signal, plot
 import pandas as pd
 from scipy.signal import butter, filtfilt

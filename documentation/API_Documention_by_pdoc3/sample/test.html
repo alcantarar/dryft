@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.2" />
-<title>dryft API documentation</title>
-<meta name="description" content="Removes linear or non-linear ground reaction force signal drift in a stepwise manner. It is intended
-for running ground reaction force data commonly …" />
+<title>dryft.sample.test API documentation</title>
+<meta name="description" content="Test script for `dryft` package …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -18,51 +17,123 @@ for running ground reaction force data commonly …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>dryft</code></h1>
+<h1 class="title">Module <code>dryft.sample.test</code></h1>
 </header>
 <section id="section-intro">
-<p>Removes linear or non-linear ground reaction force signal drift in a stepwise manner. It is intended
-for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
-a given stance phase are used to tare the signal instead of assuming an overall linear trend or signal offset.</p>
+<p>Test script for <a title="dryft" href="../index.html"><code>dryft</code></a> package.</p>
 <p>Licensed under an MIT License (c) Ryan Alcantara 2019</p>
-<p><a href="https://alcantarar.github.io">https://alcantarar.github.io</a></p>
 <p>Distributed here: <a href="https://github.com/alcantarar/dryft">https://github.com/alcantarar/dryft</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-
-Removes linear or non-linear ground reaction force signal drift in a stepwise manner. It is intended
-for running ground reaction force data commonly analyzed in the field of Biomechanics. The aerial phase before and after
-a given stance phase are used to tare the signal instead of assuming an overall linear trend or signal offset.
+Test script for `dryft` package.
 
 Licensed under an MIT License (c) Ryan Alcantara 2019
 
-https://alcantarar.github.io
-
 Distributed here: https://github.com/alcantarar/dryft
+&#34;&#34;&#34;
+from dryft import signal, plot
+import pandas as pd
+from scipy.signal import butter, filtfilt
+import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import Path
+# Read in data from force plate
+GRF = pd.read_csv(Path(__file__).parent /
+                  &#39;custom_drift_S001runT25.csv&#39;, header=None)
 
-&#34;&#34;&#34;</code></pre>
+# Apply Butterworth Filter
+Fs = 300
+Fc = 50
+Fn = (Fs / 2)
+n_pass = 2  # filtfilt is dual pass
+order = 2  # filtfilt doubles effective order (resulting order = 2*order)
+# Correction factor per Research Methods in Biomechanics (2e) pg 288
+C = (2**(1/n_pass) - 1)**(1/(2*order))
+Wn = (np.tan(np.pi*Fc/Fs))/C  # Apply correction to adjusted cutoff freq
+Fc_corrected = np.arctan(Wn)*Fs/np.pi  # Hz
+b, a = butter(order, Fc_corrected/Fn)
+# filtfilt doubles order (2nd*2 = 4th order effect)
+GRF_filt = filtfilt(b, a, GRF, axis=0)
+
+# Identify where stance phase occurs (foot on ground)
+stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
+                                                                   threshold=140,
+                                                                   Fs=300,
+                                                                   min_tc=0.2,
+                                                                   max_tc=0.4,
+                                                                   plot=True)
+stance_begin = stance_begin_all[good_stances]
+stance_end = stance_end_all[good_stances]
+# plot.stance(GRF_filt, stance_begin, stance_end)
+
+# Determine force signal at middle of aerial phase (feet not on ground)
+aerial_vals, aerial_loc = signal.aerialforce(
+    GRF_filt, stance_begin_all, stance_end_all, good_stances)
+
+# Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
+plot.aerial(GRF_filt, aerial_vals, aerial_loc,
+            stance_begin_all, stance_end_all, good_stances)
+
+# Detrend signal
+force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
+
+# Compare corrected signal to original
+stance_begin_all_d, stance_end_all_d, good_stances_d = signal.splitsteps(vGRF=force_fd,
+                                                                         threshold=25,
+                                                                         Fs=300,
+                                                                         min_tc=0.2,
+                                                                         max_tc=0.4,
+                                                                         plot=False)
+stance_begin_d = stance_begin_all_d[good_stances_d]
+stance_end_d = stance_end_all_d[good_stances_d]
+
+aerial_vals_d, aerial_loc_d = signal.aerialforce(
+    force_fd, stance_begin_all_d, stance_end_all_d, good_stances_d)
+
+# Plot waveforms (original vs corrected)
+plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+          GRF_filt,
+          color=&#39;tab:red&#39;,
+          alpha=0.75,
+          label=&#39;Original Signal&#39;)  # converted to sec
+plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
+          force_fd,
+          color=&#39;tab:blue&#39;,
+          alpha=0.75,
+          label=&#39;Corrected Signal&#39;)  # converted to sec
+plt1.grid(zorder=0)
+plt1.legend(loc=2)
+plt1.set_xlabel(&#39;Seconds&#39;)
+plt1.set_ylabel(&#39;Force (N)&#39;)
+
+# Plot aerial phases (original vs corrected)
+plt2.set_title(&#39;Aerial Phases&#39;)
+plt2.set_xlabel(&#39;Frames&#39;)
+plt2.set_ylabel(&#39;Force (N)&#39;)
+plt.scatter(aerial_loc,
+            aerial_vals,
+            marker=&#39;o&#39;,
+            color=&#39;tab:red&#39;,
+            label=&#39;Original Signal&#39;, zorder=2)
+plt.scatter(aerial_loc_d,
+            aerial_vals_d,
+            marker=&#39;o&#39;,
+            color=&#39;tab:blue&#39;,
+            label=&#39;Corrected Signal&#39;, zorder=2)
+
+plt2.legend(loc=2)
+plt.tight_layout()
+plt2.grid(zorder=0)
+plt.show(block=True)
+
+print(&#39;dryft test complete&#39;)</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="dryft.plot" href="plot.html">dryft.plot</a></code></dt>
-<dd>
-<section class="desc"><p>View separated aerial phases and steps produced in dryft.signal …</p></section>
-</dd>
-<dt><code class="name"><a title="dryft.sample" href="sample/index.html">dryft.sample</a></code></dt>
-<dd>
-<section class="desc"><p>The <a title="dryft.sample" href="sample/index.html"><code>dryft.sample</code></a> module contains a test script for the <a title="dryft" href="#dryft"><code>dryft</code></a> package …</p></section>
-</dd>
-<dt><code class="name"><a title="dryft.signal" href="signal.html">dryft.signal</a></code></dt>
-<dd>
-<section class="desc"><p>Removes non-linear ground reaction force signal drift in a stepwise manner. It is intended
-for running ground reaction force data commonly analyzed in …</p></section>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -77,11 +148,9 @@ for running ground reaction force data commonly analyzed in …</p></section>
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="dryft.plot" href="plot.html">dryft.plot</a></code></li>
-<li><code><a title="dryft.sample" href="sample/index.html">dryft.sample</a></code></li>
-<li><code><a title="dryft.signal" href="signal.html">dryft.signal</a></code></li>
+<li><code><a title="dryft.sample" href="index.html">dryft.sample</a></code></li>
 </ul>
 </li>
 </ul>
