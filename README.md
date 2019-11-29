@@ -1,8 +1,5 @@
 # `dryft`
-#### Created by [Ryan Alcantara](https://alcantarar.github.io)
-<p align="center">
-<img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/example_JOSS.png" width="700">
-</p>      
+#### Created by [Ryan Alcantara](https://alcantarar.github.io)    
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
 signal drift. This package was developed for biomechanical researchers using force plates
@@ -29,9 +26,30 @@ The package requires the following dependencies:
 * matplotlib
 * scipy
 
-## Recommended Installation
+## Installation
+### Using pip/virtualenv
+On Windows:
+```
+git clone https://github.com/alcantarar/dryft.git
+pip install virtualenv
+python -m venv dryft-env
+.\dryft-env\Scripts\activate
+```
+On macOS or Linux:
+```
+git clone https://github.com/alcantarar/dryft.git
+pip install virtualenv
+python -m venv dryft-env
+source dryft-env/bin/activate
+```
+Then install `dryft` dependencies using pip:
+```
+cd dryft
+pip install -r requirements.txt
+```
 
-I recommend using the [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
+### Using Anaconda
+You can use [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
 environment to use this package. If you wish to setup a new environment, an Anaconda [environment](environment.yml) 
 file is included to automatically install most dependencies. 
 You can create/activate an anaconda environment and download dependencies using the Anaconda Prompt: 
@@ -44,19 +62,27 @@ python setup.py install
 ```
 
 ## How `dryft` works
+<p align="center">
+<img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/example_JOSS.png" width="700">
+</p>  
 Running is generally characterized by two phases: a stance and aerial phase. Only one foot is on the ground at a time during 
 stance phase and both feet are off the ground during aerial phase. The force exerted by the body on the ground during 
 aerial phase is zero and during stance phase it is greater than zero. If drift is present in the force signal, values 
 during the aerial phase will no longer be zero. First, `dryft` calculates the force occurring during each aerial phase of
 a continuous running trial. Then these aerial phase values are interpolated to the length of the trial using a 3rd order
 spline fill. Lastly, the interpolated values, which represents the signal drift over time, are subtracted from the original 
-trial. This effectively corrects for signal drift. A similar method is 
-described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), but `dryft` does not assume a 
-constant drift for a given step, instead spline interpolating between aerial phases. The `dryft` package differs from currently 
-available signal correction methods, which can only 
-account for [linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) 
-or a constant [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
+trial. This effectively corrects for signal drift.
 
+Another method of correcting drift is described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), 
+where the mean force measured during the aerial phase is subtracted from the following stance phase. The success of this 
+approach is highly dependent upon the method of identifying aerial phases in the vertical ground reaction force signal. If a 
+force threshold is used to define the boundaries of each aerial phase, parts of the neighboring stance phases may 
+be included in the calculation of the mean (left panel in the figure above). Additionally, this approach assumes no change in drift over the duration of a 
+stance phase. The `dryft` package uses the force measured at the middle of each aerial phase
+and spline interpolates between them to correct signal drift. This approach differs from the method described by Paolini 
+*et al.* (2007) and currently available drift correction methods which can only account for 
+[linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) or a constant 
+[offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO) 
 
 ## Using `dryft`
 
