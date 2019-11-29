@@ -1,8 +1,5 @@
 # `dryft`
-#### Created by [Ryan Alcantara](https://alcantarar.github.io)
-<p align="center">
-<img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/example_JOSS.png" width="700">
-</p>      
+#### Created by [Ryan Alcantara](https://alcantarar.github.io)    
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
 signal drift. This package was developed for biomechanical researchers using force plates
@@ -25,172 +22,83 @@ Other python 3.X versions may be supported, provided dependency compatibilities 
 
 The package requires the following dependencies: 
 * numpy
-* pandas
+* pandas *(0.24.0 or newer)*
 * matplotlib
 * scipy
 
-## Recommended Installation
+## Installation
+### Using pip/virtualenv
+On Windows:
+```
+git clone https://github.com/alcantarar/dryft.git
+pip install virtualenv
+python -m venv dryft-env
+.\dryft-env\Scripts\activate
+```
+On macOS or Linux:
+```
+git clone https://github.com/alcantarar/dryft.git
+pip install virtualenv
+python -m venv dryft-env
+source dryft-env/bin/activate
+```
+Then install `dryft` dependencies using pip:
+```
+cd dryft
+pip install -r requirements.txt
+```
 
-I recommend using the [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
+### Using Anaconda
+You can use [Anaconda](https://www.anaconda.com/distribution/#download-section) to setup a Python 3.6.7 
 environment to use this package. If you wish to setup a new environment, an Anaconda [environment](environment.yml) 
-file is included to automatically install most dependencies. To setup a new environment for `dryft`, type the following 
-command into Anaconda Prompt:
+file is included to automatically install most dependencies. 
+You can create/activate an anaconda environment and download dependencies using the Anaconda Prompt: 
 ```
+git clone https://github.com/alcantarar/dryft.git
+cd dryft
 conda env create -f path\to\environment.yml
-```
-This will create a new environment named `dryft-env`, which can be actived by typing:
-```
 conda activate dryft-env
-```
-Once the environment is setup and activated, `dryft` can be installed by cloning/downloading
-this repository and then running:
-```
 python setup.py install
 ```
 
 ## How `dryft` works
+<p align="center">
+<img src="https://raw.githubusercontent.com/alcantarar/dryft/master/documentation/JOSS_submission/example_JOSS.png" width="700">
+</p>  
 Running is generally characterized by two phases: a stance and aerial phase. Only one foot is on the ground at a time during 
 stance phase and both feet are off the ground during aerial phase. The force exerted by the body on the ground during 
 aerial phase is zero and during stance phase it is greater than zero. If drift is present in the force signal, values 
 during the aerial phase will no longer be zero. First, `dryft` calculates the force occurring during each aerial phase of
 a continuous running trial. Then these aerial phase values are interpolated to the length of the trial using a 3rd order
 spline fill. Lastly, the interpolated values, which represents the signal drift over time, are subtracted from the original 
-trial. This effectively corrects for signal drift. A similar method is 
-described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), but `dryft` does not assume a 
-constant drift for a given step, instead spline interpolating between aerial phases. The `dryft` package differs from currently 
-available signal correction methods, which can only 
-account for [linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) 
-or a constant [offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO).
+trial. This effectively corrects for signal drift.
 
+Another method of correcting drift is described by [Paolini *et al.* (2007)](https://www.ncbi.nlm.nih.gov/pubmed/16759895), 
+where the mean force measured during the aerial phase is subtracted from the following stance phase. The success of this 
+approach is highly dependent upon the method of identifying aerial phases in the vertical ground reaction force signal. If a 
+force threshold is used to define the boundaries of each aerial phase, parts of the neighboring stance phases may 
+be included in the calculation of the mean (left panel in the figure above). Additionally, this approach assumes no change in drift over the duration of a 
+stance phase. The `dryft` package uses the force measured at the middle of each aerial phase
+and spline interpolates between them to correct signal drift. This approach differs from the method described by Paolini 
+*et al.* (2007) and currently available drift correction methods which can only account for 
+[linear drift](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html) or a constant 
+[offset](https://www.c-motion.com/v3dwiki/index.php/FP_ZERO) 
 
 ## Using `dryft`
+
+### Testing
+Running the following from the command line will automatically test the installation of `dryft`:
+```
+python -m dryft.sample.test
+```
+
+### Tutorial
+A notebook of `dryft.sample.test` is available [here](https://alcantarar.github.io/dryft/test.html) as a tutorial.
+
 ### Documentation
 Please refer to the [documentation page](https://alcantarar.github.io/dryft/index.html)
-### Example
-The following tutorial and its supporting documents are found in `setup.py`, located in [sample](sample)
-#### Read force signal data
-The three-dimensional force data modified from [Fukuchi *et al* (2017)](https://peerj.com/articles/3298/). 
-There is a sine wave with an amplitude of 100 Newtons and wavelength equal to trial length added to the force signal to 
-simulate a variety of drift slopes. 
-```
-from dryft import signal, plot
-import pandas as pd
-from scipy.signal import butter, filtfilt
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Read in data from force plate
-GRF = pd.read_csv('custom_drift_S001runT25.csv', header = None)
-```
-#### Filter signal
-Filtering data will improve step identification methods. Here I apply a zero-lag 4th order low pass butterworth
-filter with a 50Hz cutoff.
-```
-# Apply Butterworth Filter
-Fs = 300
-Fc = 50
-Fn = (Fs / 2)
-n_pass = 2  # filtfilt is dual pass
-order = 2  # filtfilt doubles effective order (resulting order = 2*order)
-C = (2**(1/n_pass) - 1)**(1/(2*order))  # Correction factor per Research Methods in Biomechanics (2e) pg 288
-Wn = (np.tan(np.pi*Fc/Fs))/C  # Apply correction to adjusted cutoff freq
-Fc_corrected = np.arctan(Wn)*Fs/np.pi  # Hz
-b,a = butter(order, Fc_corrected/Fn)
-GRF_filt = filtfilt(b, a, GRF, axis=0)  # filtfilt doubles order (2nd*2 = 4th order effect)
-```
-
-#### Identify where stance and aerial phases occur
-Note the unusually high force threshold to define a stance phase (ideally <20 N). This will depend upon the amount of 
-drift present in your signal. `GRF_filt[:,2]` is the vertical component of the ground reaction 
-force signal (vGRF) and has an artificial drift of 100 Newtons, so a threshold of 110 Newtons 
-will suffice for identifying stance phases. 
-
-**After signal drift is corrected, be sure to run `signal.splitsteps()` on the corrected signal with a lower threshold!**
-
-```
-# Identify where stance phase occurs (foot on ground)
-stance_begin_all, stance_end_all, good_stances = signal.splitsteps(vGRF=GRF_filt,
-                                                                   threshold=140,
-                                                                   Fs=300,
-                                                                   min_tc=0.2,
-                                                                   max_tc=0.4,
-                                                                   plot=True)
-stance_begin = stance_begin_all[good_stances]
-stance_end = stance_end_all[good_stances]
-plot.stance(GRF_filt, stance_begin, stance_end)
-```
-#### Determine force signal during aerial phase
-To calculate the force measured during aerial phase, `signal.aerialforce()` extracts the value that lies at the middle of 
-the aerial phase. This ensures that no trailing values from the neighboring stance phases are included. 
-```
-# Determine force signal at middle of aerial phase (feet not on ground)
-aerial_vals, aerial_loc = signal.aerialforce(GRF_filt, stance_begin_all, stance_end_all, good_stances)
-
-# Plot all aerial phases to see what is being subtracted from signal in signal.detrend()
-plot.aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin_all, stance_end_all, good_stances)
-```
-#### Remove force signal drift
-`signal.detrend()` first interpolates the aerial phase values to the length of the trial, and then subtracts it from the 
-signal.
-```
-force_fd = signal.detrend(GRF_filt, aerial_vals, aerial_loc)
-```
-#### Plot results of `dryft`
-```
-# Compare corrected signal to original
-stance_begin_all_d, stance_end_all_d, good_stances_d = signal.splitsteps(vGRF=force_fd,
-                                                                         threshold=25,
-                                                                         Fs=300,
-                                                                         min_tc=0.2,
-                                                                         max_tc=0.4,
-                                                                         plot=False)
-stance_begin_d = stance_begin_all_d[good_stances_d]
-stance_end_d = stance_end_all_d[good_stances_d]
-
-aerial_vals_d, aerial_loc_d = signal.aerialforce(force_fd, stance_begin_all_d, stance_end_all_d, good_stances_d)
-
-# Plot waveforms (original vs corrected)
-plt.detrendp, (plt1, plt2) = plt.subplots(2, 1, figsize=(15, 7))
-plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-          GRF_filt,
-          color='tab:red',
-          alpha=0.75,
-          label='Original Signal')  # converted to sec
-plt1.plot(np.linspace(0, force_fd.shape[0] / Fs, force_fd.shape[0]),
-          force_fd,
-          color='tab:blue',
-          alpha=0.75,
-          label='Corrected Signal')  # converted to sec
-plt1.grid(zorder =0)
-plt1.legend(loc=2)
-plt1.set_xlabel('Seconds')
-plt1.set_ylabel('Force (N)')
-
-# Plot aerial phases (original vs corrected)
-plt2.set_title('Aerial Phases')
-plt2.set_xlabel('Frames')
-plt2.set_ylabel('Force (N)')
-plt.scatter(aerial_loc,
-            aerial_vals,
-            marker='o',
-            color='tab:red',
-            label='Original Signal', zorder = 2)
-plt.scatter(aerial_loc_d,
-            aerial_vals_d,
-            marker='o',
-            color='tab:blue',
-            label='Corrected Signal', zorder = 2)
-
-plt2.legend(loc=2)
-plt.tight_layout()
-plt2.grid(zorder = 0)
-plt.show()
-```
-produces the following plot:
-![README_image](documentation/README_output.png)
 
 ## Contributing
-
 To report an problem with `dryft`, please create a new [issue](https://github.com/alcantarar/dryft/issues).
 
 Contact [alcantarar](https://github.com/alcantarar) with any support or general questions about `dryft`. I also welcome

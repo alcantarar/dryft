@@ -7,7 +7,7 @@ setup(
     name = "dryft",
     version = "1.0.4",
     packages = find_packages(),
-    install_requires = ['numpy','pandas','matplotlib','scipy'],
+    install_requires = ['numpy','pandas>=0.24.0','matplotlib','scipy'],
     author = "Ryan Alcantara",
     description = "A package to process biomechanical running data",
     long_description=long_description,

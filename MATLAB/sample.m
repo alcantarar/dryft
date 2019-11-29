@@ -1,12 +1,15 @@
 %Script corrects force signal drift in a step-specific manner. Subtracts
 %mean of aerial phase before and after each step for whole trial.
 %
-%   Calls on the following functions:
+%   Calls on the following functions in the [dryft] package:
 %   split_steps.m
 %   trim_aerial.m
 %   aerial_force.m
 %   plot_aerial.m (optional)
 %   detrend.m
+%
+%   See https://www.mathworks.com/help/matlab/matlab_oop/scoping-classes-with-packages.html#brf3g8k
+%   for implementation of packages & namespaces in MATLAB
 %
 %   Relies on this modified dataset from Fukuchi et al. (2017):
 %   drifting_forces.txt
@@ -14,6 +17,13 @@
 %   Author: Ryan Alcantara | ryan.alcantara@colorado.edu | github.com/alcantarar/dryft
 %   License: MIT (c) 2019 Ryan Alcantara
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
+
+%% Add [dryft] package to MATLAB path
+addpath("path/to/dryft/MATLAB/");
+savepath(); %optional, saves path/to/dryft/MATALAB/ to your MTALABPATH permanently 
+
+%% test dryft to make sure install was successfull
+test_result = runtests('dryft.test')
 
 %% Read in data from force plate
 clear
@@ -34,7 +44,7 @@ Fc_corrected = atan(Wn)*Fs/pi; % Hz
 GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where stance phase occurs (foot on ground)
-[stance_begin,stance_end, good_stances] = split_steps(GRF_filt,... %vertical GRF
+[stance_begin,stance_end, good_stances] = dryft.split_steps(GRF_filt,... %vertical GRF
     140,... %threshold
     Fs,... %Sampling Frequency
     0.2,... %min_tc
@@ -43,18 +53,18 @@ GRF_filt = filtfilt(b, a, GRF);
 
 %% Identify where aerial phase occurs (feet not on ground)
 % Determine force signal during middle of aerial phase.
-[aerial_vals, aerial_loc] = aerial_force(GRF_filt, stance_begin, stance_end, good_stances);
-plot_aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin, stance_end, good_stances)
+[aerial_vals, aerial_loc] = dryft.aerial_force(GRF_filt, stance_begin, stance_end, good_stances);
+dryft.plot_aerial(GRF_filt, aerial_vals, aerial_loc, stance_begin, stance_end, good_stances)
 
 %% Subtract aerial phase to remove drift
-vGRF_detrend = detrend(GRF_filt, aerial_vals, aerial_loc);
+vGRF_detrend = dryft.detrend(GRF_filt, aerial_vals, aerial_loc);
 
 %% Compare original to detrended signal
 
 % Split steps BUT WITH A LOWER STEP THRESHOLD. GO AS LOW AS YOU CAN.
-[stance_begin_d,stance_end_d, good_stances_d] = split_steps(vGRF_detrend, 25, Fs, 0.2, 0.4, 0);
+[stance_begin_d,stance_end_d, good_stances_d] = dryft.split_steps(vGRF_detrend, 25, Fs, 0.2, 0.4, 0);
 %calculate force at middle of aerial phase
-[aerial_vals_d, aerial_loc_d] = aerial_force(vGRF_detrend, stance_begin_d, stance_end_d, good_stances_d);
+[aerial_vals_d, aerial_loc_d] = dryft.aerial_force(vGRF_detrend, stance_begin_d, stance_end_d, good_stances_d);
 
 % Plot original vs detrended signal
 figure
@@ -78,4 +88,3 @@ grid on
 title('Aerial phases')
 xlabel('Frame')
 ylabel('Force [N]')
-
