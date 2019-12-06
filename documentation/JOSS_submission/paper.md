@@ -24,7 +24,7 @@ with force transducers, and are used to calculate a variety of clinical and perf
 [@sloot2015comprehensive], causing the signal to drift. If ignored, signal drift can lead to the inaccurate calculation of
 biomechanical variables. For example, ground contact time is defined as the time the foot is in contact with the ground and is often
 calculated as the time a vertical GRF exceeds a threshold. Signal drift can cause more (or less) of the vertical GRF
-signal to fall below the threshold, affecting one's ability to identify stance phase [@riley2008kinematics] or calculate of time-dependent GRF
+signal to fall below the threshold, affecting one's ability to identify stance phase [@riley2008kinematics] or calculate time-dependent GRF
 metrics. Signal drift can also potentially lead to data loss if the signal exceeds the range of the force transducer.
 
 ![The process of correcting drift in a vertical ground reaction force (GRF) signal collected during treadmill running.
@@ -65,7 +65,7 @@ of an aerial phase.](steps.png)
 # Conclusion
 Prior work has corrected drift in GRF signals by subtracting the force measured during a given
 aerial phase from the following stance phase [@sloot2015comprehensive; @paolini2007testing; @riley2008kinematics]. The
-success of this approach heavily relies on how accurately stance and aerial phases are identified and assumes that there
+success of this approach relies on how accurately stance and aerial phases are identified and assumes that there
 is no change in drift within a given step (consecutive aerial and stance phases). Instead, `dryft` interpolates the
 force measured at the middle of each aerial phase and subtracts this from the entire trial. This package can be used to
 identify stance phases and correct linear or non-linear drift in GRF signals produced during treadmill running or
