@@ -16,7 +16,7 @@ function plot_aerial(force, aerial_vals, aerial_loc, stance_begin, stance_end, g
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
 
 if any(good_stances == false)
-    [aerial_begin, aerial_end] = find_good_aerial(stance_begin, stance_end, good_stances);
+    [aerial_begin, aerial_end] = dryft.find_good_aerial(stance_begin, stance_end, good_stances);
 else
     aerial_begin = stance_end(1:end-1);
     aerial_end = stance_begin(2:end);
