@@ -12,7 +12,7 @@ function force_fd = detrend(force_f, aerial_vals, aerial_loc)
 %   ------
 %   force_fd: detrended force signal
 %
-%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu 
+%   Author: Ryan Alcantara | ryan.alcantara@colorado.edu
 %   License: MIT (c) 2019 Ryan Alcantara
 %   Distributed as part of [dryft] | github.com/alcantarar/dryft
 %
@@ -21,7 +21,11 @@ function force_fd = detrend(force_f, aerial_vals, aerial_loc)
 drift = NaN(length(force_f),1);
 drift(aerial_loc) = aerial_vals;
 % Use cubic spline fill for nans, recreating the underlying drift in signal
-drift = interp1(1:length(drift),drift,1:length(drift),'spline','extrap')';
+try
+    drift = fillmissing(drift, 'spline'); %requires MATLAB 2016b or newer
+catch
+    drift = interp1(1:length(drift),drift,1:length(drift),'spline','extrap')';
+end
 % Subtract drift from force signal
 force_fd = force_f-drift;
 
