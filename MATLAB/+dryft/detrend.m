@@ -22,7 +22,7 @@ drift = NaN(length(force_f),1);
 drift(aerial_loc) = aerial_vals;
 % Use cubic spline fill for nans, recreating the underlying drift in signal
 try
-    drift = fillmissing(drift, 'spline'); %requires MATLAB 2016b or newer
+    drift = fillmissing(drift, 'spline', 'EndValues','nearest'); %requires MATLAB 2016b or newer
 catch
     drift = interp1(1:length(drift),drift,1:length(drift),'spline','extrap')';
 end
