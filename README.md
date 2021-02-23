@@ -1,6 +1,6 @@
 # `dryft`
-#### Created by [Ryan Alcantara](https://alcantarar.github.io)    
-Read the published manuscript in the Journal of Open Source Software here:
+![visitors](https://visitor-badge.laobi.icu/badge?page_id=alcantarar.dryft)    
+Read the published manuscript in the Journal of Open Source Software:    
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.01910/status.svg)](https://doi.org/10.21105/joss.01910)    
 
 `dryft` is an open-source Python package that corrects running ground reaction force (GRF) 
