@@ -194,7 +194,7 @@ def splitsteps(vGRF, threshold, Fs, min_tc, max_tc, plot=False):
 
         if plot:
             plt.plot(vGRF)
-            plt.plot(events*500)
+            plt.plot(events*10)
             plt.show(block = False)
 
         # if trial starts with end of stance phase, ignore
