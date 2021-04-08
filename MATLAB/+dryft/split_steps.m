@@ -75,7 +75,9 @@ good_stances = (good_stance1 + good_stance2 == 2);
 stance_begin = stance_begin.keep; %take those stance phases' beginnings
 stance_end = stance_end.keep; %take those stance phases' ends
 
-disp(['Number of stance phase begin/ends: ', num2str(length(stance_begin)), '/', num2str(length(stance_end))])
+if d
+    disp(['Number of stance phase begin/ends: ', num2str(length(stance_begin)), '/', num2str(length(stance_end))])
+end
 
 end
 
