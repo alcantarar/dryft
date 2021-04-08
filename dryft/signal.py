@@ -73,16 +73,35 @@ def findgoodaerial(stance_begin, stance_end, good_stances):
         good_aerial_end : `ndarray`
             Array of frame indexes for aerial phase ends not connected to bad steps (per min/max_tc requirements).
         """
-    bs = np.where(good_stances == False)
+    bs = np.array(np.where(good_stances == False)[0])
     aerial_start = np.ones((len(good_stances),), dtype=bool)
     aerial_end = np.ones((len(good_stances),), dtype=bool)
 
-    aerial_end[bs[0]] = False
-    aerial_end[bs[0] + 1] = False
+    # if the first stance phase is bad, remove aerial phase afterwards:
+    if np.equal(bs, 0).any():  # first stance is bad
+        x = np.where(bs == 0)
+        # only need to remove aerial phase after first bad stance
+        aerial_start[bs[x]] = False
+        aerial_end[bs[x]+1] = False
+        bs = bs[bs != 0]  # remove first bad stance since it's fixed now
 
-    aerial_start[bs[0]] = False
-    aerial_start[bs[0] - 1] = False
+    # if the last stance phase is bad, remove aerial phase before:
+    if np.equal(bs, len(good_stances)-1).any():  # last stance is bad
+        y = np.where(bs == len(good_stances)-1)
+        # only need to remove aerial phase before bad stance
+        aerial_start[bs[y]-1] = False
+        aerial_end[bs[y]] = False
+        bs = bs[bs != len(good_stances)-1]
 
+    if bs:
+        # remove earial phases for bad stances that are not the first/last ones:
+        aerial_end[bs[0]] = False
+        aerial_end[bs[0] + 1] = False
+
+        aerial_start[bs[0]] = False
+        aerial_start[bs[0] - 1] = False
+
+    # store good aerial phase info
     good_aerial_begin = stance_end[aerial_start][:-1]
     good_aerial_end = stance_begin[aerial_end][1:]
 
